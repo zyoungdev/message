@@ -1,0 +1,148 @@
+@import "vars";
+/**************************************************************************************
+*
+*                   Mobile/Global
+*
+***************************************************************************************/
+$i: $fixed-increments;
+@while $i <= $fixed-increments-max{
+    //Global cascades Up
+    %a-#{$i}-f {
+        width: #{$i + 'px'};
+        @if $useFloatLeft {
+            @extend %fl-l;
+        } @else {
+            @extend %d-ib;
+        }
+        @extend %bxz-bb;
+        @extend %pos-r;
+    }
+    %a-#{$i}-f:before, %a-#{$i}-f:after{
+        @extend %clearfix;
+    }
+    %a-#{$i}-f:after{
+        @extend %cl-b;
+    }
+
+    //mobile landscape
+    %ml-#{$i}-f {
+        @if $useFloatLeft {
+            @extend %fl-l;
+        } @else {
+            @extend %d-ib;
+        }
+        @extend %bxz-bb;
+        @extend %pos-r;
+    }
+    %ml-#{$i}-f:before, %a-#{$i}-f:after{
+        @extend %clearfix;
+    }
+    %ml-#{$i}-f:after{
+        @extend %cl-b;
+    }
+
+    //Tablet
+    %t-#{$i}-f {
+        @if $useFloatLeft {
+            @extend %fl-l;
+        } @else {
+            @extend %d-ib;
+        }
+        @extend %bxz-bb;
+        @extend %pos-r;
+    }
+    %t-#{$i}-f:before, %a-#{$i}-f:after{
+        @extend %clearfix;
+    }
+    %t-#{$i}-f:after{
+        @extend %cl-b;
+    }
+
+    //Desktop
+    %d-#{$i}-f {
+        @if $useFloatLeft {
+            @extend %fl-l;
+        } @else {
+            @extend %d-ib;
+        }
+        @extend %bxz-bb;
+        @extend %pos-r;
+    }
+    %d-#{$i}-f:before, %a-#{$i}-f:after{
+        @extend %clearfix;
+    }
+    %d-#{$i}-f:after{
+        @extend %cl-b;
+    }
+    $i: ($i + $fixed-increments);
+}
+
+
+/**************************************************************************************
+*
+*                   Mobile Landscape
+*
+***************************************************************************************/
+@media screen and (orientation: landscape)
+{
+    @media (min-width:nth($breakpoints, 1)){
+        //Cascades Up
+        $i: $fixed-increments;
+        @while $i <= $fixed-increments-max{
+            %ml-#{$i}-f {
+                width: #{$i + 'px'};
+            }
+            $i: ($i + $fixed-increments);
+        }
+        
+
+        //Constrained to Mobile Landscape only
+        @media (max-width: ( nth($breakpoints, 2)-0.00001 )){
+            
+        }
+    }
+
+}
+/**************************************************************************************
+*
+*                   Tablet
+*
+***************************************************************************************/
+@media screen and (orientation: landscape)
+{
+    @media (min-width:nth($breakpoints, 2)){
+        //Cascades Up
+        $i: $fixed-increments;
+        @while $i <= $fixed-increments-max{
+            %t-#{$i}-f {
+                width: #{$i + 'px'};
+            }
+            $i: ($i + $fixed-increments);
+        }
+        
+        
+        //Constrained to Tablet
+        @media (max-width:( nth($breakpoints, 3)-0.00001 )){
+            
+        }
+    }
+}
+/**************************************************************************************
+*
+*                   Desktop
+*
+***************************************************************************************/
+@media screen and (orientation: landscape)
+{
+    @media (min-width:nth($breakpoints, 3)){
+        $i: $fixed-increments;
+        @while $i <= $fixed-increments-max{
+            %d-#{$i}-f {
+                width: #{$i + 'px'};
+            }
+            $i: ($i + $fixed-increments);
+        }
+        
+        
+    }
+}

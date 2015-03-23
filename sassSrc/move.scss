@@ -1,0 +1,169 @@
+@import "vars";
+/**************************************************************************************
+*
+*                   Move Mobile/Global
+*
+***************************************************************************************/
+$i: $increments;
+@while $i <= 100{
+    //Global cascades Up
+    %a-L-#{$i}{
+        // @extend .pos-r;
+        left: percentage($i/100*-1);
+    }
+    %a-R-#{$i}{
+        // @extend .pos-r;
+        left: percentage($i/100);
+    }
+
+    //mobile landscape
+    %ml-L-#{$i}{
+        // @extend .pos-r;
+    }
+    %ml-R-#{$i}{
+        // @extend .pos-r;
+    }
+
+    //Tablet
+    %t-L-#{$i}{
+        // @extend .pos-r;
+    }
+    %t-R-#{$i}{
+        // @extend .pos-r;
+    }
+
+    //Desktop
+    %d-L-#{$i}{
+        // @extend .pos-r;
+    }
+    %d-R-#{$i}{
+        // @extend .pos-r;
+    }
+    $i: ($i + 5);
+}
+@each $lab, $perc in (33, 33.33333%), (66, 66.66666%)
+{
+    //Global cascades Up
+    %a-L-#{$lab}{
+        // @extend .pos-r;
+        left: $perc*-1;
+    }
+    %a-R-#{$lab}{
+        left: $perc;
+        // @extend .pos-r;
+    }
+
+    //Mobile Landscape
+    %ml-L-#{$lab}{
+        // @extend .pos-r;
+    }
+    %ml-R-#{$lab}{
+        // @extend .pos-r;
+    }
+
+    //Tablet
+    %t-L-#{$lab}{
+        // @extend .pos-r;
+    }
+    %t-R-#{$lab}{
+        // @extend .pos-r;
+    }
+
+    //Desktop
+    %d-L-#{$lab}{
+        // @extend .pos-r;
+    }
+    %d-R-#{$lab}{
+        // @extend .pos-r;
+    }
+}
+/**************************************************************************************
+*
+*                   Move Mobile Landscape
+*
+***************************************************************************************/
+@media screen and (orientation: landscape)
+{
+    @media (min-width:nth($breakpoints, 1)){
+        //Cascades Up
+        $i: $increments;
+        @while $i <= 100{
+            %ml-L-#{$i}{
+                left: percentage($i/100*-1);
+            }
+            %ml-R-#{$i}{
+                left: percentage($i/100);
+            }
+            $i: ($i + 5);
+        }
+        @each $lab, $perc in (33, 33.33333%), (66, 66.66666%)
+        {
+            %ml-L-#{$lab}{
+                left: ($perc * -1);
+            }
+            %ml-R-#{$lab}{
+                left: $perc;
+            }
+        }
+    }
+
+}
+/**************************************************************************************
+*
+*                   Move Tablet
+*
+***************************************************************************************/
+@media screen and (orientation: landscape)
+{
+    @media (min-width:nth($breakpoints, 2)){
+        //Cascades Up
+        $i: 0;
+        @while $i <= 100{
+            %t-L-#{$i}{
+                left: percentage($i/100*-1);
+            }
+            %t-R-#{$i}{
+                left: percentage($i/100);
+            }
+            $i: ($i + 5);
+        }
+        @each $lab, $perc in (33, 33.33333%), (66, 66.66666%)
+        {
+            %t-L-#{$lab}{
+                left: ($perc * -1);
+            }
+            %t-R-#{$lab}{
+                left: $perc;
+            }
+        }
+    }
+}
+/**************************************************************************************
+*
+*                   Move Desktop
+*
+***************************************************************************************/
+@media screen and (orientation: landscape)
+{
+    @media (min-width:nth($breakpoints, 3)){
+        $i: 0;
+        @while $i <= 100{
+            %d-L-#{$i}{
+                left: percentage($i/100*-1);
+            }
+            %d-R-#{$i}{
+                left: percentage($i/100);
+            }
+            $i: ($i + 5);
+        }
+        @each $lab, $perc in (33, 33.33333%), (66, 66.66666%)
+        {
+            %d-L-#{$lab}{
+                left: ($perc * -1);
+            }
+            %d-R-#{$lab}{
+                left: $perc;
+            }
+        }
+    }
+}

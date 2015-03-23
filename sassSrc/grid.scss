@@ -1,0 +1,245 @@
+@import "vars";
+/**************************************************************************************
+*
+*                   Mobile/Global
+*
+***************************************************************************************/
+$i: $increments;
+@while $i <= 100{
+    //Global cascades Up
+    %a-#{$i} {
+        width: percentage($i/100);
+        @if $useFloatLeft {
+            @extend %fl-l;
+        } @else {
+            @extend %d-ib;
+        }
+        @extend %bxz-bb;
+        @extend %pos-r;
+    }
+    %a-#{$i}:before, %a-#{$i}:after{
+        @extend %clearfix;
+    }
+    %a-#{$i}:after{
+        @extend %cl-b;
+    }
+
+    //mobile landscape
+    %ml-#{$i} {
+        @if $useFloatLeft {
+            @extend %fl-l;
+        } @else {
+            @extend %d-ib;
+        }
+        @extend %bxz-bb;
+        @extend %pos-r;
+    }
+    %ml-#{$i}:before, %a-#{$i}:after{
+        @extend %clearfix;
+    }
+    %ml-#{$i}:after{
+        @extend %cl-b;
+    }
+
+    //Tablet
+    %t-#{$i} {
+        @if $useFloatLeft {
+            @extend %fl-l;
+        } @else {
+            @extend %d-ib;
+        }
+        @extend %bxz-bb;
+        @extend %pos-r;
+    }
+    %t-#{$i}:before, %a-#{$i}:after{
+        @extend %clearfix;
+    }
+    %t-#{$i}:after{
+        @extend %cl-b;
+    }
+
+    //Desktop
+    %d-#{$i} {
+        @if $useFloatLeft {
+            @extend %fl-l;
+        } @else {
+            @extend %d-ib;
+        }
+        @extend %bxz-bb;
+        @extend %pos-r;
+    }
+    %d-#{$i}:before, %a-#{$i}:after{
+        @extend %clearfix;
+    }
+    %d-#{$i}:after{
+        @extend %cl-b;
+    }
+    $i: ($i + $increments);
+}
+@each $lab, $perc in (33, 33.33333%), (66, 66.66666%)
+{
+    //Global cascades Up
+    %a-#{$lab}{
+        width: $perc;
+        @if $useFloatLeft {
+            @extend %fl-l;
+        } @else {
+            @extend %d-ib;
+        }
+        @extend %bxz-bb;
+        @extend %pos-r;
+    }
+    %a-#{$lab}:before, %a-#{$lab}:after{
+        @extend %clearfix;
+    }
+    %a-#{$lab}:after{
+        @extend %cl-b;
+    }
+
+    //Mobile Landscape
+    %ml-#{$lab}{
+        @if $useFloatLeft {
+            @extend %fl-l;
+        } @else {
+            @extend %d-ib;
+        }
+        @extend %bxz-bb;
+        @extend %pos-r;
+    }
+    %ml-#{$lab}:before, %a-#{$lab}:after{
+        @extend %clearfix;
+    }
+    %ml-#{$lab}:after{
+        @extend %cl-b;
+    }
+
+    //Tablet
+    %t-#{$lab}{
+        @if $useFloatLeft {
+            @extend %fl-l;
+        } @else {
+            @extend %d-ib;
+        }
+        @extend %bxz-bb;
+        @extend %pos-r;
+    }
+    %t-#{$lab}:before, %a-#{$lab}:after{
+        @extend %clearfix;
+    }
+    %t-#{$lab}:after{
+        @extend %cl-b;
+    }
+
+    //Desktop
+    %d-#{$lab}{
+        @if $useFloatLeft {
+            @extend %fl-l;
+        } @else {
+            @extend %d-ib;
+        }
+        @extend %bxz-bb;
+        @extend %pos-r;
+    }
+    %d-#{$lab}:before, %a-#{$lab}:after{
+        @extend %clearfix;
+    }
+    %d-#{$lab}:after{
+        @extend %cl-b;
+    }
+}
+@media screen and (orientation: portrait)
+{
+    //Constrain to Mobile
+    .m-hide{
+        display:none;
+    }
+}
+/**************************************************************************************
+*
+*                   Mobile Landscape
+*
+***************************************************************************************/
+@media screen and (orientation: landscape)
+{
+    @media (min-width:nth($breakpoints, 1)){
+        //Cascades Up
+        $i: $increments;
+        @while $i <= 100{
+            %ml-#{$i} {
+                width: percentage($i/100);
+            }
+            $i: ($i + $increments);
+        }
+        @each $lab, $perc in (33, 33.33333%), (66, 66.66666%)
+        {
+            %ml-#{$lab}{
+                width: $perc
+            }
+        }
+
+        //Constrained to Mobile Landscape only
+        @media (max-width: ( nth($breakpoints, 2)-0.00001 )){
+            %ml-hide{
+                display:none;
+            }
+        }
+    }
+
+}
+/**************************************************************************************
+*
+*                   Tablet
+*
+***************************************************************************************/
+@media screen and (orientation: landscape)
+{
+    @media (min-width:nth($breakpoints, 2)){
+        //Cascades Up
+        $i: $increments;
+        @while $i <= 100{
+            %t-#{$i} {
+                width: percentage($i/100);
+            }
+            $i: ($i + $increments);
+        }
+        @each $lab, $perc in (33, 33.33333%), (66, 66.66666%)
+        {
+            %t-#{$lab}{
+                width: $perc
+            }
+        }
+        
+        //Constrained to Tablet
+        @media (max-width:( nth($breakpoints, 3)-0.00001 )){
+            %t-hide{
+                display:none;
+            }
+        }
+    }
+}
+/**************************************************************************************
+*
+*                   Desktop
+*
+***************************************************************************************/
+@media screen and (orientation: landscape)
+{
+    @media (min-width:nth($breakpoints, 3)){
+        $i: $increments;
+        @while $i <= 100{
+            %d-#{$i} {
+                width: percentage($i/100);
+            }
+            $i: ($i + $increments);
+        }
+        @each $lab, $perc in (33, 33.33333%), (66, 66.66666%)
+        {
+            %d-#{$lab}{
+                width: $perc
+            }
+        }
+        %d-hide{
+            display:none;
+        }
+    }
+}

@@ -1,0 +1,39 @@
+/**************************************************************************************
+*
+*                   Global Template
+*
+***************************************************************************************/
+html,body{
+    height:100%;
+}
+
+.login-box{
+    @extend %a-100;
+    @extend %t-75;
+
+    @extend %a-cent-cent;
+
+    @extend %a-p-20;
+
+    background-color: #0f0;
+
+    input{
+        @extend %a-100;
+        @extend %t-30;
+
+        @extend %a-p-5;
+
+        margin-right:14px;
+
+    }
+    button{
+        @extend %a-50;
+        @extend %t-30;
+
+        @extend %a-null-cent;
+        @extend %t-null-null;
+
+        @extend %a-p-5;
+
+    }
+}

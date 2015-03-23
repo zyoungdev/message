@@ -1,0 +1,74 @@
+@import "vars";
+/**************************************************************************************
+*
+*                   Float Mobile/Global
+*
+***************************************************************************************/
+%a-fl-L{
+    float:left;
+}
+%a-fl-R{
+    float:right;
+}
+%a-fl-N{
+    float:none;
+}
+
+/**************************************************************************************
+*
+*                   Float Mobile Landscape
+*
+***************************************************************************************/
+@media screen and (orientation: landscape)
+{
+    @media (min-width:nth($breakpoints, 1)){
+        %ml-fl-L{
+            float:left;
+        }
+        %ml-fl-R{
+            float:right;
+        }
+        %ml-fl-N{
+            float:none;
+        }
+    }
+
+}
+/**************************************************************************************
+*
+*                   Float Tablet
+*
+***************************************************************************************/
+@media screen and (orientation: landscape)
+{
+    @media (min-width:nth($breakpoints, 2)){
+        %t-fl-L{
+            float:left;
+        }
+        %t-fl-R{
+            float:right;
+        }
+        %t-fl-N{
+            float:none;
+        }
+    }
+}
+/**************************************************************************************
+*
+*                   Float Desktop
+*
+***************************************************************************************/
+@media screen and (orientation: landscape)
+{
+    @media (min-width:nth($breakpoints, 3)){
+        %d-fl-L{
+            float:left;
+        }
+        %d-fl-R{
+            float:right;
+        }
+        %d-fl-N{
+            float:none;
+        }
+    }
+}

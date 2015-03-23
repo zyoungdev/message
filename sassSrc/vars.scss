@@ -1,0 +1,33 @@
+//*************************************************
+//*
+//*                   Global Variables
+//*
+//***************************************************/
+
+//Number of items in a container
+//to set the 'order' property
+//Elements above are default order:0
+$flexboxitems: 50;
+
+//@media breakpoints
+//First item is Mobile Landscape
+//Second item is Tablet
+//Third item is Desktop
+$breakpoints: (20em, 60em, 80em); //320, 960, 1280
+
+//Width percentages for class creation
+$increments: 5;
+
+//Fixed width in px
+$fixed-increments:5;
+//Fixed width maximum in px
+$fixed-increments-max: 2000;
+
+//padding maximum
+$padding-max:50;
+//padding increment
+$padding-inc:5;
+
+
+//Use a float left model or inline block model. True to float left.
+$useFloatLeft: true;

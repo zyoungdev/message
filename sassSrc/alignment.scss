@@ -1,0 +1,472 @@
+@import "vars";
+/**************************************************************************************
+*
+*                   Alignment Mobile/Global
+*
+***************************************************************************************/
+
+
+%a-cent-cent{
+    top:50%;
+    right:auto;
+    left:50%;
+    bottom:auto;
+    @include transform(-50%, -50%);
+    position: relative;
+    // display:table;
+}
+%a-top-cent{
+    top:0;
+    right:auto;
+    bottom:auto;
+    left:50%;
+    @include transform(-50%, 0%);
+    position: relative;
+    // display:table;
+}
+%a-top-right{
+    top:0;
+    right:0;
+    bottom:auto;
+    left:auto;
+    @include transform(0%, 0%);
+    position: relative;
+    // display:table;
+}
+%a-cent-right{
+    top:50%;
+    right:0;
+    bottom:auto;
+    left:auto;
+    @include transform(0%, -50%);
+    position: relative;
+    // display:table;
+}
+%a-bot-right{
+    top:auto;
+    right:0;
+    bottom:0;
+    left:auto;
+    @include transform(0%, 0%);
+    position: relative;
+    // display:table;
+}
+%a-bot-cent{
+    top:auto;
+    right:auto;
+    bottom:0;
+    left:50%;
+    @include transform(-50%, 0%);
+    position: relative;
+    // display:table;
+}
+%a-bot-left{
+    top:auto;
+    right:auto;
+    bottom:0;
+    left:0;
+    @include transform(0%, 0%);
+    position: relative;
+    // display:table;
+}
+%a-cent-left{
+    top:50%;
+    right:auto;
+    bottom:auto;
+    left:0;
+    @include transform(0%, -50%);
+    position: relative;
+    // display:table;
+}
+%a-top-left{
+    top:0;
+    right:auto;
+    bottom:auto;
+    left:0;
+    @include transform(0%, 0%);
+    position: relative;
+    // display:table;
+}
+%a-cent-null{
+    top:50%;
+    right:auto;
+    bottom:auto;
+    left:auto;
+    @include transform(0%, -50%);
+    position: relative;
+    // display:table;
+}
+%a-null-cent{
+    top:auto;
+    right:auto;
+    bottom:auto;
+    left:50%;
+    @include transform(-50%, 0%);
+    position: relative;
+    // display:table;
+}
+%a-null-null{
+    top:auto;
+    right:auto;
+    bottom:auto;
+    left:auto;
+    @include transform(0%, 0%);
+    position: relative;
+    // display:table;
+}
+
+/**************************************************************************************
+*
+*                   Alignment Mobile Landscape
+*
+***************************************************************************************/
+@media screen and (orientation: landscape)
+{
+    @media (min-width:nth($breakpoints, 1)){
+        %ml-cent-cent{
+            top:50%;
+            right:auto;
+            left:50%;
+            bottom:auto;
+            @include transform(-50%, -50%);
+            position: relative;
+            // display:table;
+        }
+        %ml-top-cent{
+            top:0;
+            right:auto;
+            bottom:auto;
+            left:50%;
+            @include transform(-50%, 0%);
+            position: relative;
+            // display:table;
+        }
+        %ml-top-right{
+            top:0;
+            right:0;
+            bottom:auto;
+            left:auto;
+            @include transform(0%, 0%);
+            position: relative;
+            // display:table;
+        }
+        %ml-cent-right{
+            top:50%;
+            right:0;
+            bottom:auto;
+            left:auto;
+            @include transform(0%, -50%);
+            position: relative;
+            // display:table;
+        }
+        %ml-bot-right{
+            top:auto;
+            right:0;
+            bottom:0;
+            left:auto;
+            @include transform(0%, 0%);
+            position: relative;
+            // display:table;
+        }
+        %ml-bot-cent{
+            top:auto;
+            right:auto;
+            bottom:0;
+            left:50%;
+            @include transform(-50%, 0%);
+            position: relative;
+            // display:table;
+        }
+        %ml-bot-left{
+            top:auto;
+            right:auto;
+            bottom:0;
+            left:0;
+            @include transform(0%, 0%);
+            position: relative;
+            // display:table;
+        }
+        %ml-cent-left{
+            top:50%;
+            right:auto;
+            bottom:auto;
+            left:0;
+            @include transform(0%, -50%);
+            position: relative;
+            // display:table;
+        }
+        %ml-top-left{
+            top:0;
+            right:auto;
+            bottom:auto;
+            left:0;
+            @include transform(0%, 0%);
+            position: relative;
+            // display:table;
+        }
+        %ml-cent-null{
+            top:50%;
+            right:auto;
+            bottom:auto;
+            left:auto;
+            @include transform(0%, -50%);
+            position: relative;
+            // display:table;
+        }
+        %ml-null-cent{
+            top:auto;
+            right:auto;
+            bottom:auto;
+            left:50%;
+            @include transform(-50%, 0%);
+            position: relative;
+            // display:table;
+        }
+        %ml-null-null{
+            top:auto;
+            right:auto;
+            bottom:auto;
+            left:auto;
+            @include transform(0%, 0%);
+            position: relative;
+            // display:table;
+        }
+    }
+
+}
+/**************************************************************************************
+*
+*                   Alignment Tablet
+*
+***************************************************************************************/
+@media screen and (orientation: landscape)
+{
+    @media (min-width:nth($breakpoints, 2)){
+        %t-cent-cent{
+            top:50%;
+            right:auto;
+            left:50%;
+            bottom:auto;
+            @include transform(-50%, -50%);
+            position: relative;
+            // display:table;
+        }
+        %t-top-cent{
+            top:0;
+            right:auto;
+            bottom:auto;
+            left:50%;
+            @include transform(-50%, 0%);
+            position: relative;
+            // display:table;
+        }
+        %t-top-right{
+            top:0;
+            right:0;
+            bottom:auto;
+            left:auto;
+            @include transform(0%, 0%);
+            position: relative;
+            // display:table;
+        }
+        %t-cent-right{
+            top:50%;
+            right:0;
+            bottom:auto;
+            left:auto;
+            @include transform(0%, -50%);
+            position: relative;
+            // display:table;
+        }
+        %t-bot-right{
+            top:auto;
+            right:0;
+            bottom:0;
+            left:auto;
+            @include transform(0%, 0%);
+            position: relative;
+            // display:table;
+        }
+        %t-bot-cent{
+            top:auto;
+            right:auto;
+            bottom:0;
+            left:50%;
+            @include transform(-50%, 0%);
+            position: relative;
+            // display:table;
+        }
+        %t-bot-left{
+            top:auto;
+            right:auto;
+            bottom:0;
+            left:0;
+            @include transform(0%, 0%);
+            position: relative;
+            // display:table;
+        }
+        %t-cent-left{
+            top:50%;
+            right:auto;
+            bottom:auto;
+            left:0;
+            @include transform(0%, -50%);
+            position: relative;
+            // display:table;
+        }
+        %t-top-left{
+            top:0;
+            right:auto;
+            bottom:auto;
+            left:0;
+            @include transform(0%, 0%);
+            position: relative;
+            // display:table;
+        }
+        %t-cent-null{
+            top:50%;
+            right:auto;
+            bottom:auto;
+            left:auto;
+            @include transform(0%, -50%);
+            position: relative;
+            // display:table;
+        }
+        %t-null-cent{
+            top:auto;
+            right:auto;
+            bottom:auto;
+            left:50%;
+            @include transform(-50%, 0%);
+            position: relative;
+            // display:table;
+        }
+        %t-null-null{
+            top:auto;
+            right:auto;
+            bottom:auto;
+            left:auto;
+            @include transform(0%, 0%);
+            position: relative;
+            // display:table;
+        }
+    }
+}
+/**************************************************************************************
+*
+*                   Alignment Desktop
+*
+***************************************************************************************/
+@media screen and (orientation: landscape)
+{
+    @media (min-width:nth($breakpoints, 3)){
+        %d-cent-cent{
+            top:50%;
+            right:auto;
+            left:50%;
+            bottom:auto;
+            @include transform(-50%, -50%);
+            position: relative;
+            // display:table;
+        }
+        %d-top-cent{
+            top:0;
+            right:auto;
+            bottom:auto;
+            left:50%;
+            @include transform(-50%, 0%);
+            position: relative;
+            // display:table;
+        }
+        %d-top-right{
+            top:0;
+            right:0;
+            bottom:auto;
+            left:auto;
+            @include transform(0%, 0%);
+            position: relative;
+            // display:table;
+        }
+        %d-cent-right{
+            top:50%;
+            right:0;
+            bottom:auto;
+            left:auto;
+            @include transform(0%, -50%);
+            position: relative;
+            // display:table;
+        }
+        %d-bot-right{
+            top:auto;
+            right:0;
+            bottom:0;
+            left:auto;
+            @include transform(0%, 0%);
+            position: relative;
+            // display:table;
+        }
+        %d-bot-cent{
+            top:auto;
+            right:auto;
+            bottom:0;
+            left:50%;
+            @include transform(-50%, 0%);
+            position: relative;
+            // display:table;
+        }
+        %d-bot-left{
+            top:auto;
+            right:auto;
+            bottom:0;
+            left:0;
+            @include transform(0%, 0%);
+            position: relative;
+            // display:table;
+        }
+        %d-cent-left{
+            top:50%;
+            right:auto;
+            bottom:auto;
+            left:0;
+            @include transform(0%, -50%);
+            position: relative;
+            // display:table;
+        }
+        %d-top-left{
+            top:0;
+            right:auto;
+            bottom:auto;
+            left:0;
+            @include transform(0%, 0%);
+            position: relative;
+            // display:table;
+        }
+        %d-cent-null{
+            top:50%;
+            right:auto;
+            bottom:auto;
+            left:auto;
+            @include transform(0%, -50%);
+            position: relative;
+            // display:table;
+        }
+        %d-null-cent{
+            top:auto;
+            right:auto;
+            bottom:auto;
+            left:50%;
+            @include transform(-50%, 0%);
+            position: relative;
+            // display:table;
+        }
+        %d-null-null{
+            top:auto;
+            right:auto;
+            bottom:auto;
+            left:auto;
+            @include transform(0%, 0%);
+            position: relative;
+            // display:table;
+        }
+    }
+}

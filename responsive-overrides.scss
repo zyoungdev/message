@@ -1,0 +1,51 @@
+@import "sassSrc/vars.scss";
+/**************************************************************************************
+*
+*                   Responsive Overrides
+*
+***************************************************************************************/
+
+/**************************************************************************************
+*
+*                   Responsive Mobile Landscape
+*
+***************************************************************************************/
+@media screen and (orientation: landscape)
+{
+    @media (min-width:nth($breakpoints, 1)){
+        //Cascading properties
+
+        //Constrain to Mobile Landscape
+        @media (max-width:( nth($breakpoints, 2)-0.00001 )){
+            
+        }
+    }
+}
+/**************************************************************************************
+*
+*                   Responsive Tablet
+*
+***************************************************************************************/
+@media screen and (orientation: landscape)
+{
+    @media (min-width:nth($breakpoints, 2)){
+        //Cascading Properties
+
+        //Constrain to Tablet
+        @media (max-width:( nth($breakpoints, 3)-0.00001 )){
+            
+        }
+    }
+}
+/**************************************************************************************
+*
+*                   Responsive Desktop
+*
+***************************************************************************************/
+@media screen and (orientation: landscape)
+{
+    @media (min-width:nth($breakpoints, 3)){
+        //Cascading Properties
+        
+    }
+}
