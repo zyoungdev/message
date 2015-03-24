@@ -10,30 +10,64 @@ html,body{
 .login-box{
     @extend %a-100;
     @extend %t-75;
+    @extend %d-50;
 
     @extend %a-cent-cent;
 
     @extend %a-p-20;
 
-    background-color: #0f0;
+    background-color:rgb(247, 247, 247);
+    border-bottom-left-radius: 2px;
+    border-bottom-right-radius: 2px;
+    color:rgb(64, 64, 64);
+    box-shadow:rgba(0, 0, 0, 0.298039) 0px 2px 2px 0px;
 
     input{
         @extend %a-100;
-        @extend %t-30;
+        @extend %t-75;
+        @extend %d-75;
 
-        @extend %a-p-5;
+        // @extend %a-p-5;
+        @extend %t-null-cent;
 
-        margin-right:14px;
+        // margin-left:1.66665%;
+        // margin-right:1.66665%;
+        margin-bottom:10px;
+        border-radius: 10px;
+        border-top: solid 1px rgb(192, 192, 192);
+        border-left:solid 1px rgb(217, 217, 217);
+        border-right:solid 1px rgb(217, 217, 217);
+        border-bottom:solid 1px rgb(217, 217, 217);
+        color:rgb(64, 64, 64);
+        text-align:center;
+        height:50px;
+
+        &:hover{
+            border:solid 1px rgb(192,192,192);
+            border-top:solid 1px rgb(150,150,150);
+        }
+        &:focus{
+            border:solid 1px rgb(48, 121, 237);
+        }
 
     }
     button{
         @extend %a-50;
-        @extend %t-30;
+        // @extend %t-30;
 
         @extend %a-null-cent;
-        @extend %t-null-null;
+        // @extend %d-null-null;
 
         @extend %a-p-5;
+
+        margin-left:1.66665%;
+        margin-right:1.66665%;
+        border-radius: 3px;
+        border:solid 1px rgb(48, 121, 237);
+        text-shadow: 0 1px rgba(0,0,0,0.1);
+        background:rgb(77, 144, 254);
+        color:white;
+        height:50px;
 
     }
 }

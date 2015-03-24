@@ -83,7 +83,7 @@ class Login{
 
         if (!$this->mongo["users"]->save($newuser))
         {
-            echo "Error: User not added";
+            $this->cleanup();
             exit;
         }
     }
@@ -102,7 +102,7 @@ class Login{
     }
 }
 
-
+//accepts $_POST["un"] and $_POST["pw"]
 function main()
 {
     $login = new Login;
