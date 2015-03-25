@@ -7,7 +7,7 @@ html,body{
     height:100%;
 }
 
-.login-box{
+.login-box, .module-container{
     @extend %a-100;
     @extend %t-75;
     @extend %d-50;
@@ -29,7 +29,7 @@ html,body{
         text-align:center;
     }
 
-    input{
+    input, textarea{
         @extend %a-100;
         @extend %t-75;
         @extend %d-75;
@@ -47,7 +47,7 @@ html,body{
         border-bottom:solid 1px rgb(217, 217, 217);
         color:rgb(64, 64, 64);
         text-align:center;
-        height:50px;
+        min-height:50px;
 
         &:hover{
             border:solid 1px rgb(192,192,192);

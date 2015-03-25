@@ -129,7 +129,7 @@ class Login{
     }
     public function createMasterKeys()
     {
-        $keypairLength = Sodium::CRYPTO_SIGN_KEYPAIRBYTES;
+        $keypairLength = Sodium::CRYPTO_BOX_KEYPAIRBYTES;
         $challengeSecretLength = Sodium::CRYPTO_SECRETBOX_KEYBYTES;
 
         //Create Keypair
@@ -146,8 +146,8 @@ class Login{
     }
     public function createSigningKeys()
     {
-        $_SESSION["user"]["key"]["secret"] = Sodium::crypto_sign_secretkey($_SESSION["user"]["key"]["keypair"]);
-        $_SESSION["user"]["key"]["public"] = Sodium::crypto_sign_publickey($_SESSION["user"]["key"]["keypair"]);
+        $_SESSION["user"]["key"]["secret"] = Sodium::crypto_box_secretkey($_SESSION["user"]["key"]["keypair"]);
+        $_SESSION["user"]["key"]["public"] = Sodium::crypto_box_publickey($_SESSION["user"]["key"]["keypair"]);
     }
     public function encryptChallenge()
     {
@@ -206,6 +206,21 @@ class Login{
             return 0;
         }
     }
+    public function cleanup()
+    {
+        if(isset($_SESSION["user"]["key"]["hashedPW"]))
+            // echo "hashedPW";
+            Sodium::sodium_memzero($_SESSION["user"]["key"]["hashedPW"]);
+        if(isset($_SESSION["user"]["key"]["salt"]))
+            // echo "salt";
+            Sodium::sodium_memzero($_SESSION["user"]["key"]["salt"]);
+        if(isset($_SESSION["user"]["key"]["nonce"]))
+            // echo "nonce";
+            Sodium::sodium_memzero($_SESSION["user"]["key"]["nonce"]);
+        if(isset($_SESSION["user"]["key"]["keypair"]))
+            // echo "keypair";
+            Sodium::sodium_memzero($_SESSION["user"]["key"]["keypair"]);
+    }
 }
 
 //accepts $_POST["username"] and $_POST["password"]
@@ -236,6 +251,7 @@ function logUserIn()
         {
             $return->exitNow(0, "Challenge not decrypted\n");
         }
+        $login->cleanup();
         $return->exitNow(1, "Welcome! " . $_SESSION["user"]["username"]);
     }
     else
@@ -250,6 +266,7 @@ function logUserIn()
         {
             $return->exitNow(0, "Could not create new user in DB\n");
         }
+        $login->cleanup();
         $return->exitNow(1, "Welcome! " . $_SESSION["user"]["username"]);
     }
 }
