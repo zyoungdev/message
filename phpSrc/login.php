@@ -1,5 +1,5 @@
 <?php 
-include "./unloadSession.php";
+include "./helper.php";
 /* Stored */
 //user
     //username
@@ -19,22 +19,7 @@ include "./unloadSession.php";
         //secret
         //public
 
-class Returning{
-    public $code;
-    public $message;
-    public function exitNow($c, $m)
-    {
-        $this->code = $c;
-        $this->message = $m;
-        if ($this->code == 0)
-        {
-            unloadSession();
-            session_regenerate_id();
-        }
-        echo json_encode($this);
-        exit;
-    }
-}
+
 
 
 class Login{

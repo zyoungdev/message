@@ -1,4 +1,21 @@
-<?php 
+<?php
+
+class Returning{
+    public $code;
+    public $message;
+    public function exitNow($c, $m)
+    {
+        $this->code = $c;
+        $this->message = $m;
+        if ($this->code == 0)
+        {
+            unloadSession();
+            session_regenerate_id();
+        }
+        echo json_encode($this);
+        exit;
+    }
+}
 function unloadSession()
 {
     if(isset($_SESSION["user"]["username"]))
@@ -35,4 +52,5 @@ function unloadSession()
         // echo "public";
         Sodium::sodium_memzero($_SESSION["user"]["key"]["public"]);
 }
+
 ?>

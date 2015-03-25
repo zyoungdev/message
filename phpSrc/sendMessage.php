@@ -1,11 +1,6 @@
 <?php 
-class Message{
-    public $sender = array();
-    public $recipient;
-    public $nonce;
-    public $ciphertext;
-    public $timestamp;
-}
+include "./helper.php";
+
 class SendMessage{
     public $clean = array();
     public $mongo = array();
@@ -73,7 +68,7 @@ class SendMessage{
         $this->message["ciphertext"] = bin2hex($this->message["ciphertext"]);
         $this->message["nonce"] = bin2hex($this->message["nonce"]);
 
-        Sodium::sodium_memzero($keypair);
+
     }
     public function send()
     {
@@ -90,6 +85,7 @@ class SendMessage{
 
         if ($this->mongo["usersprivate"]->update($query, $update))
         {
+            $this->cleanup();
             return 1;
         }
         else
@@ -97,30 +93,50 @@ class SendMessage{
             return 0;
         }
     }
+    public function cleanup()
+    {
+        if(isset($this->recipient["username"]))
+            Sodium::sodium_memzero($this->recipient["username"]);
+        if(isset($this->recipient["lastLogin"]))
+            unset($this->recipient["lastLogin"]);
+        if(isset($this->recipient["key"]["public"]))
+            Sodium::sodium_memzero($this->recipient["key"]["public"]);
+
+        if(isset($this->message["recipient"]["username"]))
+            Sodium::sodium_memzero($this->message["recipient"]["username"]);
+        if(isset($this->message["nonce"]))
+            Sodium::sodium_memzero($this->message["nonce"]);
+        if(isset($this->message["ciphertext"]))
+            Sodium::sodium_memzero($this->message["ciphertext"]);
+        if(isset($this->message["timestamp"]))
+            unset($this->message["timestamp"]);
+        if(isset($this->message["sender"]["username"]))
+            Sodium::sodium_memzero($this->message["sender"]["username"]);
+        if(isset($this->message["sender"]["public"]))
+            Sodium::sodium_memzero($this->message["sender"]["public"]);
+    }
 }
 
 function sendMessage()
 {
     session_start();
     $send = new SendMessage;
+    $return = new Returning;
 
     if (!$send->recipientIsClean())
     {
-        echo "Recipient is not clean\n";
-        exit;
+        $return->exitNow(0, "Recipient name is not clean\n");
     }
     if (!$send->userExists())
     {
-        echo "User doesn't exist\n";
-        exit;
+        $return->exitNow(0, "User does not exist\n");
     }
     $send->escapePlaintext();
     $send->encryptPlaintext();
 
     if (!$send->send())
     {
-        echo "Could not send message\n";
-        exit;
+        $return->exitNow(0, "Cloud not send the message\n");
     }
 
 }
