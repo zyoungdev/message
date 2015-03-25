@@ -54,11 +54,13 @@ var APP = (function()
                     if (r.code)
                     {
                         console.log(r.message);
+                        hf.elCN("loginerror")[0].innerText = r.message;
                     }
                     else
                     {
                         //Something failed
                         console.log(r.message);
+                        hf.elCN("loginerror")[0].innerText = r.message;
                     }
                 }
             })

@@ -5,17 +5,14 @@ include "./unloadSession.php";
     //username
     //logintime
     //key
-        //hashedpw
-        //salt
-        //ChallengeKey
-        //nonce
+        //public
 
 /* Session */
 //user
     //username
     //logintime
     //key
-        //hashedpw
+        //hashedPW
         //salt
         //ChallengeKey
         //nonce
@@ -32,9 +29,9 @@ class Returning{
         if ($this->code == 0)
         {
             unloadSession();
+            session_regenerate_id();
         }
         echo json_encode($this);
-
         exit;
     }
 }
@@ -48,6 +45,7 @@ class Login{
 
     public function __construct()
     {
+        unloadSession();
         $this->mongo["client"] = new Mongo();
         $this->mongo["collection"] = $this->mongo["client"]->messageApp;
         $this->mongo["userspublic"] = $this->mongo["collection"]->userspublic;
@@ -78,11 +76,13 @@ class Login{
     public function userExists()
     {
         //check DB if username exists
-        if ($user = $this->mongo["userspublic"]->findone(array("username" => $this->clean["un"])))
+        if ($this->mongo["userspublic"]->findone(array("username" => $this->clean["un"])))
         {
-            if ($userprivate = $this->mongo["usersprivate"]->findone(array("username" => $this->clean["un"])))
+            if ($user = $this->mongo["usersprivate"]->findone(array("username" => $this->clean["un"])))
             {
+                $_SESSION["user"]["username"] = $user["username"];
                 $_SESSION["user"]["key"]["hashedPW"] = $user["key"]["hashedPW"];
+
                 return 1;
             }
         } 
@@ -100,6 +100,10 @@ class Login{
                 $_SESSION["user"] = $user;
                 $_SESSION["user"]["key"]["public"] = hex2bin($_SESSION["user"]["key"]["public"]);
                 return 1;
+            }
+            else
+            {
+                return 0;
             }
         }
         else
@@ -202,18 +206,11 @@ class Login{
             return 0;
         }
     }
-
-    public function cleanup()
-    {
-        unloadSession();
-        session_regenerate_id();
-    }
 }
 
 //accepts $_POST["username"] and $_POST["password"]
 function logUserIn()
 {
-    
 
     $login = new Login;
     $return = new Returning;
