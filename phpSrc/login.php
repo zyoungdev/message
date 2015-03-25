@@ -1,5 +1,5 @@
 <?php 
-
+include "./unloadSession.php";
 /* Stored */
 //user
     //username
@@ -29,7 +29,12 @@ class Returning{
     {
         $this->code = $c;
         $this->message = $m;
+        if ($this->code == 0)
+        {
+            unloadSession();
+        }
         echo json_encode($this);
+
         exit;
     }
 }
@@ -45,7 +50,8 @@ class Login{
     {
         $this->mongo["client"] = new Mongo();
         $this->mongo["collection"] = $this->mongo["client"]->messageApp;
-        $this->mongo["users"] = $this->mongo["collection"]->users;
+        $this->mongo["userspublic"] = $this->mongo["collection"]->userspublic;
+        $this->mongo["usersprivate"] = $this->mongo["collection"]->usersprivate;
 
         $this->dirty["pw"] = $_POST["password"];
     }
@@ -72,13 +78,30 @@ class Login{
     public function userExists()
     {
         //check DB if username exists
-        if ($user = $this->mongo["users"]->findone(array("username" => $this->clean["un"])))
+        if ($user = $this->mongo["userspublic"]->findone(array("username" => $this->clean["un"])))
         {
-            $_SESSION["user"] = $user;
-
-            $_SESSION["user"]["key"]["public"] = hex2bin($_SESSION["user"]["key"]["public"]);
-            return 1;
+            if ($userprivate = $this->mongo["usersprivate"]->findone(array("username" => $this->clean["un"])))
+            {
+                $_SESSION["user"]["key"]["hashedPW"] = $user["key"]["hashedPW"];
+                return 1;
+            }
         } 
+        else
+        {
+            return 0;
+        }
+    }
+    public function passwordIsCorrect()
+    {
+        if (Sodium::crypto_pwhash_scryptsalsa208sha256_str_verify($_SESSION["user"]["key"]["hashedPW"], $this->dirty["pw"]))
+        {
+            if ($user = $this->mongo["usersprivate"]->findone(array("username" => $_SESSION["user"]["username"])))
+            {
+                $_SESSION["user"] = $user;
+                $_SESSION["user"]["key"]["public"] = hex2bin($_SESSION["user"]["key"]["public"]);
+                return 1;
+            }
+        }
         else
         {
             return 0;
@@ -86,8 +109,8 @@ class Login{
     }
     public function hashPW()
     {
-        $_SESSION["user"]["key"]["hashedPW"] = Sodium::crypto_pwhash_scryptsalsa208sha256_str
-          ($this->dirty["pw"], Sodium::CRYPTO_PWHASH_SCRYPTSALSA208SHA256_OPSLIMIT_INTERACTIVE,
+        $_SESSION["user"]["key"]["hashedPW"] = Sodium::crypto_pwhash_scryptsalsa208sha256_str(
+            $this->dirty["pw"], Sodium::CRYPTO_PWHASH_SCRYPTSALSA208SHA256_OPSLIMIT_INTERACTIVE,
                     Sodium::CRYPTO_PWHASH_SCRYPTSALSA208SHA256_MEMLIMIT_INTERACTIVE);
     }
     public function createSaltNonce()
@@ -146,38 +169,43 @@ class Login{
     {
         date_default_timezone_set('America/Los_Angeles');
         $date = new DateTime('NOW');
+        $newuserprivate = array('username' => $this->clean["un"],
+            'lastLogin' => $date->getTimestamp(),
+            'key' => array(
+                'hashedPW' => $_SESSION["user"]["key"]["hashedPW"],
+                'public' => bin2hex($_SESSION["user"]["key"]["public"]),
+                'salt' => bin2hex($_SESSION["user"]["key"]["salt"]),
+                'challenge' => bin2hex($_SESSION["user"]["key"]["challenge"]),
+                'nonce' => bin2hex($_SESSION["user"]["key"]["nonce"])
+            )
+        );
         $newuser = array('username' => $this->clean["un"],
             'lastLogin' => $date->getTimestamp(),
             'key' => array(
-                'public' => bin2hex($_SESSION["user"]["key"]["public"]),
-                'hashedPW' => $_SESSION["user"]["key"]["hashedPW"],
-                'salt' => bin2hex($_SESSION["user"]["key"]["salt"]),
-                'nonce' => bin2hex($_SESSION["user"]["key"]["nonce"]),
-                'challenge' => bin2hex($_SESSION["user"]["key"]["challenge"])
+                'public' => bin2hex($_SESSION["user"]["key"]["public"])
             )
-            );
+        );
 
-        if (!$this->mongo["users"]->save($newuser))
+        if ($this->mongo["usersprivate"]->save($newuserprivate))
         {
-            $this->cleanup();
-            return 0;
+            if (!$this->mongo["userspublic"]->save($newuser))
+            {
+                return 0;
+            }
+            else
+            {
+                return 1;
+            }
         }
         else
         {
-            return 1;
+            return 0;
         }
     }
-    public function passwordIsCorrect()
-    {
-        if (Sodium::crypto_pwhash_scryptsalsa208sha256_str_verify($_SESSION["user"]["key"]["hashedPW"], $this->dirty["pw"])) return 1;
-        else return 0;
-    }
+
     public function cleanup()
     {
-        Sodium::sodium_memzero($_SESSION["user"]["key"]["hashedPW"]);
-        Sodium::sodium_memzero($_SESSION["user"]["key"]["salt"]);
-        Sodium::sodium_memzero($_SESSION["user"]["key"]["keypair"]);
-
+        unloadSession();
         session_regenerate_id();
     }
 }
@@ -185,6 +213,8 @@ class Login{
 //accepts $_POST["username"] and $_POST["password"]
 function logUserIn()
 {
+    
+
     $login = new Login;
     $return = new Returning;
     if (!$login->usernameIsClean())
@@ -192,9 +222,9 @@ function logUserIn()
         $return->exitNow(0, "Username is not clean\n");
     }
 
+    session_start();
     //check if user is in the DB
     //if true then load up our user variables
-    session_start();
     if ($login->userExists())
     {
         // verify password
@@ -209,8 +239,6 @@ function logUserIn()
         {
             $return->exitNow(0, "Challenge not decrypted\n");
         }
-        $login->cleanup();
-
         $return->exitNow(1, "Welcome! " . $_SESSION["user"]["username"]);
     }
     else
@@ -225,8 +253,6 @@ function logUserIn()
         {
             $return->exitNow(0, "Could not create new user in DB\n");
         }
-        $login->cleanup();
-
         $return->exitNow(1, "Welcome! " . $_SESSION["user"]["username"]);
     }
 }

@@ -49,7 +49,17 @@ var APP = (function()
             {
                 if (res)
                 {
-                    console.log(res);
+                    var
+                    r = JSON.parse(res);
+                    if (r.code)
+                    {
+                        console.log(r.message);
+                    }
+                    else
+                    {
+                        //Something failed
+                        console.log(r.message);
+                    }
                 }
             })
             
