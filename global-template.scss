@@ -86,14 +86,27 @@ html,body{
 
 
         div{
-            @extend %a-50;
-
             @extend %a-p-10;
 
             margin-bottom:10px;
             text-align:center;
 
+            
+            &:nth-child(1)
+            {
+                @extend %a-45;
 
+            }
+            &:nth-child(2)
+            {
+                @extend %a-45;
+
+            }
+            &:nth-child(3)
+            {
+                @extend %a-10;
+                
+            }
         }
         &:hover div{
             background-color: #0aa;

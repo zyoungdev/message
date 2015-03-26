@@ -117,7 +117,10 @@ var APP = (function()
 
                 contactList = JSON.parse(res);
                 console.log(contactList);
-                buildList();
+                if (contactList["code"] == null)
+                {
+                    buildList();
+                }
             });
         };
         return {
@@ -135,8 +138,8 @@ var APP = (function()
         buildList = function()
         {
             var
-            frag = document.createDocumentFragment(),
             listContainer = hf.elCN("message-list-container")[0];
+            listContainer.innerHTML = "";
 
             for (var user in messageList)
             {
@@ -148,10 +151,13 @@ var APP = (function()
                 for (var message in messageList[user])
                 {
                     var
-                    time = document.createElement("div"),
                     messageDiv = document.createElement("div"),
-                    username = document.createElement("div");
+                    username = document.createElement("div"),
+                    time = document.createElement("div"),
+                    closeButton = document.createElement("div");
 
+                    closeButton.innerText = "Delete";
+                    closeButton.className = "delete-message-in-list";
                     messageDiv.className = "message-in-list";
                     username.innerText = user;
 
@@ -159,6 +165,7 @@ var APP = (function()
 
                     messageDiv.appendChild(username);
                     messageDiv.appendChild(time);
+                    messageDiv.appendChild(closeButton);
                     listContainer.appendChild(messageDiv);
                 }
             }
@@ -176,10 +183,38 @@ var APP = (function()
                 console.log(res);
             });
         },
+        deleteMessage = function(i, u, t)
+        {
+            var
+            fd = new FormData();
+
+            fd.append("timestamp", t);
+            fd.append("username", u);
+
+            hf.ajax("POST", fd, "phpSrc/deleteMessage.php", function(res)
+            {
+                console.log(res);
+                // res = JSON.parse(res);
+                if (res["code"] == null)
+                {
+                    delete messageList[u][t];
+                    buildList();
+                }
+                else
+                {
+                    console.log(res);
+                }
+            });
+        },
         getList = function()
         {
             hf.ajax("GET", null, "phpSrc/listMessages.php", function(res)
             {
+                if (document.getElementsByClassName("message-list-container")[0])
+                {
+                    document.getElementsByClassName("message-list-container")[0].parentNode.removeChild(document.getElementsByClassName("message-list-container")[0]);
+                }
+
                 var
                 div = document.createElement("div");
                 div.className = "module-container message-list-container";
@@ -187,9 +222,12 @@ var APP = (function()
 
                 messageList = JSON.parse(res);
                 console.log(messageList);
-                buildList();
+                if (messageList["code"] == null)
+                {
+                    buildList();
+                }
             });
-        }
+        };
 
         return{
             init: function()
@@ -211,7 +249,14 @@ var APP = (function()
                         user = ev.target.parentNode.children[0].innerText,
                         time = ev.target.parentNode.children[1].innerText;
 
-                        viewMessage(user, time);
+                        if (ev.target.className == "delete-message-in-list")
+                        {
+                            deleteMessage(index, user, time);
+                        }
+                        else
+                        {
+                            // viewMessage(user, time);
+                        }
                     }
                 }
             }
@@ -247,7 +292,7 @@ var APP = (function()
                         document.body.innerHTML = "";
                         sendMessage.init();
                         listMessages.init();
-                        listContacts.init();
+                        // listContacts.init();
 
                     }
                     else

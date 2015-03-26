@@ -1,6 +1,9 @@
 <?php
+include "./helper.php";
 
 class ListMessages{
+    public $messages;
+
     public function __construct()
     {
         $this->mongo["client"] = new Mongo();
@@ -15,7 +18,7 @@ class ListMessages{
             $this->mongo["client"]->close();
         }
     }
-    public function grabMessages()
+    public function getMessages()
     {
         $query = array('username' => $_SESSION["user"]["username"]);
         $projection = array(
@@ -26,13 +29,25 @@ class ListMessages{
 
         if ($result = $this->mongo["usersprivate"]->findone($query, $projection))
         {
-            print_r(json_encode($result["messages"]));
+            if (isset($result["messages"]))
+            {
+                $this->messages = $result["messages"];
+                return 1;
+            }
+            else
+            {
+                return 0;
+            }
+
         }
         else
         {
-            echo "Query didn't work\n";
-            exit;
+            return 0;
         }
+    }
+    public function send()
+    {
+        echo json_encode($this->messages);
     }
 }
 
@@ -41,7 +56,13 @@ function main()
     session_start();
 
     $list = new ListMessages;
-    $list->grabMessages();
+    $return = new Returning;
+
+    if (!$list->getMessages())
+    {
+        $return->exitNow(0, "Could not get message\n");
+    }
+    $list->send();
 
 }
 main();

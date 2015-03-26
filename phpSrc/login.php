@@ -220,6 +220,9 @@ class Login{
         if(isset($_SESSION["user"]["key"]["salt"]))
             // echo "salt";
             Sodium::sodium_memzero($_SESSION["user"]["key"]["salt"]);
+        if(isset($_SESSION["user"]["key"]["challenge"]))
+            // echo "salt";
+            Sodium::sodium_memzero($_SESSION["user"]["key"]["challenge"]);
         if(isset($_SESSION["user"]["key"]["nonce"]))
             // echo "nonce";
             Sodium::sodium_memzero($_SESSION["user"]["key"]["nonce"]);
