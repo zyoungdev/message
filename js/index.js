@@ -91,8 +91,18 @@ var APP = (function()
         buildList = function()
         {
             var
-            contactListContainer = hf.elCN('contact-list-container')[0];
+            contactListContainer = hf.elCN('contact-list-container')[0],
+            addContactInput = document.createElement("input"),
+            addContactButton = document.createElement("button");
+
+            addContactInput.className = "add-contact-input";
+            addContactButton.className = "add-contact-button";
+
             contactListContainer.innerHTML = "";
+            contactListContainer.appendChild(addContactInput);
+            contactListContainer.appendChild(addContactButton);
+
+
             for (var user in contactList)
             {
                 var
@@ -125,6 +135,31 @@ var APP = (function()
                 if (contactList["code"] == null)
                 {
                     buildList();
+                }
+            });
+        },
+        addContact = function(u)
+        {
+            var
+            fd = new FormData();
+
+            fd.append("contact", u);
+
+            hf.ajax("POST", fd, "phpSrc/addContact.php", function(res)
+            {
+                // console.log(res);
+                if (contactList["code"] == null)
+                {
+                    hf.ajax("GET", null, "phpSrc/listContacts.php", function(r)
+                    {
+                        contactList = JSON.parse(r);
+                        if (contactList["code"] == null)
+                        {
+                            console.log("yay");
+                            console.log(contactList);
+                            buildList();
+                        }
+                    });
                 }
             });
         },
@@ -176,6 +211,12 @@ var APP = (function()
                         {
                             // viewMessage(user, time);
                         }
+                    }
+                    if (ev.target.className == "add-contact-button")
+                    {
+                        var
+                        user = hf.elCN("add-contact-input")[0].value;
+                        addContact(user)
                     }
                 }
             }

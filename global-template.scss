@@ -114,6 +114,17 @@ html,body{
     }
 }
 .contact-list-container{
+    .add-contact-input{
+        @extend %a-70;
+
+        @extend %a-null-null;
+    }
+    .add-contact-button, button{
+        @extend %a-25;
+
+        @extend %a-null-null;
+    }
+
     .contact{
         cursor: pointer;
 
