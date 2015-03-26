@@ -6,6 +6,8 @@ class AddContact{
 
     public function __construct()
     {
+        session_start();
+
         $this->mongo["client"] = new Mongo();
         $this->mongo["collection"] = $this->mongo["client"]->messageApp;
         $this->mongo["userspublic"] = $this->mongo["collection"]->userspublic;
@@ -13,6 +15,7 @@ class AddContact{
     }
     public function __destruct()
     {
+        session_write_close();
         if ($this->mongo)
         {
             $this->mongo["client"]->close();
@@ -64,7 +67,6 @@ class AddContact{
 
 function main()
 {
-    session_start();
     $add = new AddContact;
     $return = new Returning;
 

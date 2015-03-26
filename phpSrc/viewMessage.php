@@ -7,6 +7,7 @@ class ViewMessage{
 
     public function __construct()
     {
+        session_start();
         $this->mongo["client"] = new Mongo();
         $this->mongo["collection"] = $this->mongo["client"]->messageApp;
         // $this->mongo["userspublic"] = $this->mongo["collection"]->userspublic;
@@ -14,6 +15,7 @@ class ViewMessage{
     }
     public function __destruct()
     {
+        session_write_close();
         if ($this->mongo)
         {
             $this->mongo["client"]->close();
@@ -76,7 +78,6 @@ class ViewMessage{
 
 function main()
 {
-    session_start();
     $view = new ViewMessage;
     $return = new Returning;
 

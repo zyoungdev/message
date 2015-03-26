@@ -382,7 +382,7 @@ var APP = (function()
 
                         document.body.innerHTML = "";
                         sendMessage.init();
-                        // listMessages.init();
+                        listMessages.init();
                         listContacts.init();
 
                     }

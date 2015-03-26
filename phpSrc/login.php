@@ -30,6 +30,7 @@ class Login{
 
     public function __construct()
     {
+        session_start();
         unloadSession();
         $this->mongo["client"] = new Mongo();
         $this->mongo["collection"] = $this->mongo["client"]->messageApp;
@@ -40,6 +41,7 @@ class Login{
     }
     public function __destruct()
     {
+        session_write_close();
         if ($this->mongo)
         {
             $this->mongo["client"]->close();
@@ -243,7 +245,6 @@ function logUserIn()
         $return->exitNow(0, "Username is not clean\n");
     }
 
-    session_start();
     //check if user is in the DB
     //if true then load up our user variables
     if ($login->userExists())
