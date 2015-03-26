@@ -30,7 +30,7 @@ var APP = (function()
             }
         };
     })(),
-    listContacts = (function()
+    contactList = (function()
     {
         var
         contactList,
@@ -152,7 +152,7 @@ var APP = (function()
                         }
                         else
                         {
-                            // viewMessage(user, time);
+                            sendMessage.init(user);
                         }
                     }
                     if (ev.target.className == "add-contact-button")
@@ -180,7 +180,7 @@ var APP = (function()
             hf.ajax("POST", fd, "phpSrc/sendMessage.php", function(res)
             {
                 console.log(res);
-                listContacts.init();
+                contactList.init();
             });
         }
         return{
@@ -503,7 +503,7 @@ var APP = (function()
                         document.body.innerHTML = "";
                         // sendMessage.init();
                         messageList.init();
-                        listContacts.init();
+                        contactList.init();
 
                     }
                     else
@@ -553,7 +553,7 @@ var APP = (function()
             login.click(ev);
             sendMessage.click(ev);
             messageList.click(ev);
-            listContacts.click(ev);
+            contactList.click(ev);
             messageView.click(ev);
         }
     };
