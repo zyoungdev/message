@@ -103,6 +103,7 @@ var APP = (function()
             contactListContainer.appendChild(addContactInput);
             contactListContainer.appendChild(addContactButton);
 
+            if (contactList["code"] == 0) return;
 
             for (var user in contactList)
             {
@@ -131,24 +132,16 @@ var APP = (function()
                 div.className = "module-container contact-list-container",
                 elemExists = document.getElementsByClassName("contact-list-container")[0];
 
-                if (!elemExists)
-                {
-                    document.body.appendChild(div);
-                }
-
-
-
+                if (!elemExists) document.body.appendChild(div);
 
                 contactList = JSON.parse(res);
                 console.log(contactList);
-                if (contactList["code"] == null)
-                {
-                    buildList();
-                }
+                buildList();
             });
         },
         addContact = function(u)
         {
+            console.log("yay");
             var
             fd = new FormData();
 
@@ -157,19 +150,15 @@ var APP = (function()
             hf.ajax("POST", fd, "phpSrc/addContact.php", function(res)
             {
                 // console.log(res);
-                if (contactList["code"] == null)
+                hf.ajax("GET", null, "phpSrc/listContacts.php", function(r)
                 {
-                    hf.ajax("GET", null, "phpSrc/listContacts.php", function(r)
+                    contactList = JSON.parse(r);
+                    if (contactList["code"] == null)
                     {
-                        contactList = JSON.parse(r);
-                        if (contactList["code"] == null)
-                        {
-                            console.log("yay");
-                            console.log(contactList);
-                            buildList();
-                        }
-                    });
-                }
+                        console.log(contactList);
+                        buildList();
+                    }
+                });
             });
         },
         deleteContact = function(i, u)
