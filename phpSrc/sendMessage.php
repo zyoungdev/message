@@ -10,10 +10,7 @@ class SendMessage{
     public function __construct()
     {
         session_start();
-        $this->mongo["client"] = new Mongo();
-        $this->mongo["collection"] = $this->mongo["client"]->messageApp;
-        $this->mongo["userspublic"] = $this->mongo["collection"]->userspublic;
-        $this->mongo["usersprivate"] = $this->mongo["collection"]->usersprivate;
+        $this->mongo = openDB();
 
         $message->sender["username"] = $_SESSION["user"]["username"];
         $message->sender["public"] = $_SESSION["user"]["key"]["public"];
@@ -22,10 +19,7 @@ class SendMessage{
     public function __destruct()
     {
         session_write_close();
-        if ($this->mongo)
-        {
-            $this->mongo["client"]->close();
-        }
+        closeDB($this->mongo["client"]);
     }
     public function recipientIsClean()
     {

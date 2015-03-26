@@ -52,5 +52,19 @@ function unloadSession()
         // echo "public";
         Sodium::sodium_memzero($_SESSION["user"]["key"]["public"]);
 }
+function openDB()
+{
+    $mongo["client"] = new Mongo();
+    $mongo["collection"] = $mongo["client"]->messageApp;
+    $mongo["userspublic"] = $mongo["collection"]->userspublic;
+    $mongo["usersprivate"] = $mongo["collection"]->usersprivate;
+
+    return $mongo;
+}
+function closeDB($db)
+{
+    if (isset($db))
+        $db->close();
+}
 
 ?>
