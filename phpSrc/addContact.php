@@ -7,7 +7,6 @@ class AddContact{
     public function __construct()
     {
         session_start();
-
         $this->mongo = openDB();
     }
     public function __destruct()
@@ -76,8 +75,6 @@ function main()
     {
         $return->exitNow(0, "Could not add the contact\n");
     }
-
-    // $add->send();
 }
 
 if ($_POST["contact"])
@@ -85,4 +82,4 @@ if ($_POST["contact"])
     main();
 }
 
- ?>
+?>

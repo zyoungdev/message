@@ -34,7 +34,6 @@ class ListContacts{
     }
 }
 
-
 function main()
 {
     $contacts = new ListContacts;

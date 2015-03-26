@@ -57,5 +57,4 @@ if ($_POST["username"])
     main();
 }
 
-
 ?>

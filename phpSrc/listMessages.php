@@ -22,7 +22,6 @@ class ListMessages{
             'messages' => 1,
         );
 
-
         if ($result = $this->mongo["usersprivate"]->findone($query, $projection))
         {
             if (isset($result["messages"]))
@@ -34,7 +33,6 @@ class ListMessages{
             {
                 return 0;
             }
-
         }
         else
         {

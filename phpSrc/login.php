@@ -64,7 +64,6 @@ class Login{
             {
                 $_SESSION["user"]["username"] = $user["username"];
                 $_SESSION["user"]["key"]["hashedPW"] = $user["key"]["hashedPW"];
-
                 return 1;
             }
         } 
@@ -196,13 +195,9 @@ class Login{
         if ($this->mongo["usersprivate"]->save($newuserprivate))
         {
             if (!$this->mongo["userspublic"]->save($newuser))
-            {
                 return 0;
-            }
             else
-            {
                 return 1;
-            }
         }
         else
         {
@@ -232,7 +227,6 @@ class Login{
 //accepts $_POST["username"] and $_POST["password"]
 function logUserIn()
 {
-
     $login = new Login;
     $return = new Returning;
     if (!$login->usernameIsClean())

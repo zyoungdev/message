@@ -34,7 +34,6 @@ class ViewMessage{
     }
     public function decryptMessage()
     {
-
         $keypair = Sodium::crypto_box_keypair_from_secretkey_and_publickey(
             hex2bin($_SESSION["user"]["key"]["secret"]), 
             hex2bin($this->message["sender"]["public"]));
@@ -66,7 +65,6 @@ class ViewMessage{
         Sodium::sodium_memzero($this->plaintext["sender"]);
         Sodium::sodium_memzero($this->plaintext["plaintext"]);
         unset($this->plaintext["timestamp"]);
-
     }
 }
 

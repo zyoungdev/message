@@ -14,7 +14,6 @@ class SendMessage{
 
         $message->sender["username"] = $_SESSION["user"]["username"];
         $message->sender["public"] = $_SESSION["user"]["key"]["public"];
-
     }
     public function __destruct()
     {
@@ -63,12 +62,9 @@ class SendMessage{
             $this->clean["plaintext"], $this->message["nonce"], $keypair);
             // $this->clean["plaintext"], $this->message["nonce"], $keypair);
 
-
         $this->message["ciphertext"] = bin2hex($this->message["ciphertext"]);
         $this->message["keypair"] = bin2hex($keypair);
         $this->message["nonce"] = bin2hex($this->message["nonce"]);
-
-
     }
     public function addContact()
     {
@@ -76,7 +72,6 @@ class SendMessage{
 
         $query = array('username' => $_SESSION["user"]["username"]);
         $update = array('$set' => array("contacts.$user" => array("public" => $this->recipient["key"]["public"])));
-
 
         $this->mongo["usersprivate"]->update($query, $update);
     }
@@ -148,8 +143,8 @@ function sendMessage()
     {
         $return->exitNow(0, "Cloud not send the message\n");
     }
-
 }
+
 if ($_POST["recipient"] && $_POST["plaintext"])
 {
     sendMessage();
