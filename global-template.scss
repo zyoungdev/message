@@ -59,7 +59,7 @@ html,body{
         }
 
     }
-    button{
+    >button, .send-message-button{
         @extend %a-50;
         // @extend %t-30;
 
@@ -81,7 +81,14 @@ html,body{
 }
 .message-list-container{
     .refresh-messages-button{
-
+        @extend %a-45;
+        @extend %a-null-null;
+        @extend %a-p-0;
+    }   
+    .new-message-button{
+        @extend %a-45;
+        @extend %a-null-null;
+        @extend %a-p-0;
     }
     .message-in-list{
 

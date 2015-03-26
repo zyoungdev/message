@@ -51,7 +51,6 @@ var APP = (function()
         return{
             init: function()
             {
-
                 hf.ajax("GET", null, "templates/sendMessage.php", function(res)
                 {
                     var
@@ -220,7 +219,7 @@ var APP = (function()
             }
         };
     })(),
-    listMessages = (function()
+    messageList = (function()
     {
         var
         messageList,
@@ -228,12 +227,15 @@ var APP = (function()
         {
             var
             listContainer = hf.elCN("message-list-container")[0],
-            refreshButton = document.createElement("button");
+            refreshButton = document.createElement("button"),
+            newMessageButton = document.createElement("button");
             listContainer.innerHTML = "";
 
             refreshButton.className = "refresh-messages-button";
+            newMessageButton.className = "new-message-button";
 
             listContainer.appendChild(refreshButton);
+            listContainer.appendChild(newMessageButton);
 
             if (messageList["code"] == 0) return;
 
@@ -348,12 +350,17 @@ var APP = (function()
                         }
                         else
                         {
-                            // viewMessage(user, time);
+                            viewMessage(user, time);
                         }
                     }
                     else if (ev.target.className == "refresh-messages-button")
                     {
                         getList();
+                    }
+                    else if (ev.target.className == "new-message-button")
+                    {
+                        console.log("yay");
+                        sendMessage.init();
                     }
                 }
             }
@@ -387,8 +394,8 @@ var APP = (function()
                         hf.elCN("loginerror")[0].innerText = r.message;
 
                         document.body.innerHTML = "";
-                        sendMessage.init();
-                        listMessages.init();
+                        // sendMessage.init();
+                        messageList.init();
                         listContacts.init();
 
                     }
@@ -438,7 +445,7 @@ var APP = (function()
         {
             login.click(ev);
             sendMessage.click(ev);
-            listMessages.click(ev);
+            messageList.click(ev);
             listContacts.click(ev);
         }
     };
