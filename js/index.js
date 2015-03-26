@@ -84,6 +84,50 @@ var APP = (function()
             }
         };
     })(),
+    listContacts = (function()
+    {
+        var
+        contactList,
+        buildList = function()
+        {
+            var
+            contactListContainer = hf.elCN('contact-list-container')[0];
+            for (var user in contactList)
+            {
+                var
+                contact = document.createElement("div"),
+                userDiv = document.createElement("div");
+
+                contact.className = "contact";
+                userDiv.innerText = user;
+
+                contact.appendChild(userDiv);
+                contactListContainer.appendChild(contact);
+            }
+        },
+        getList = function()
+        {
+            hf.ajax("GET", null, "phpSrc/listContacts.php", function(res)
+            {
+                // console.log(res);
+                var
+                div = document.createElement("div");
+                div.className = "module-container contact-list-container";
+                document.body.appendChild(div);
+
+                contactList = JSON.parse(res);
+                console.log(contactList);
+                buildList();
+            });
+        };
+        return {
+            init: function()
+            {
+                getList();
+
+            }
+        };
+    })(),
     listMessages = (function()
     {
         var
@@ -136,6 +180,11 @@ var APP = (function()
         {
             hf.ajax("GET", null, "phpSrc/listMessages.php", function(res)
             {
+                var
+                div = document.createElement("div");
+                div.className = "module-container message-list-container";
+                document.body.appendChild(div);
+
                 messageList = JSON.parse(res);
                 console.log(messageList);
                 buildList();
@@ -145,16 +194,7 @@ var APP = (function()
         return{
             init: function()
             {
-                hf.ajax("GET", null, "templates/listMessages.php", function(res)
-                {
-                    var
-                    div = document.createElement("div");
-                    div.className = "module-container";
-                    div.innerHTML = res;
-                    document.body.appendChild(div);
-
-                    getList();
-                });
+                getList();
             },
             click: function(ev)
             {
@@ -200,12 +240,14 @@ var APP = (function()
                     r = JSON.parse(res);
                     if (r.code)
                     {
+                        //Logged in!
                         console.log(r.message);
                         hf.elCN("loginerror")[0].innerText = r.message;
 
                         document.body.innerHTML = "";
                         sendMessage.init();
                         listMessages.init();
+                        listContacts.init();
 
                     }
                     else

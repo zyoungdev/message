@@ -62,10 +62,9 @@ class SendMessage{
             hex2bin($_SESSION["user"]["key"]["secret"]), hex2bin($this->recipient["key"]["public"]));
 
         $this->message["nonce"] = Sodium::randombytes_buf(Sodium::CRYPTO_BOX_NONCEBYTES);
-        $nonce = "000000000000000000000000";
 
         $this->message["ciphertext"] = Sodium::crypto_box(
-            $this->clean["plaintext"], $nonce, $keypair);
+            $this->clean["plaintext"], $this->message["nonce"], $keypair);
             // $this->clean["plaintext"], $this->message["nonce"], $keypair);
 
 
@@ -74,6 +73,16 @@ class SendMessage{
         $this->message["nonce"] = bin2hex($this->message["nonce"]);
 
 
+    }
+    public function addContact()
+    {
+        $user = $this->message["recipient"]["username"];
+
+        $query = array('username' => $_SESSION["user"]["username"]);
+        $update = array('$set' => array("contacts.$user" => array("public" => $this->recipient["key"]["public"])));
+
+
+        $this->mongo["usersprivate"]->update($query, $update);
     }
     public function send()
     {
@@ -139,7 +148,7 @@ function sendMessage()
     }
     $send->escapePlaintext();
     $send->encryptPlaintext();
-
+    $send->addContact();
     if (!$send->send())
     {
         $return->exitNow(0, "Cloud not send the message\n");

@@ -80,7 +80,6 @@ html,body{
     }
 }
 .message-list-container{
-    min-height:200px;
     .message-in-list{
 
         cursor: pointer;
@@ -98,6 +97,23 @@ html,body{
         }
         &:hover div{
             background-color: #0aa;
+        }
+    }
+}
+.contact-list-container{
+    .contact{
+        cursor: pointer;
+
+        div{
+            @extend %a-100;
+
+            @extend %a-p-10;
+
+            margin-bottom:10px;
+            text-align:center;
+        }
+        &:hover div{
+            background-color: #a0a;
         }
     }
 }

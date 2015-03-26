@@ -44,8 +44,7 @@ class ViewMessage{
             hex2bin($this->message["sender"]["public"]));
 
         $ciphertext = hex2bin($this->message["ciphertext"]);
-        // $nonce = hex2bin($this->message["nonce"]);
-        $nonce = "000000000000000000000000";
+        $nonce = hex2bin($this->message["nonce"]);
 
         if ($pt = Sodium::crypto_box_open($ciphertext,$nonce,$keypair))
         {
@@ -54,6 +53,7 @@ class ViewMessage{
             $this->plaintext["timestamp"] = $this->message["timestamp"];
 
             Sodium::sodium_memzero($keypair);
+            Sodium::sodium_memzero($nonce);
             Sodium::sodium_memzero($pt);
 
             return 1;
