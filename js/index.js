@@ -15,6 +15,10 @@ var APP = (function()
                     if (node == target) return true;
                 }
             },
+            cN: function(e,cl)
+            {
+                return e.className == cl;
+            },
             ajax: function(type, fd, uri, callback)
             {
                 var
@@ -55,7 +59,7 @@ var APP = (function()
                 var
                 contact = document.createElement("div"),
                 userDiv = document.createElement("div"),
-                deleteButton = document.createElement("div");
+                deleteButton = document.createElement("button");
 
                 deleteButton.innerText = "Delete";
                 deleteButton.className = "delete-contact-in-list";
@@ -142,7 +146,7 @@ var APP = (function()
 
                 if (hf.isInside(e, contactListContainer))
                 {
-                    if (ev.target.parentNode.className == "contact")
+                    if (hf.cN(e.parentNode, "contact"))
                     {
                         var index = Array.prototype.indexOf.call(contactListContainer.children, ev.target.parentNode);
                         var user = ev.target.parentNode.children[0].innerText;
@@ -155,7 +159,7 @@ var APP = (function()
                             sendMessage.init(user);
                         }
                     }
-                    if (ev.target.className == "add-contact-button")
+                    if (hf.cN(e, "add-contact-button"))
                     {
                         var
                         user = hf.elCN("add-contact-input")[0].value;
@@ -222,6 +226,7 @@ var APP = (function()
                     else if (e == sub)
                     {
                         sendPlaintext(rec.value, ta.value);
+                        document.body.removeChild(e.parentNode);
                     }
                     else if (e == dis)
                     {
@@ -305,18 +310,18 @@ var APP = (function()
 
                 if (hf.isInside(e, viewMessageContainer))
                 {
-                    if (e.className == "view-message-reply-button")
+                    if (hf.cN(e, "view-message-reply-button"))
                     {
                         sendMessage.init(messageArray[index]["sender"]);
                     }
-                    else if (e.className == "view-message-delete-button")
+                    else if (hf.cN(e, "view-message-delete-button"))
                     {
                         viewMessageContainer.removeChild(e.parentNode);
                         messageList.deleteMessage(messageArray[index]["sender"], messageArray[index]["timestamp"])
                         messageArray[index] = {};
 
                     }
-                    else if (e.className == "view-message-close-button")
+                    else if (hf.cN(e, "view-message-close-button"))
                     {
                         viewMessageContainer.removeChild(e.parentNode);
                     }
@@ -353,10 +358,10 @@ var APP = (function()
                     messageDiv = document.createElement("div"),
                     username = document.createElement("div"),
                     time = document.createElement("div"),
-                    closeButton = document.createElement("div");
+                    deleteButton = document.createElement("button");
 
-                    closeButton.innerText = "Delete";
-                    closeButton.className = "delete-message-in-list";
+                    deleteButton.innerText = "Delete";
+                    deleteButton.className = "delete-message-in-list";
                     messageDiv.className = "message-in-list";
                     username.innerText = user;
 
@@ -364,7 +369,7 @@ var APP = (function()
 
                     messageDiv.appendChild(username);
                     messageDiv.appendChild(time);
-                    messageDiv.appendChild(closeButton);
+                    messageDiv.appendChild(deleteButton);
                     listContainer.appendChild(messageDiv);
                 }
             }
@@ -451,7 +456,8 @@ var APP = (function()
                         user = e.parentNode.children[0].innerText,
                         time = e.parentNode.children[1].innerText;
 
-                        if (e.className == "delete-message-in-list")
+                        // if (e.className == "delete-message-in-list")
+                        if (hf.cN(e, "delete-message-in-list"))
                         {
                             this.deleteMessage(user, time);
                         }
@@ -460,11 +466,11 @@ var APP = (function()
                             viewMessage(user, time);
                         }
                     }
-                    else if (e.className == "refresh-messages-button")
+                    else if (hf.cN(e, "refresh-messages-button"))
                     {
                         getList();
                     }
-                    else if (e.className == "new-message-button")
+                    else if (hf.cN(e, "new-message-button"))
                     {
                         console.log("yay");
                         sendMessage.init();
