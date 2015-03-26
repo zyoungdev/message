@@ -30,7 +30,15 @@ class ListContacts{
     }
     public function send()
     {
-        echo json_encode($this->contacts["contacts"]);
+        if (!challengeIsDecrypted($this->mongo))
+        {
+            $ret = new Returning;
+            $ret->exitNow(-1, "Challenge could not be decrypted");
+        }
+        else
+        {
+            echo json_encode($this->contacts["contacts"]);
+        }
     }
 }
 

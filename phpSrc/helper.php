@@ -9,8 +9,12 @@ class Returning{
         $this->message = $m;
         if ($this->code == 0)
         {
-            unloadSession();
+            // unloadSession();
             session_regenerate_id();
+        }
+        else if ($this->code == -1)
+        {
+            unloadSession();
         }
         echo json_encode($this);
         exit;
@@ -51,6 +55,8 @@ function unloadSession()
     if(isset($_SESSION["user"]["key"]["public"]))
         // echo "public";
         Sodium::sodium_memzero($_SESSION["user"]["key"]["public"]);
+    unset($_SESSION);
+    session_destroy();
 }
 function openDB()
 {
@@ -65,6 +71,22 @@ function closeDB($db)
 {
     if (isset($db))
         $db->close();
+}
+
+function challengeIsDecrypted($db)
+{
+    $ptChallenge = "This is the challenge";
+
+    $query = array("username" => $_SESSION["user"]["username"]);
+    $projection = array('_id' => 0, "key" => 1);
+
+    $key = $db["usersprivate"]->findone($query, $projection)["key"];
+    
+    $plaintext = Sodium::crypto_secretbox_open(hex2bin($key["challenge"]),
+       hex2bin($key["nonce"]), hex2bin($_SESSION["user"]["key"]["challengeKey"]));
+
+    if ($plaintext == $ptChallenge) return true;
+    else return false;
 }
 
 ?>

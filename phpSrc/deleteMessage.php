@@ -6,6 +6,12 @@ class DeleteMessage{
     {
         session_start();
         $this->mongo = openDB();
+
+        if (!challengeIsDecrypted($this->mongo))
+        {
+            $ret = new Returning;
+            $ret->exitNow(-1, "Challenge could not be decrypted");
+        }
     }
     public function __destruct()
     {

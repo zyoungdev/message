@@ -12,12 +12,18 @@ class SendMessage{
         session_start();
         $this->mongo = openDB();
 
+        if (!challengeIsDecrypted($this->mongo))
+        {
+            $ret = new Returning;
+            $ret->exitNow(-1, "Challenge could not be decrypted");
+        }
+
         $message->sender["username"] = $_SESSION["user"]["username"];
         $message->sender["public"] = $_SESSION["user"]["key"]["public"];
     }
     public function __destruct()
     {
-        session_write_close();
+        // session_write_close();
         closeDB($this->mongo["client"]);
     }
     public function recipientIsClean()

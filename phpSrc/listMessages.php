@@ -6,7 +6,7 @@ class ListMessages{
 
     public function __construct()
     {
-        session_start();
+        session_start();        
         $this->mongo = openDB();
     }
     public function __destruct()
@@ -41,7 +41,15 @@ class ListMessages{
     }
     public function send()
     {
-        echo json_encode($this->messages);
+        if (!challengeIsDecrypted($this->mongo))
+        {
+            $ret = new Returning;
+            $ret->exitNow(-1, "Challenge could not be decrypted");
+        }
+        else
+        {
+            echo json_encode($this->messages);
+        }
     }
 }
 
