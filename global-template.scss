@@ -80,9 +80,13 @@ html,body{
     }
 }
 .message-list-container{
+    .refresh-messages-button{
+
+    }
     .message-in-list{
 
         cursor: pointer;
+        @extend %a-100;
 
 
         div{

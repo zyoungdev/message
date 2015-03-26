@@ -227,8 +227,15 @@ var APP = (function()
         buildList = function()
         {
             var
-            listContainer = hf.elCN("message-list-container")[0];
+            listContainer = hf.elCN("message-list-container")[0],
+            refreshButton = document.createElement("button");
             listContainer.innerHTML = "";
+
+            refreshButton.className = "refresh-messages-button";
+
+            listContainer.appendChild(refreshButton);
+
+            if (messageList["code"] == 0) return;
 
             for (var user in messageList)
             {
@@ -311,10 +318,7 @@ var APP = (function()
 
                 messageList = JSON.parse(res);
                 console.log(messageList);
-                if (messageList["code"] == null)
-                {
-                    buildList();
-                }
+                buildList();
             });
         };
 
@@ -346,6 +350,10 @@ var APP = (function()
                         {
                             // viewMessage(user, time);
                         }
+                    }
+                    else if (ev.target.className == "refresh-messages-button")
+                    {
+                        getList();
                     }
                 }
             }
