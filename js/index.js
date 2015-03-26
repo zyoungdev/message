@@ -92,16 +92,21 @@ var APP = (function()
         {
             var
             contactListContainer = hf.elCN('contact-list-container')[0];
+            contactListContainer.innerHTML = "";
             for (var user in contactList)
             {
                 var
                 contact = document.createElement("div"),
-                userDiv = document.createElement("div");
+                userDiv = document.createElement("div"),
+                deleteButton = document.createElement("div");
 
+                deleteButton.innerText = "Delete";
+                deleteButton.className = "delete-contact-in-list";
                 contact.className = "contact";
                 userDiv.innerText = user;
 
                 contact.appendChild(userDiv);
+                contact.appendChild(deleteButton);
                 contactListContainer.appendChild(contact);
             }
         },
@@ -122,12 +127,57 @@ var APP = (function()
                     buildList();
                 }
             });
+        },
+        deleteContact = function(i, u)
+        {
+            var
+            fd = new FormData();
+
+            fd.append("username", u);
+
+            hf.ajax("POST", fd, "phpSrc/deleteContact.php", function(res)
+            {
+                console.log(res);
+                // res = JSON.parse(res);
+                if (res["code"] == null)
+                {
+                    delete contactList[u];
+                    buildList();
+                }
+                else
+                {
+                    console.log(res);
+                }
+            });
         };
         return {
             init: function()
             {
                 getList();
 
+            },
+            click: function(ev)
+            {
+                var
+                e = ev.target,
+                contactListContainer = hf.elCN("contact-list-container")[0];
+
+                if (hf.isInside(e, contactListContainer))
+                {
+                    if (ev.target.parentNode.className == "contact")
+                    {
+                        var index = Array.prototype.indexOf.call(contactListContainer.children, ev.target.parentNode);
+                        var user = ev.target.parentNode.children[0].innerText;
+                        if (ev.target.className == "delete-contact-in-list")
+                        {
+                            deleteContact(index, user);
+                        }
+                        else
+                        {
+                            // viewMessage(user, time);
+                        }
+                    }
+                }
             }
         };
     })(),
@@ -291,8 +341,8 @@ var APP = (function()
 
                         document.body.innerHTML = "";
                         sendMessage.init();
-                        listMessages.init();
-                        // listContacts.init();
+                        // listMessages.init();
+                        listContacts.init();
 
                     }
                     else
@@ -342,6 +392,7 @@ var APP = (function()
             login.click(ev);
             sendMessage.click(ev);
             listMessages.click(ev);
+            listContacts.click(ev);
         }
     };
 })();

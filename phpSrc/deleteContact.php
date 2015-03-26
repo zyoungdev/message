@@ -1,7 +1,7 @@
 <?php 
 include "./helper.php";
 
-class DeleteMessage{
+class DeleteContact{
     public function __construct()
     {
         $this->mongo["client"] = new Mongo();
@@ -18,20 +18,17 @@ class DeleteMessage{
     }
     public function isClean()
     {
-        $pattern = "/[0-9]/";
-
-        if (preg_match($pattern, $_POST["timestamp"]) && ctype_alnum($_POST["username"]))
+        if (ctype_alnum($_POST["username"]))
             return 1;
         else
             return 0;
     }
-    public function deleteMessage()
+    public function deleteContact()
     {
-        $message = $_POST["timestamp"];
         $user = $_POST["username"];
 
         $query = array("username" => $_SESSION["user"]["username"]);
-        $projection = array('$unset' => array("messages.$user.$message" => ""));
+        $projection = array('$unset' => array("contacts.$user" => ""));
 
         if ($this->mongo["usersprivate"]->update($query, $projection))
         {
@@ -44,28 +41,26 @@ class DeleteMessage{
     }
 }
 
-
 function main()
 {
     session_start();
-    $del = new DeleteMessage;
+    $del = new DeleteContact;
     $return = new Returning;
 
     if (!$del->isClean())
     {
-        $return->exitNow(0, "Not a timestamp\n");
+        $return->exitNow(0, "Username is not clean\n");
     }
-    if (!$del->deleteMessage())
+    if (!$del->deleteContact())
     {
-        $return->exitNow(0, "Could not delete message\n");
+        $return->exitNow(0, "Could  not delete contact\n");
     }
-    echo "We made it!\n";
-
 }
 
-if ($_POST["timestamp"] && $_POST["username"])
+if ($_POST["username"])
 {
     main();
 }
+
 
 ?>
