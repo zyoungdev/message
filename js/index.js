@@ -30,60 +30,6 @@ var APP = (function()
             }
         };
     })(),
-    sendMessage = (function()
-    {
-        var
-        sendPlaintext = function(rec, pt)
-        {
-            if (pt === "") return;
-            var
-            fd = new FormData();
-
-            fd.append("plaintext", pt);
-            fd.append("recipient", rec);
-
-            hf.ajax("POST", fd, "phpSrc/sendMessage.php", function(res)
-            {
-                console.log(res);
-                listContacts.init();
-            });
-        }
-        return{
-            init: function()
-            {
-                hf.ajax("GET", null, "templates/sendMessage.php", function(res)
-                {
-                    var
-                    div = document.createElement("div");
-                    div.className = "module-container";
-                    div.innerHTML = res;
-                    document.body.appendChild(div);
-                });
-            },
-            click: function(ev)
-            {
-                var
-                e = ev.target,
-                sendMessageBox = hf.elCN("send-message-box")[0];
-
-                if (hf.isInside(e, sendMessageBox))
-                {
-                    var
-                    rec = sendMessageBox.getElementsByTagName("input")[0],
-                    ta = sendMessageBox.getElementsByTagName("textarea")[0],
-                    sub = sendMessageBox.getElementsByTagName("button")[0];
-                    if (e == ta)
-                    {
-
-                    }
-                    else if (e == sub)
-                    {
-                        sendPlaintext(rec.value, ta.value);
-                    }
-                }
-            }
-        };
-    })(),
     listContacts = (function()
     {
         var
@@ -219,6 +165,166 @@ var APP = (function()
             }
         };
     })(),
+    sendMessage = (function()
+    {
+        var
+        sendPlaintext = function(rec, pt)
+        {
+            if (pt === "") return;
+            var
+            fd = new FormData();
+
+            fd.append("plaintext", pt);
+            fd.append("recipient", rec);
+
+            hf.ajax("POST", fd, "phpSrc/sendMessage.php", function(res)
+            {
+                console.log(res);
+                listContacts.init();
+            });
+        }
+        return{
+            init: function(rec)
+            {
+                hf.ajax("GET", null, "templates/sendMessage.php", function(res)
+                {
+                    var
+                    container = document.createElement("div");
+                    container.className = "module-container send-message-box";
+                    container.innerHTML = "";
+
+                    var elemExists = hf.elCN("send-message-box")[0]
+                    if (!elemExists)
+                        document.body.appendChild(container);
+                    container.innerHTML = res;
+
+                    if (rec)
+                        hf.elCN("send-message-box")[0].children[0].value = rec;
+                });
+            },
+            click: function(ev)
+            {
+                var
+                e = ev.target,
+                sendMessageBox = hf.elCN("send-message-box")[0];
+
+                if (hf.isInside(e, sendMessageBox))
+                {
+                    var
+                    rec = sendMessageBox.getElementsByTagName("input")[0],
+                    ta = sendMessageBox.getElementsByTagName("textarea")[0],
+                    sub = sendMessageBox.getElementsByTagName("button")[0],
+                    dis = sendMessageBox.getElementsByTagName("button")[1];
+                    if (e == ta)
+                    {
+
+                    }
+                    else if (e == sub)
+                    {
+                        sendPlaintext(rec.value, ta.value);
+                    }
+                    else if (e == dis)
+                    {
+                        document.body.removeChild(e.parentNode);
+                    }
+                }
+            }
+        };
+    })(),
+    messageView = (function()
+    {
+        var
+        messageArray = [],
+        buildView = function()
+        {
+            var
+            frag = document.createDocumentFragment(),
+            viewMessageContainer = document.createElement("div"),
+            viewMessageMessage= document.createElement("div"),
+            replyButton = document.createElement("button"),
+            deleteButton = document.createElement("button"),
+            closeButton = document.createElement("button"),
+            sender = document.createElement("div"),
+            timestamp = document.createElement("div"),
+            message = document.createElement("div");
+
+            viewMessageContainer.className = "module-container view-message-container";
+            viewMessageMessage.className = "view-message-message";
+            sender.className = "view-message-sender";
+            timestamp.className = "view-message-timestamp";
+            message.className = "view-message-message";
+
+            replyButton.className = "view-message-reply-button";
+            deleteButton.className = "view-message-delete-button";
+            closeButton.className = "view-message-close-button";
+
+            replyButton.innerText = "Reply";
+            deleteButton.innerText = "Delete";
+            closeButton.innerText = "Close";
+
+            sender.innerText = "From: " + messageArray[messageArray.length-1]["sender"];
+            timestamp.innerText = "Sent: " + messageArray[messageArray.length-1]["timestamp"];
+            message.innerText = messageArray[messageArray.length-1]["plaintext"];
+
+
+            frag.appendChild(replyButton);
+            frag.appendChild(deleteButton);
+            frag.appendChild(closeButton);
+            frag.appendChild(sender);
+            frag.appendChild(timestamp);
+            frag.appendChild(message);
+
+            viewMessageMessage.appendChild(frag);
+            var
+            elemExists = hf.elCN("view-message-container")[0];
+            if (elemExists)
+            {
+                elemExists.appendChild(viewMessageMessage);
+            }
+            else
+            {
+                document.body.appendChild(viewMessageContainer);
+                viewMessageContainer.appendChild(viewMessageMessage);
+            }
+
+        }
+        return{
+            init: function(res)
+            {
+                messageArray.push(res);
+                buildView();
+            },
+            click: function(ev)
+            {
+                var
+                e = ev.target,
+                viewMessageContainer = hf.elCN("view-message-container")[0],
+                index;
+                if (viewMessageContainer)
+                    index = Array.prototype.indexOf.call(viewMessageContainer.children, e.parentNode);
+
+                if (hf.isInside(e, viewMessageContainer))
+                {
+                    if (e.className == "view-message-reply-button")
+                    {
+                        sendMessage.init(messageArray[index]["sender"]);
+                    }
+                    else if (e.className == "view-message-delete-button")
+                    {
+                        viewMessageContainer.removeChild(e.parentNode);
+                        messageList.deleteMessage(messageArray[index]["sender"], messageArray[index]["timestamp"])
+                        messageArray[index] = {};
+
+                    }
+                    else if (e.className == "view-message-close-button")
+                    {
+                        viewMessageContainer.removeChild(e.parentNode);
+                    }
+
+                }
+            }
+        }
+    })(),
     messageList = (function()
     {
         var
@@ -241,11 +347,6 @@ var APP = (function()
 
             for (var user in messageList)
             {
-                var
-                userFrag = document.createDocumentFragment();
-                
-                
-
                 for (var message in messageList[user])
                 {
                     var
@@ -278,10 +379,12 @@ var APP = (function()
 
             hf.ajax("POST", fd, "phpSrc/viewMessage.php", function(res)
             {
-                console.log(res);
+                res = JSON.parse(res);
+
+                messageView.init(res);                
             });
         },
-        deleteMessage = function(i, u, t)
+        delMessage = function(u, t)
         {
             var
             fd = new FormData();
@@ -329,6 +432,10 @@ var APP = (function()
             {
                 getList();
             },
+            deleteMessage: function(user,time)
+            {
+                delMessage(user,time);
+            },
             click: function(ev)
             {
                 var
@@ -337,27 +444,27 @@ var APP = (function()
 
                 if (hf.isInside(e, messageListContainer))
                 {
-                    if (ev.target.parentNode.className == "message-in-list")
+                    if (e.parentNode.className == "message-in-list")
                     {
-                        var index = Array.prototype.indexOf.call(messageListContainer.children, ev.target.parentNode);
+                        var index = Array.prototype.indexOf.call(messageListContainer.children, e.parentNode);
                         var
-                        user = ev.target.parentNode.children[0].innerText,
-                        time = ev.target.parentNode.children[1].innerText;
+                        user = e.parentNode.children[0].innerText,
+                        time = e.parentNode.children[1].innerText;
 
-                        if (ev.target.className == "delete-message-in-list")
+                        if (e.className == "delete-message-in-list")
                         {
-                            deleteMessage(index, user, time);
+                            this.deleteMessage(user, time);
                         }
                         else
                         {
                             viewMessage(user, time);
                         }
                     }
-                    else if (ev.target.className == "refresh-messages-button")
+                    else if (e.className == "refresh-messages-button")
                     {
                         getList();
                     }
-                    else if (ev.target.className == "new-message-button")
+                    else if (e.className == "new-message-button")
                     {
                         console.log("yay");
                         sendMessage.init();
@@ -447,6 +554,7 @@ var APP = (function()
             sendMessage.click(ev);
             messageList.click(ev);
             listContacts.click(ev);
+            messageView.click(ev);
         }
     };
 })();
