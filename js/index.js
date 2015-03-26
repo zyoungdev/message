@@ -53,8 +53,11 @@ var APP = (function()
 
                 hf.ajax("GET", null, "templates/sendMessage.php", function(res)
                 {
-                    document.body.innerHTML = "";
-                    document.body.innerHTML = res;
+                    var
+                    div = document.createElement("div");
+                    div.className = "module-container";
+                    div.innerHTML = res;
+                    document.body.appendChild(div);
                 });
             },
             click: function(ev)
@@ -81,6 +84,99 @@ var APP = (function()
             }
         };
     })(),
+    listMessages = (function()
+    {
+        var
+        messageList,
+        buildList = function()
+        {
+            var
+            frag = document.createDocumentFragment(),
+            listContainer = hf.elCN("message-list-container")[0];
+
+            for (var user in messageList)
+            {
+                var
+                userFrag = document.createDocumentFragment();
+                
+                
+
+                for (var message in messageList[user])
+                {
+                    var
+                    time = document.createElement("div"),
+                    messageDiv = document.createElement("div"),
+                    username = document.createElement("div");
+
+                    messageDiv.className = "message-in-list";
+                    username.innerText = user;
+
+                    time.innerText = messageList[user][message].timestamp;
+
+                    messageDiv.appendChild(username);
+                    messageDiv.appendChild(time);
+                    listContainer.appendChild(messageDiv);
+                }
+            }
+        },
+        viewMessage = function(u,t)
+        {
+            var
+            fd = new FormData();
+
+            fd.append("username", u);
+            fd.append("timestamp", t);
+
+            hf.ajax("POST", fd, "phpSrc/viewMessage.php", function(res)
+            {
+                console.log(res);
+            });
+        },
+        getList = function()
+        {
+            hf.ajax("GET", null, "phpSrc/listMessages.php", function(res)
+            {
+                messageList = JSON.parse(res);
+                console.log(messageList);
+                buildList();
+            });
+        }
+
+        return{
+            init: function()
+            {
+                hf.ajax("GET", null, "templates/listMessages.php", function(res)
+                {
+                    var
+                    div = document.createElement("div");
+                    div.className = "module-container";
+                    div.innerHTML = res;
+                    document.body.appendChild(div);
+
+                    getList();
+                });
+            },
+            click: function(ev)
+            {
+                var
+                e = ev.target,
+                messageListContainer = hf.elCN("message-list-container")[0];
+
+                if (hf.isInside(e, messageListContainer))
+                {
+                    if (ev.target.parentNode.className == "message-in-list")
+                    {
+                        var index = Array.prototype.indexOf.call(messageListContainer.children, ev.target.parentNode);
+                        var
+                        user = ev.target.parentNode.children[0].innerText,
+                        time = ev.target.parentNode.children[1].innerText;
+
+                        viewMessage(user, time);
+                    }
+                }
+            }
+        }
+    })(),
     login = (function()
     {
         var
@@ -106,7 +202,10 @@ var APP = (function()
                     {
                         console.log(r.message);
                         hf.elCN("loginerror")[0].innerText = r.message;
+
+                        document.body.innerHTML = "";
                         sendMessage.init();
+                        listMessages.init();
 
                     }
                     else
@@ -155,6 +254,7 @@ var APP = (function()
         {
             login.click(ev);
             sendMessage.click(ev);
+            listMessages.click(ev);
         }
     };
 })();

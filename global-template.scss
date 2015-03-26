@@ -78,3 +78,25 @@ html,body{
 
     }
 }
+.message-list-container{
+    min-height:200px;
+    .message-in-list{
+
+        cursor: pointer;
+
+
+        div{
+            @extend %a-50;
+
+            @extend %a-p-10;
+
+            margin-bottom:10px;
+            text-align:center;
+
+
+        }
+        &:hover div{
+            background-color: #0aa;
+        }
+    }
+}

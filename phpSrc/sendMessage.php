@@ -59,13 +59,18 @@ class SendMessage{
     public function encryptPlaintext()
     {
         $keypair = Sodium::crypto_box_keypair_from_secretkey_and_publickey(
-            $_SESSION["user"]["key"]["secret"], hex2bin($this->recipient["key"]["public"]));
+            hex2bin($_SESSION["user"]["key"]["secret"]), hex2bin($this->recipient["key"]["public"]));
 
         $this->message["nonce"] = Sodium::randombytes_buf(Sodium::CRYPTO_BOX_NONCEBYTES);
+        $nonce = "000000000000000000000000";
+
         $this->message["ciphertext"] = Sodium::crypto_box(
-            $this->clean["plaintext"],$this->message["nonce"],$keypair);
+            $this->clean["plaintext"], $nonce, $keypair);
+            // $this->clean["plaintext"], $this->message["nonce"], $keypair);
+
 
         $this->message["ciphertext"] = bin2hex($this->message["ciphertext"]);
+        $this->message["keypair"] = bin2hex($keypair);
         $this->message["nonce"] = bin2hex($this->message["nonce"]);
 
 
@@ -76,7 +81,8 @@ class SendMessage{
         $date = new DateTime('NOW');
         $this->message["timestamp"] = $date->getTimestamp();
         $this->message["sender"]["username"] = $_SESSION["user"]["username"];
-        $this->message["sender"]["public"] = bin2hex($_SESSION["user"]["key"]["public"]);
+        $this->message["sender"]["public"] = $_SESSION["user"]["key"]["public"];
+        // $this->message["sender"]["secret"] = $_SESSION["user"]["key"]["secret"];
         $time = $this->message["timestamp"];
         $sender = $this->message["sender"]["username"];
 

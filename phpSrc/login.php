@@ -78,12 +78,14 @@ class Login{
     }
     public function passwordIsCorrect()
     {
-        if (Sodium::crypto_pwhash_scryptsalsa208sha256_str_verify($_SESSION["user"]["key"]["hashedPW"], $this->dirty["pw"]))
+        if (Sodium::crypto_pwhash_scryptsalsa208sha256_str_verify(hex2bin($_SESSION["user"]["key"]["hashedPW"]), $this->dirty["pw"]))
         {
-            if ($user = $this->mongo["usersprivate"]->findone(array("username" => $_SESSION["user"]["username"])))
+            $query = array("username" => $_SESSION["user"]["username"]);
+            $projection = array("messages" => 0);
+            if ($user = $this->mongo["usersprivate"]->findone($query, $projection))
             {
                 $_SESSION["user"] = $user;
-                $_SESSION["user"]["key"]["public"] = hex2bin($_SESSION["user"]["key"]["public"]);
+                $_SESSION["user"]["key"]["public"] = $_SESSION["user"]["key"]["public"];
                 return 1;
             }
             else
@@ -101,38 +103,46 @@ class Login{
         $_SESSION["user"]["key"]["hashedPW"] = Sodium::crypto_pwhash_scryptsalsa208sha256_str(
             $this->dirty["pw"], Sodium::CRYPTO_PWHASH_SCRYPTSALSA208SHA256_OPSLIMIT_INTERACTIVE,
                     Sodium::CRYPTO_PWHASH_SCRYPTSALSA208SHA256_MEMLIMIT_INTERACTIVE);
+
+        $_SESSION["user"]["key"]["hashedPW"] = bin2hex($_SESSION["user"]["key"]["hashedPW"]);
     }
     public function createSaltNonce()
     {
         $_SESSION["user"]["key"]["salt"] = Sodium::randombytes_buf(Sodium::CRYPTO_PWHASH_SCRYPTSALSA208SHA256_SALTBYTES);
+        $_SESSION["user"]["key"]["salt"] = bin2hex($_SESSION["user"]["key"]["salt"]);
         $_SESSION["user"]["key"]["nonce"] = Sodium::randombytes_buf(Sodium::CRYPTO_SECRETBOX_NONCEBYTES);
+        $_SESSION["user"]["key"]["nonce"] = bin2hex($_SESSION["user"]["key"]["nonce"]);
     }
     public function getSalt()
     {
-        $_SESSION["user"]["key"]["salt"] = hex2bin($_SESSION["user"]["key"]["salt"]);
-        $_SESSION["user"]["key"]["nonce"] = hex2bin($_SESSION["user"]["key"]["nonce"]);
+        $_SESSION["user"]["key"]["salt"] = $_SESSION["user"]["key"]["salt"];
+        $_SESSION["user"]["key"]["nonce"] = $_SESSION["user"]["key"]["nonce"];
     }
     public function createMasterKeys()
     {
-        $keypairLength = Sodium::CRYPTO_BOX_KEYPAIRBYTES;
+        $keypairLength = Sodium::CRYPTO_BOX_SECRETKEYBYTES;
         $challengeSecretLength = Sodium::CRYPTO_SECRETBOX_KEYBYTES;
 
-        //Create Keypair
-        $_SESSION["user"]["key"]["keypair"] = Sodium::crypto_pwhash_scryptsalsa208sha256(
-            $keypairLength, $this->dirty["pw"], $_SESSION["user"]["key"]["salt"],
+        //Create Secret
+        $_SESSION["user"]["key"]["secret"] = Sodium::crypto_pwhash_scryptsalsa208sha256(
+            $keypairLength, $this->dirty["pw"], hex2bin($_SESSION["user"]["key"]["salt"]),
             Sodium::CRYPTO_PWHASH_SCRYPTSALSA208SHA256_OPSLIMIT_INTERACTIVE,
             Sodium::CRYPTO_PWHASH_SCRYPTSALSA208SHA256_MEMLIMIT_INTERACTIVE);
+
+        $_SESSION["user"]["key"]["secret"] = bin2hex($_SESSION["user"]["key"]["secret"]);
 
         //Create Challenge Secret
         $_SESSION["user"]["key"]["challengeKey"] = Sodium::crypto_pwhash_scryptsalsa208sha256(
-            $challengeSecretLength, $this->dirty["pw"], $_SESSION["user"]["key"]["salt"],
+            $challengeSecretLength, $this->dirty["pw"], hex2bin($_SESSION["user"]["key"]["salt"]),
             Sodium::CRYPTO_PWHASH_SCRYPTSALSA208SHA256_OPSLIMIT_INTERACTIVE,
             Sodium::CRYPTO_PWHASH_SCRYPTSALSA208SHA256_MEMLIMIT_INTERACTIVE);
+
+        $_SESSION["user"]["key"]["challengeKey"] = bin2hex($_SESSION["user"]["key"]["challengeKey"]);
     }
     public function createSigningKeys()
     {
-        $_SESSION["user"]["key"]["secret"] = Sodium::crypto_box_secretkey($_SESSION["user"]["key"]["keypair"]);
-        $_SESSION["user"]["key"]["public"] = Sodium::crypto_box_publickey($_SESSION["user"]["key"]["keypair"]);
+        $_SESSION["user"]["key"]["public"] = Sodium::crypto_box_publickey_from_secretkey(hex2bin($_SESSION["user"]["key"]["secret"]));
+        $_SESSION["user"]["key"]["public"] = bin2hex($_SESSION["user"]["key"]["public"]);
     }
     public function encryptChallenge()
     {
@@ -144,15 +154,26 @@ class Login{
             This is also easier to quickly check that we are the same user without using a password
         */
         $_SESSION["user"]["key"]["challenge"] = Sodium::crypto_secretbox($this->challenge, 
-            $_SESSION["user"]["key"]["nonce"], $_SESSION["user"]["key"]["challengeKey"]);
+           hex2bin( $_SESSION["user"]["key"]["nonce"]), hex2bin($_SESSION["user"]["key"]["challengeKey"]));
+        $_SESSION["user"]["key"]["challenge"] = bin2hex($_SESSION["user"]["key"]["challenge"]);
     }
     public function challengeIsDecrypted()
     {
         $plaintext = Sodium::crypto_secretbox_open(hex2bin($_SESSION["user"]["key"]["challenge"]),
-            $_SESSION["user"]["key"]["nonce"], $_SESSION["user"]["key"]["challengeKey"]);
+           hex2bin($_SESSION["user"]["key"]["nonce"]), hex2bin($_SESSION["user"]["key"]["challengeKey"]));
 
         if ($plaintext == $this->challenge) return true;
         else return false;
+    }
+    public function updateLoginTime()
+    {
+        date_default_timezone_set('America/Los_Angeles');
+        $date = new DateTime('NOW');
+
+        $query = array("username" => $_SESSION["user"]["username"]);
+        $update = array('$set' => array("lastLogin" => $date->getTimestamp()));
+
+        $this->mongo["userspublic"]->update($query, $update);
     }
     public function createNewUser()
     {
@@ -162,16 +183,16 @@ class Login{
             'lastLogin' => $date->getTimestamp(),
             'key' => array(
                 'hashedPW' => $_SESSION["user"]["key"]["hashedPW"],
-                'public' => bin2hex($_SESSION["user"]["key"]["public"]),
-                'salt' => bin2hex($_SESSION["user"]["key"]["salt"]),
-                'challenge' => bin2hex($_SESSION["user"]["key"]["challenge"]),
-                'nonce' => bin2hex($_SESSION["user"]["key"]["nonce"])
+                'public' => $_SESSION["user"]["key"]["public"],
+                'salt' => $_SESSION["user"]["key"]["salt"],
+                'challenge' => $_SESSION["user"]["key"]["challenge"],
+                'nonce' => $_SESSION["user"]["key"]["nonce"]
             )
         );
         $newuser = array('username' => $this->clean["un"],
             'lastLogin' => $date->getTimestamp(),
             'key' => array(
-                'public' => bin2hex($_SESSION["user"]["key"]["public"])
+                'public' => $_SESSION["user"]["key"]["public"]
             )
         );
 
@@ -236,6 +257,7 @@ function logUserIn()
         {
             $return->exitNow(0, "Challenge not decrypted\n");
         }
+        $login->updateLoginTime();
         $login->cleanup();
         $return->exitNow(1, "Welcome! " . $_SESSION["user"]["username"]);
     }
