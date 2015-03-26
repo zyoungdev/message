@@ -45,6 +45,7 @@ var APP = (function()
             hf.ajax("POST", fd, "phpSrc/sendMessage.php", function(res)
             {
                 console.log(res);
+                listContacts.init();
             });
         }
         return{
@@ -127,8 +128,16 @@ var APP = (function()
                 // console.log(res);
                 var
                 div = document.createElement("div");
-                div.className = "module-container contact-list-container";
-                document.body.appendChild(div);
+                div.className = "module-container contact-list-container",
+                elemExists = document.getElementsByClassName("contact-list-container")[0];
+
+                if (!elemExists)
+                {
+                    document.body.appendChild(div);
+                }
+
+
+
 
                 contactList = JSON.parse(res);
                 console.log(contactList);
