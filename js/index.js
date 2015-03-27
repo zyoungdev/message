@@ -289,7 +289,7 @@ var APP = (function()
     messageView = (function()
     {
         var
-        messageArray = [],
+        currentMessage,
         buildView = function()
         {
             var
@@ -317,10 +317,9 @@ var APP = (function()
             deleteButton.innerText = "Delete";
             closeButton.innerText = "Close";
 
-            sender.innerText = "From: " + messageArray[messageArray.length-1]["sender"];
-            timestamp.innerText = "Sent: " + messageArray[messageArray.length-1]["timestamp"];
-            message.innerHTML = messageArray[messageArray.length-1]["plaintext"];
-
+            sender.innerText = "From: " + currentMessage["sender"];
+            timestamp.innerText = "Sent: " + currentMessage["timestamp"];
+            message.innerHTML = currentMessage["plaintext"];
 
             frag.appendChild(replyButton);
             frag.appendChild(deleteButton);
@@ -333,7 +332,8 @@ var APP = (function()
             var
             elemExists = hf.elCN("view-message-container")[0];
             if (elemExists)
-            {
+            {   
+                elemExists.innerHTML = "";
                 elemExists.appendChild(viewMessage);
             }
             else
@@ -346,7 +346,7 @@ var APP = (function()
         return{
             init: function(res)
             {
-                messageArray.push(res);
+                currentMessage = res;
                 buildView();
             },
             click: function(ev)
@@ -362,14 +362,13 @@ var APP = (function()
                 {
                     if (hf.cN(e, "view-message-reply-button"))
                     {
-                        sendMessage.init(messageArray[index]["sender"]);
+                        sendMessage.init(currentMessage[index]["sender"]);
                     }
                     else if (hf.cN(e, "view-message-delete-button"))
                     {
                         viewMessageContainer.removeChild(e.parentNode);
-                        messageList.deleteMessage(messageArray[index]["sender"], messageArray[index]["timestamp"])
-                        console.log(index, messageArray[index]["sender"], messageArray[index]["timestamp"]);
-                        delete messageArray[index];
+                        messageList.deleteMessage(currentMessage["sender"], currentMessage["timestamp"])
+                        console.log(index, currentMessage["sender"], currentMessage["timestamp"]);
 
                     }
                     else if (hf.cN(e, "view-message-close-button"))
@@ -500,7 +499,7 @@ var APP = (function()
 
                 if (hf.isInside(e, messageListContainer))
                 {
-                    if (e.parentNode.className == "message-in-list")
+                    if (hf.cN(e.parentNode, "message-in-list"))
                     {
                         var index = Array.prototype.indexOf.call(messageListContainer.children, e.parentNode);
                         var

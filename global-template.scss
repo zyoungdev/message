@@ -169,6 +169,9 @@ button{
             @extend %a-10;
 
         }
+        div{
+            @extend %a-p-20;
+        }
         .view-message-sender,.view-message-timestamp,.view-message-message{
             @extend %a-100;
         }
