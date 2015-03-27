@@ -57,49 +57,41 @@ var APP = (function()
         contactList,
         buildList = function()
         {
-            var
-            contactListContainer = hf.elCN('contact-list-container')[0],
-            addContactInput = document.createElement("input"),
-            addContactButton = document.createElement("button");
-
-            addContactInput.className = "add-contact-input";
-            addContactButton.className = "add-contact-button";
-
-            contactListContainer.innerHTML = "";
-            contactListContainer.appendChild(addContactInput);
-            contactListContainer.appendChild(addContactButton);
-
-            if (contactList["code"] == 0) return;
-
-            for (var user in contactList)
+            hf.ajax("GET", null, "templates/contactList.php", function(res)
             {
                 var
-                contact = document.createElement("div"),
-                userDiv = document.createElement("div"),
-                deleteButton = document.createElement("button");
+                container = hf.cEL("div", {class: "module-container contact-list-container"}),
+                frag = document.createDocumentFragment(),
+                containerExists = hf.elCN("contact-list-container")[0];
 
-                deleteButton.innerText = "Delete";
-                deleteButton.className = "delete-contact-in-list";
-                contact.className = "contact";
-                userDiv.innerText = user;
+                container.innerHTML = res;
 
-                contact.appendChild(userDiv);
-                contact.appendChild(deleteButton);
-                contactListContainer.appendChild(contact);
-            }
+                if (!containerExists)
+                    document.body.appendChild(container);
+                else
+                    hf.elCN("contact-list")[0].innerHTML = "";
+                
+                if (contactList["code"] == 0) return;
+
+                for (var user in contactList)
+                {
+                    var
+                    contact = hf.cEL("div", {class: "contact"}),
+                    username = hf.cEL("div", {class: "contact-username"}, user),
+                    delBut = hf.cEL("button", {class: "contact-delete-button"}, "Delete");
+
+                    contact.appendChild(username);
+                    contact.appendChild(delBut);
+
+                    frag.appendChild(contact);
+                }
+                hf.elCN("contact-list")[0].appendChild(frag);
+            });
         },
         getList = function()
         {
             hf.ajax("GET", null, "phpSrc/listContacts.php", function(res)
             {
-                console.log(res);
-                var
-                div = document.createElement("div");
-                div.className = "module-container contact-list-container",
-                elemExists = document.getElementsByClassName("contact-list-container")[0];
-
-                if (!elemExists) document.body.appendChild(div);
-
                 contactList = JSON.parse(res);
                 // console.log(contactList);
                 buildList();
@@ -148,7 +140,7 @@ var APP = (function()
                     // console.log(res);
                 }
             });
-        };
+        }
         return {
             init: function()
             {
@@ -167,7 +159,7 @@ var APP = (function()
                     {
                         var index = Array.prototype.indexOf.call(contactListContainer.children, ev.target.parentNode);
                         var user = ev.target.parentNode.children[0].innerText;
-                        if (ev.target.className == "delete-contact-in-list")
+                        if (ev.target.className == "contact-delete-button")
                         {
                             deleteContact(index, user);
                         }
@@ -337,8 +329,8 @@ var APP = (function()
             deleteButton.innerText = "Delete";
             closeButton.innerText = "Close";
 
-            sender.innerText = "From: " + currentMessage["sender"];
-            timestamp.innerText = "Sent: " + date.toLocaleString();
+            sender.innerText = currentMessage["sender"];
+            timestamp.innerText = date.toLocaleString();
             message.innerHTML = currentMessage["plaintext"];
 
             frag.appendChild(replyButton);
@@ -382,7 +374,7 @@ var APP = (function()
                 {
                     if (hf.cN(e, "view-message-reply-button"))
                     {
-                        sendMessage.init(currentMessage[index]["sender"]);
+                        sendMessage.init(currentMessage["sender"]);
                     }
                     else if (hf.cN(e, "view-message-delete-button"))
                     {
@@ -406,47 +398,42 @@ var APP = (function()
         messageList,
         buildList = function()
         {
-            var
-            listContainer = hf.elCN("message-list-container")[0],
-            refreshButton = document.createElement("button"),
-            newMessageButton = document.createElement("button");
-            listContainer.innerHTML = "";
-
-            refreshButton.className = "refresh-messages-button";
-            newMessageButton.className = "new-message-button";
-
-            newMessageButton.innerText = "New Message";
-            refreshButton.innerText = "Refresh";
-
-            listContainer.appendChild(newMessageButton);
-            listContainer.appendChild(refreshButton);
-
-            if (messageList["code"] == 0) return;
-
-            for (var user in messageList)
+            hf.ajax("GET", null, "templates/messageList.php", function(res)
             {
-                for (var message in messageList[user])
+                var
+                container = hf.cEL("div", {class: "module-container message-list-container"}),
+                frag = document.createDocumentFragment(),
+                containerExists = hf.elCN("message-list-container")[0];
+
+                container.innerHTML = res;
+
+                if (!containerExists)
+                    document.body.appendChild(container);
+                else
+                    hf.elCN("message-list")[0].innerHTML = "";
+                
+                if (messageList["code"] == 0) return;
+
+                for (var user in messageList)
                 {
-                    var
-                    messageDiv = document.createElement("div"),
-                    username = document.createElement("div"),
-                    time = document.createElement("div"),
-                    deleteButton = document.createElement("button"),
-                    date = new Date(messageList[user][message].timestamp * 1000);
+                    for (var message in messageList[user])
+                    {
+                        var
+                        msg = hf.cEL("div", {class: "message"}),
+                        username = hf.cEL("div", {class: "message-username"}, user),
+                        date = new Date(messageList[user][message].timestamp * 1000),
+                        timestamp = hf.cEL("div", {class: "message-timestamp"}, date.toLocaleString()),
+                        delBut = hf.cEL("button", {class: "message-delete-button"}, "Delete");
 
-                    deleteButton.innerText = "Delete";
-                    deleteButton.className = "delete-message-in-list";
-                    messageDiv.className = "message-in-list";
-                    username.innerText = user;
+                        msg.appendChild(username);
+                        msg.appendChild(timestamp);
+                        msg.appendChild(delBut);
 
-                    time.innerText = date.toLocaleString();
-
-                    messageDiv.appendChild(username);
-                    messageDiv.appendChild(time);
-                    messageDiv.appendChild(deleteButton);
-                    listContainer.appendChild(messageDiv);
+                        frag.appendChild(msg);
+                    }
                 }
-            }
+                hf.elCN("message-list")[0].appendChild(frag);
+            });
         },
         viewMessage = function(u,t)
         {
@@ -490,18 +477,7 @@ var APP = (function()
         {
             hf.ajax("GET", null, "phpSrc/listMessages.php", function(res)
             {
-                if (document.getElementsByClassName("message-list-container")[0])
-                {
-                    document.getElementsByClassName("message-list-container")[0].parentNode.removeChild(document.getElementsByClassName("message-list-container")[0]);
-                }
-
-                var
-                div = document.createElement("div");
-                div.className = "module-container message-list-container";
-                document.body.appendChild(div);
-
                 messageList = JSON.parse(res);
-                // console.log(messageList);
                 buildList();
             });
         };
@@ -523,14 +499,14 @@ var APP = (function()
 
                 if (hf.isInside(e, messageListContainer))
                 {
-                    if (hf.cN(e.parentNode, "message-in-list"))
+                    if (hf.cN(e.parentNode, "message"))
                     {
-                        var index = Array.prototype.indexOf.call(messageListContainer.children, e.parentNode);
+                        // var index = Array.prototype.indexOf.call(messageListContainer.children, e.parentNode);
                         var
                         user = e.parentNode.children[0].innerText,
                         time = new Date(e.parentNode.children[1].innerText).getTime() / 1000;
 
-                        if (hf.cN(e, "delete-message-in-list"))
+                        if (hf.cN(e, "message-delete-button"))
                         {
                             this.deleteMessage(user, time);
                         }
@@ -545,7 +521,6 @@ var APP = (function()
                     }
                     else if (hf.cN(e, "new-message-button"))
                     {
-                        // console.log("yay");
                         sendMessage.init();
                     }
                 }

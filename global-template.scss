@@ -78,86 +78,67 @@ button{
     }
 }
 .message-list-container{
-    .refresh-messages-button{
-        @extend %a-45;
-        @extend %a-null-null;
-        @extend %a-p-0;
-    }   
-    .new-message-button{
-        @extend %a-45;
-        @extend %a-null-null;
-        @extend %a-p-0;
-    }
-    .message-in-list{
+    @extend %a-100;
 
-        cursor: pointer;
+    .message-list-controls-container{
         @extend %a-100;
+
         button{
-            margin-top:15px;
-            height:30px;
+            @extend %a-50;
+            @extend %a-null-cent;
         }
+    }
+    .message-list{
+        @extend %a-100;
 
-        div{
-            @extend %a-p-10;
+        .message{
+            @extend %a-75;
+            @extend %a-null-cent;
+            height:50px;
+            line-height:50px;
 
-            margin-top:10px;
-            margin-bottom:10px;
-            text-align:center;
-
-
-            &:nth-child(1)
-            {
-                @extend %a-45;
-
+            .message-username{
+                @extend %a-40;
             }
-            &:nth-child(2)
-            {
-                @extend %a-45;
-
+            .message-timestamp{
+                @extend %a-40;
             }
-            &:nth-child(3)
-            {
-                @extend %a-10;
-                
+            .message-delete-button{
+                @extend %a-15;
+                @extend %a-cent-null;
+                height:30px;
             }
-        }
-        &:hover div{
-            background-color: #0aa;
         }
     }
 }
 .contact-list-container{
-    .add-contact-input{
-        @extend %a-70;
+    .contact-list-controls{
+        @extend %a-100;
 
-        @extend %a-null-null;
-    }
-    .add-contact-button, button{
-        @extend %a-25;
-
-        @extend %a-null-null;
-    }
-
-    .contact{
-        cursor: pointer;
-        button{
-            height:30px;
-            @extend %a-15;
+        input{
+            @extend %a-75;
         }
-        div{
-            &:nth-child(1)
-            {
-                @extend %a-80;
-            }
-            
-
+        button{
+            @extend %a-20;
+        }
+    }
+    .contact-list{
+        .contact{
+            @extend %a-100;
+    
             @extend %a-p-10;
 
-            margin-bottom:10px;
-            text-align:center;
-        }
-        &:hover div{
-            background-color: #a0a;
+            height:40px;
+            line-height:40px;
+            text-align: center;
+
+            .contact-username{
+                @extend %a-75;
+            }
+            .contact-delete-button{
+                @extend %a-20;
+                height:30px;
+            }
         }
     }
 }
