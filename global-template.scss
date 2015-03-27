@@ -86,8 +86,6 @@ button{
 
         button{
             @extend %a-20;
-            @extend %a-null-cent;
-            left:35%;
         }
     }
     .message-list{
@@ -123,6 +121,11 @@ button{
         button{
             @extend %a-20;
         }
+        .delete-multiple-contact-button{
+            @extend %a-100;
+            margin:0;
+            display:none;
+        }
     }
     .contact-list{
         .contact{
@@ -133,13 +136,17 @@ button{
             height:40px;
             line-height:40px;
             text-align: center;
-
+            
+            .contact-checkbox{
+                @extend %a-10;
+                width:3%;
+            }
             .contact-username{
-                @extend %a-75;
+                @extend %a-90;
             }
             .contact-delete-button{
-                @extend %a-20;
-                height:30px;
+                // @extend %a-20;
+                // height:30px;
             }
         }
     }

@@ -55,6 +55,7 @@ var APP = (function()
     {
         var
         contactList,
+        checkBoxIndexes = [],
         buildList = function()
         {
             hf.ajax("GET", null, "templates/contactList.php", function(res)
@@ -76,12 +77,14 @@ var APP = (function()
                 for (var user in contactList)
                 {
                     var
+                    selBut = hf.cEL("input", {class: "contact-checkbox", type: "checkbox"}),
                     contact = hf.cEL("div", {class: "contact"}),
-                    username = hf.cEL("div", {class: "contact-username"}, user),
-                    delBut = hf.cEL("button", {class: "contact-delete-button"}, "Delete");
+                    username = hf.cEL("div", {class: "contact-username"}, user);
+                    // delBut = hf.cEL("button", {class: "contact-delete-button"}, "Delete");
 
+                    contact.appendChild(selBut);
                     contact.appendChild(username);
-                    contact.appendChild(delBut);
+                    // contact.appendChild(delBut);
 
                     frag.appendChild(contact);
                 }
@@ -140,12 +143,65 @@ var APP = (function()
                     // console.log(res);
                 }
             });
+        },
+        deleteMultipleContacts = function()
+        {
+            console.log(contactList);
+            var
+            newContactList = {},
+            fd = new FormData(),
+            backupContactList = contactList,
+            checkboxes = hf.elCN("contact-checkbox"),
+            delBut = hf.elCN("delete-multiple-contact-button")[0],
+            contactListContainer = hf.elCN("contact-list")[0];
+
+            checkBoxIndexes = [];
+            for (var i = 0, len = checkboxes.length; i < len; i++)
+            {
+                if (!checkboxes[i].checked)
+                {
+                    var
+                    user = checkboxes[i].parentNode.children[1].innerText;
+                    newContactList[user] = contactList[user];
+                }
+            }
+            contactList = newContactList;
+            fd.append("contacts", JSON.stringify(contactList));
+            hf.ajax("POST", fd, "phpSrc/deleteMultipleContacts.php", function(res)
+            {
+                console.log(res);
+                res = JSON.parse(res);
+
+                if (res["code"] == 0)
+                {
+                    contactList = backupContactList;
+                }
+                delBut.style.display = "none";
+                buildList();
+            });
+        },
+        checkboxClick = function(e)
+        {
+            var
+            checkboxes = hf.elCN("contact-checkbox"),
+            delBut = hf.elCN("delete-multiple-contact-button")[0];
+            console.log(delBut);
+
+            //if any are selected view delete button
+            for (var i = 0, len = checkboxes.length; i < len; i++)
+            {
+                if (checkboxes[i].checked)
+                {
+                    delBut.style.display = "block";
+                    return;
+                }
+            }
+            delBut.style.display = "none";
         }
         return {
             init: function()
             {
                 getList();
-
             },
             click: function(ev)
             {
@@ -155,11 +211,11 @@ var APP = (function()
 
                 if (hf.isInside(e, contactListContainer))
                 {
-                    if (hf.cN(e.parentNode, "contact"))
+                    if (hf.cN(e.parentNode, "contact-username"))
                     {
                         var index = Array.prototype.indexOf.call(contactListContainer.children, ev.target.parentNode);
                         var user = ev.target.parentNode.children[0].innerText;
-                        if (ev.target.className == "contact-delete-button")
+                        if (hf.cN(e, "contact-delete-button"))
                         {
                             deleteContact(index, user);
                         }
@@ -168,11 +224,19 @@ var APP = (function()
                             sendMessage.init(user);
                         }
                     }
-                    if (hf.cN(e, "add-contact-button"))
+                    else if (hf.cN(e, "add-contact-button"))
                     {
                         var
                         user = hf.elCN("add-contact-input")[0].value;
                         addContact(user)
+                    }
+                    else if (hf.cN(e, "contact-checkbox"))
+                    {
+                        checkboxClick(e);
+                    }
+                    else if (hf.cN(e, "delete-multiple-contact-button"))
+                    {
+                        deleteMultipleContacts();
                     }
                 }
             }
