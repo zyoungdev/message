@@ -35,6 +35,10 @@ class DeleteMessage{
         $query = array("username" => $_SESSION["user"]["username"]);
         $projection = array('$unset' => array("messages.$user.$message" => ""));
 
+        $find = array("messages" => 1);
+        $id = $this->mongo["usersprivate"]->findone($query, $find)["messages"]["$user"]["$message"]["id"];
+        $this->mongo["messages"]->remove(array('_id' => $id));
+
         if ($this->mongo["usersprivate"]->update($query, $projection))
         {
             return 1;

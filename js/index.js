@@ -279,7 +279,6 @@ var APP = (function()
                     {
                         sendPlaintext(rec.value, ta.value,e.parentNode);
                         e.disabled = true;
-                        document.body.removeChild();
                     }
                     else if (e == dis)
                     {
