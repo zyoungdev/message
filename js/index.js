@@ -19,6 +19,23 @@ var APP = (function()
             {
                 return e.className == cl;
             },
+            cEL: function(el, attr)
+            {
+                var node = document.createElement(el);
+                if (attr)
+                {
+                    for (var a in attr)
+                    {
+                        if (attr.hasOwnProperty(a))
+                        {
+                            node.setAttribute(a, attr[a]);
+                        }
+                    }
+                }
+                if (arguments[2])
+                    node.innerHTML = arguments[2];
+                return node;
+            },
             ajax: function(type, fd, uri, callback)
             {
                 var
