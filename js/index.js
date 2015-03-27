@@ -173,7 +173,7 @@ var APP = (function()
     {
         var
         imgs = [],
-        sendPlaintext = function(rec, pt)
+        sendPlaintext = function(rec, pt, el)
         {
             pt += "<div class=message-images-container>";
             for (var i = 0, len = imgs.length; i < len; i++)
@@ -192,6 +192,7 @@ var APP = (function()
             hf.ajax("POST", fd, "phpSrc/sendMessage.php", function(res)
             {
                 // console.log("Response recieved for sent message");
+                document.body.removeChild(el);
                 imgs = [];
                 contactList.init();
             });
@@ -247,6 +248,7 @@ var APP = (function()
                         document.body.appendChild(container);
                     container.innerHTML = res;
 
+                    hf.elCN("send-message-button").disabled = false;
                     if (rec)
                         hf.elCN("send-message-box")[0].children[0].value = rec;
                 });
@@ -275,8 +277,9 @@ var APP = (function()
                     }
                     else if (e == sub)
                     {
-                        sendPlaintext(rec.value, ta.value);
-                        document.body.removeChild(e.parentNode);
+                        sendPlaintext(rec.value, ta.value,e.parentNode);
+                        e.disabled = true;
+                        document.body.removeChild();
                     }
                     else if (e == dis)
                     {
