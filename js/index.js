@@ -184,12 +184,15 @@ var APP = (function()
         imgs = [],
         sendPlaintext = function(rec, pt, el)
         {
-            pt += "<div class=message-images-container>";
-            for (var i = 0, len = imgs.length; i < len; i++)
+            if (imgs.length > 0)
             {
-                pt += imgs[i];
+                pt += "<div class=view-message-images-container>";
+                for (var i = 0, len = imgs.length; i < len; i++)
+                {
+                    pt += imgs[i];
+                }
+                pt += "</div>";
             }
-            pt += "</div>";
             if (pt === "") return;
             var
             fd = new FormData();
@@ -241,7 +244,16 @@ var APP = (function()
 
                 // console.log(fileInput.files);
             }
-        };
+        },
+        closeMessage = function(e)
+        {
+            for (var i = 0, len = imgs.length; i < len; i++)
+            {
+                imgs[i] = "0".repeat(imgs[i].length);
+            }
+            imgs = [];
+            document.body.removeChild(e);
+        }
         return{
             init: function(rec)
             {
@@ -291,7 +303,7 @@ var APP = (function()
                     }
                     else if (e == dis)
                     {
-                        document.body.removeChild(e.parentNode);
+                        closeMessage(e.parentNode);
                     }
                 }
             }
@@ -303,57 +315,45 @@ var APP = (function()
         currentMessage,
         buildView = function()
         {
-            var
-            frag = document.createDocumentFragment(),
-            viewMessageContainer = document.createElement("div"),
-            viewMessage= document.createElement("div"),
-            replyButton = document.createElement("button"),
-            deleteButton = document.createElement("button"),
-            closeButton = document.createElement("button"),
-            sender = document.createElement("div"),
-            timestamp = document.createElement("div"),
-            message = document.createElement("div"),
-            date = new Date(currentMessage["timestamp"] * 1000);
-
-            viewMessageContainer.className = "module-container view-message-container";
-            viewMessage.className = "view-message";
-            sender.className = "view-message-sender";
-            timestamp.className = "view-message-timestamp";
-            message.className = "view-message-message";
-
-            replyButton.className = "view-message-reply-button";
-            deleteButton.className = "view-message-delete-button";
-            closeButton.className = "view-message-close-button";
-
-            replyButton.innerText = "Reply";
-            deleteButton.innerText = "Delete";
-            closeButton.innerText = "Close";
-
-            sender.innerText = currentMessage["sender"];
-            timestamp.innerText = date.toLocaleString();
-            message.innerHTML = currentMessage["plaintext"];
-
-            frag.appendChild(replyButton);
-            frag.appendChild(deleteButton);
-            frag.appendChild(closeButton);
-            frag.appendChild(sender);
-            frag.appendChild(timestamp);
-            frag.appendChild(message);
-
-            viewMessage.appendChild(frag);
-            var
-            elemExists = hf.elCN("view-message-container")[0];
-            if (elemExists)
-            {   
-                elemExists.innerHTML = "";
-                elemExists.appendChild(viewMessage);
-            }
-            else
+            hf.ajax("GET", null, "templates/viewMessage.php", function(res)
             {
-                document.body.appendChild(viewMessageContainer);
-                viewMessageContainer.appendChild(viewMessage);
-            }
+                var
+                container = hf.cEL("div", {class: "module-container view-message-container"}),
+                frag = document.createDocumentFragment(),
+                date = new Date(currentMessage["timestamp"] * 1000),
+                containerExists = hf.elCN("view-message-container")[0];
 
+                container.innerHTML = res;
+
+                if (!containerExists)
+                {
+                    document.body.appendChild(container);
+                }
+                else
+                {
+                    hf.elCN("view-message-sender")[0].innerHTML = "";
+                    hf.elCN("view-message-timestamp")[0].innerHTML = "";
+                    hf.elCN("view-message-message")[0].innerHTML = "";
+                }
+                
+                if (contactList["code"] == 0) return;
+
+                hf.elCN("view-message-sender")[0].innerHTML = currentMessage["sender"];
+                hf.elCN("view-message-timestamp")[0].innerHTML = date.toLocaleString();
+                hf.elCN("view-message-message")[0].innerHTML = currentMessage["plaintext"];
+            });
+        },
+        deleteMessage = function(e)
+        {
+            messageList.deleteMessage(currentMessage["sender"], currentMessage["timestamp"]);
+        },
+        closeMessage = function(e)
+        {
+            document.body.removeChild(e.parentNode.parentNode);
+            
+            //Clear the plaintext from memory, A little heavy handed
+            currentMessage["plaintext"] = "0".repeat(currentMessage["plaintext"].length);
+            currentMessage = {};
         }
         return{
             init: function(res)
@@ -378,14 +378,12 @@ var APP = (function()
                     }
                     else if (hf.cN(e, "view-message-delete-button"))
                     {
-                        viewMessageContainer.removeChild(e.parentNode);
-                        messageList.deleteMessage(currentMessage["sender"], currentMessage["timestamp"])
-                        // console.log(index, currentMessage["sender"], currentMessage["timestamp"]);
-
+                        deleteMessage(e);
+                        closeMessage(e);
                     }
                     else if (hf.cN(e, "view-message-close-button"))
                     {
-                        viewMessageContainer.removeChild(e.parentNode);
+                        closeMessage(e);
                     }
 
                 }
@@ -519,7 +517,7 @@ var APP = (function()
                     {
                         getList();
                     }
-                    else if (hf.cN(e, "new-message-button"))
+                    else if (hf.cN(e, "create-message-button"))
                     {
                         sendMessage.init();
                     }
