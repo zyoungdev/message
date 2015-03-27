@@ -22,7 +22,7 @@ button{
     @extend %d-66;
 
     @extend %a-top-cent;
-    @extend %t-cent-cent;
+    // @extend %t-cent-cent;
 
     @extend %a-p-20;
 
@@ -68,10 +68,15 @@ button{
         }
 
     }
-    >button, .send-message-button, .discard-message-button{
+    >button{
         @extend %a-45;
 
         @extend %a-p-5;
+    }
+}
+.send-message-box{
+    .send-message-button, .add-image-button, .discard-message-button{
+        @extend %a-30;
     }
 }
 .message-list-container{
@@ -159,31 +164,22 @@ button{
     }
 }
 .view-message-container{
-    .view-message-message{
-        
-        .view-message-reply-button{
-            @extend %a-20;
-            @extend %a-null-null;
+    .view-message{
+        button{
+            @extend %a-10;
+
         }
-        .view-message-delete-button{
-            @extend %a-20;
-            @extend %a-null-null;
-        }
-        .view-message-close-button{
-            @extend %a-20;
-            @extend %a-null-null;
-        }
-        .view-message-sender{
+        .view-message-sender,.view-message-timestamp,.view-message-message{
             @extend %a-100;
-            @extend %a-p-20;
-        }
-        .view-message-timestamp{
-            @extend %a-100;
-            @extend %a-p-20;
         }
         .view-message-message{
-            @extend %a-100;
-            @extend %a-p-20;
+            .message-images-container{
+                @extend %a-95;
+                @extend %a-null-cent;
+                img{
+                    @extend %a-20;
+                }
+            }
         }
     }
 }

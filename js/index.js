@@ -172,21 +172,66 @@ var APP = (function()
     sendMessage = (function()
     {
         var
+        imgs = [],
         sendPlaintext = function(rec, pt)
         {
+            pt += "<div class=message-images-container>";
+            for (var i = 0, len = imgs.length; i < len; i++)
+            {
+                pt += imgs[i];
+            }
+            pt += "</div>";
             if (pt === "") return;
             var
             fd = new FormData();
+
 
             fd.append("plaintext", pt);
             fd.append("recipient", rec);
 
             hf.ajax("POST", fd, "phpSrc/sendMessage.php", function(res)
             {
-                console.log(res);
+                console.log("Response recieved for sent message");
+                imgs = [];
                 contactList.init();
             });
-        }
+        },
+        addImage = function()
+        {
+            var
+            fileInput = hf.elCN("file-upload-input")[0];
+            fileInput.click();
+
+            fileInput.onchange = function()
+            {
+                var
+                file = fileInput.files[0],
+                img = new Image();
+
+                img.file = file;
+
+                var reader = new FileReader();
+                    reader.onload = (function(aImg) 
+                        { 
+                            return function(e) 
+                                { 
+                                    console.log(e.target.result);
+                                    aImg.src = e.target.result; 
+
+                                    var
+                                    i = "<img src=";
+                                    i += e.target.result;
+                                    i += ">";
+                                    
+                                    imgs.push(i);
+                                    console.log(imgs);
+                                }; 
+                        })(img);
+                    reader.readAsDataURL(fileInput.files[0]);
+
+                console.log(fileInput.files);
+            }
+        };
         return{
             init: function(rec)
             {
@@ -217,11 +262,16 @@ var APP = (function()
                     var
                     rec = sendMessageBox.getElementsByTagName("input")[0],
                     ta = sendMessageBox.getElementsByTagName("textarea")[0],
-                    sub = sendMessageBox.getElementsByTagName("button")[0],
-                    dis = sendMessageBox.getElementsByTagName("button")[1];
+                    img = sendMessageBox.getElementsByTagName("button")[0],
+                    sub = sendMessageBox.getElementsByTagName("button")[1],
+                    dis = sendMessageBox.getElementsByTagName("button")[2];
                     if (e == ta)
                     {
 
+                    }
+                    else if (e == img)
+                    {
+                        addImage();
                     }
                     else if (e == sub)
                     {
@@ -245,7 +295,7 @@ var APP = (function()
             var
             frag = document.createDocumentFragment(),
             viewMessageContainer = document.createElement("div"),
-            viewMessageMessage= document.createElement("div"),
+            viewMessage= document.createElement("div"),
             replyButton = document.createElement("button"),
             deleteButton = document.createElement("button"),
             closeButton = document.createElement("button"),
@@ -254,7 +304,7 @@ var APP = (function()
             message = document.createElement("div");
 
             viewMessageContainer.className = "module-container view-message-container";
-            viewMessageMessage.className = "view-message-message";
+            viewMessage.className = "view-message";
             sender.className = "view-message-sender";
             timestamp.className = "view-message-timestamp";
             message.className = "view-message-message";
@@ -269,7 +319,7 @@ var APP = (function()
 
             sender.innerText = "From: " + messageArray[messageArray.length-1]["sender"];
             timestamp.innerText = "Sent: " + messageArray[messageArray.length-1]["timestamp"];
-            message.innerText = messageArray[messageArray.length-1]["plaintext"];
+            message.innerHTML = messageArray[messageArray.length-1]["plaintext"];
 
 
             frag.appendChild(replyButton);
@@ -279,17 +329,17 @@ var APP = (function()
             frag.appendChild(timestamp);
             frag.appendChild(message);
 
-            viewMessageMessage.appendChild(frag);
+            viewMessage.appendChild(frag);
             var
             elemExists = hf.elCN("view-message-container")[0];
             if (elemExists)
             {
-                elemExists.appendChild(viewMessageMessage);
+                elemExists.appendChild(viewMessage);
             }
             else
             {
                 document.body.appendChild(viewMessageContainer);
-                viewMessageContainer.appendChild(viewMessageMessage);
+                viewMessageContainer.appendChild(viewMessage);
             }
 
         }
@@ -318,7 +368,8 @@ var APP = (function()
                     {
                         viewMessageContainer.removeChild(e.parentNode);
                         messageList.deleteMessage(messageArray[index]["sender"], messageArray[index]["timestamp"])
-                        messageArray[index] = {};
+                        console.log(index, messageArray[index]["sender"], messageArray[index]["timestamp"]);
+                        delete messageArray[index];
 
                     }
                     else if (hf.cN(e, "view-message-close-button"))
