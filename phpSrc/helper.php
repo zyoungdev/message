@@ -64,6 +64,7 @@ function openDB()
     $mongo["collection"] = $mongo["client"]->messageApp;
     $mongo["userspublic"] = $mongo["collection"]->userspublic;
     $mongo["usersprivate"] = $mongo["collection"]->usersprivate;
+    $mongo["messages"] = $mongo["collection"]->messages;
 
     return $mongo;
 }

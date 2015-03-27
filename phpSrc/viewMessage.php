@@ -31,6 +31,11 @@ class ViewMessage{
         if ($result = $this->mongo["usersprivate"]->findone($query, $projection))
         {
             $this->message = $result["messages"]["$username"]["$timestamp"];
+
+
+            $id = $result["messages"]["$username"]["$timestamp"]["id"];
+            $mQuery = array('_id' => $id);
+            $this->message["ciphertext"] = $this->mongo["messages"]->findone($mQuery)["ciphertext"];
         }
         else
         {
@@ -70,7 +75,8 @@ class ViewMessage{
 
         Sodium::sodium_memzero($this->plaintext["sender"]);
         Sodium::sodium_memzero($this->plaintext["plaintext"]);
-        unset($this->plaintext["timestamp"]);
+        unset($this->plaintext);
+        unset($this->message);
     }
 }
 

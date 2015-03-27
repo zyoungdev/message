@@ -85,16 +85,25 @@ class SendMessage{
     {
         date_default_timezone_set('America/Los_Angeles');
         $date = new DateTime('NOW');
-        $this->message["timestamp"] = $date->getTimestamp();
-        $this->message["sender"]["username"] = $_SESSION["user"]["username"];
-        $this->message["sender"]["public"] = $_SESSION["user"]["key"]["public"];
-        // $this->message["sender"]["secret"] = $_SESSION["user"]["key"]["secret"];
-        $time = $this->message["timestamp"];
-        $sender = $this->message["sender"]["username"];
+
+        $message["timestamp"] = $date->getTimestamp();
+        $message["sender"]["username"] = $_SESSION["user"]["username"];
+        $message["sender"]["public"] = $_SESSION["user"]["key"]["public"];
+        $message["nonce"] = $this->message["nonce"];
+
+        $time = $message["timestamp"];
+        $sender = $message["sender"]["username"];
+
+        //Save the ciphertext separatesly in the messages Collection
+        //Link it to the usersprivate Collection with an the _id
+        $mQuery = array("ciphertext" => $this->message["ciphertext"]);
+        $this->mongo["messages"]->save($mQuery);
+
+        $id = $mQuery['_id'];
+        $message["id"] = $id;
 
         $query = array('username' => $this->clean["un"]);
-        $update = array('$set' => array("messages.$sender.$time" => $this->message));
-
+        $update = array('$set' => array("messages.$sender.$time" => $message));
         if ($this->mongo["usersprivate"]->update($query, $update))
         {
             $this->cleanup();
