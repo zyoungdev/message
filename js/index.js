@@ -75,7 +75,7 @@ var APP = (function()
         {
             hf.ajax("GET", null, "phpSrc/listContacts.php", function(res)
             {
-                // console.log(res);
+                console.log(res);
                 var
                 div = document.createElement("div");
                 div.className = "module-container contact-list-container",
@@ -84,13 +84,13 @@ var APP = (function()
                 if (!elemExists) document.body.appendChild(div);
 
                 contactList = JSON.parse(res);
-                console.log(contactList);
+                // console.log(contactList);
                 buildList();
             });
         },
         addContact = function(u)
         {
-            console.log("yay");
+            // console.log("yay");
             var
             fd = new FormData();
 
@@ -98,13 +98,13 @@ var APP = (function()
 
             hf.ajax("POST", fd, "phpSrc/addContact.php", function(res)
             {
-                // console.log(res);
+                console.log(res);
                 hf.ajax("GET", null, "phpSrc/listContacts.php", function(r)
                 {
                     contactList = JSON.parse(r);
                     if (contactList["code"] == null)
                     {
-                        console.log(contactList);
+                        // console.log(contactList);
                         buildList();
                     }
                 });
@@ -119,7 +119,7 @@ var APP = (function()
 
             hf.ajax("POST", fd, "phpSrc/deleteContact.php", function(res)
             {
-                console.log(res);
+                // console.log(res);
                 // res = JSON.parse(res);
                 if (res["code"] == null)
                 {
@@ -128,7 +128,7 @@ var APP = (function()
                 }
                 else
                 {
-                    console.log(res);
+                    // console.log(res);
                 }
             });
         };
@@ -191,7 +191,7 @@ var APP = (function()
 
             hf.ajax("POST", fd, "phpSrc/sendMessage.php", function(res)
             {
-                console.log("Response recieved for sent message");
+                // console.log("Response recieved for sent message");
                 imgs = [];
                 contactList.init();
             });
@@ -215,7 +215,7 @@ var APP = (function()
                         { 
                             return function(e) 
                                 { 
-                                    console.log(e.target.result);
+                                    // console.log(e.target.result);
                                     aImg.src = e.target.result; 
 
                                     var
@@ -224,12 +224,12 @@ var APP = (function()
                                     i += ">";
                                     
                                     imgs.push(i);
-                                    console.log(imgs);
+                                    // console.log(imgs);
                                 }; 
                         })(img);
                     reader.readAsDataURL(fileInput.files[0]);
 
-                console.log(fileInput.files);
+                // console.log(fileInput.files);
             }
         };
         return{
@@ -301,7 +301,8 @@ var APP = (function()
             closeButton = document.createElement("button"),
             sender = document.createElement("div"),
             timestamp = document.createElement("div"),
-            message = document.createElement("div");
+            message = document.createElement("div"),
+            date = new Date(currentMessage["timestamp"] * 1000);
 
             viewMessageContainer.className = "module-container view-message-container";
             viewMessage.className = "view-message";
@@ -318,7 +319,7 @@ var APP = (function()
             closeButton.innerText = "Close";
 
             sender.innerText = "From: " + currentMessage["sender"];
-            timestamp.innerText = "Sent: " + currentMessage["timestamp"];
+            timestamp.innerText = "Sent: " + date.toLocaleString();
             message.innerHTML = currentMessage["plaintext"];
 
             frag.appendChild(replyButton);
@@ -368,7 +369,7 @@ var APP = (function()
                     {
                         viewMessageContainer.removeChild(e.parentNode);
                         messageList.deleteMessage(currentMessage["sender"], currentMessage["timestamp"])
-                        console.log(index, currentMessage["sender"], currentMessage["timestamp"]);
+                        // console.log(index, currentMessage["sender"], currentMessage["timestamp"]);
 
                     }
                     else if (hf.cN(e, "view-message-close-button"))
@@ -395,8 +396,11 @@ var APP = (function()
             refreshButton.className = "refresh-messages-button";
             newMessageButton.className = "new-message-button";
 
-            listContainer.appendChild(refreshButton);
+            newMessageButton.innerText = "New Message";
+            refreshButton.innerText = "Refresh";
+
             listContainer.appendChild(newMessageButton);
+            listContainer.appendChild(refreshButton);
 
             if (messageList["code"] == 0) return;
 
@@ -408,14 +412,15 @@ var APP = (function()
                     messageDiv = document.createElement("div"),
                     username = document.createElement("div"),
                     time = document.createElement("div"),
-                    deleteButton = document.createElement("button");
+                    deleteButton = document.createElement("button"),
+                    date = new Date(messageList[user][message].timestamp * 1000);
 
                     deleteButton.innerText = "Delete";
                     deleteButton.className = "delete-message-in-list";
                     messageDiv.className = "message-in-list";
                     username.innerText = user;
 
-                    time.innerText = messageList[user][message].timestamp;
+                    time.innerText = date.toLocaleString();
 
                     messageDiv.appendChild(username);
                     messageDiv.appendChild(time);
@@ -449,7 +454,7 @@ var APP = (function()
 
             hf.ajax("POST", fd, "phpSrc/deleteMessage.php", function(res)
             {
-                console.log(res);
+                // console.log(res);
                 // res = JSON.parse(res);
                 if (res["code"] == null)
                 {
@@ -458,7 +463,7 @@ var APP = (function()
                 }
                 else
                 {
-                    console.log(res);
+                    // console.log(res);
                 }
             });
         },
@@ -477,7 +482,7 @@ var APP = (function()
                 document.body.appendChild(div);
 
                 messageList = JSON.parse(res);
-                console.log(messageList);
+                // console.log(messageList);
                 buildList();
             });
         };
@@ -504,9 +509,8 @@ var APP = (function()
                         var index = Array.prototype.indexOf.call(messageListContainer.children, e.parentNode);
                         var
                         user = e.parentNode.children[0].innerText,
-                        time = e.parentNode.children[1].innerText;
+                        time = new Date(e.parentNode.children[1].innerText).getTime() / 1000;
 
-                        // if (e.className == "delete-message-in-list")
                         if (hf.cN(e, "delete-message-in-list"))
                         {
                             this.deleteMessage(user, time);
@@ -522,7 +526,7 @@ var APP = (function()
                     }
                     else if (hf.cN(e, "new-message-button"))
                     {
-                        console.log("yay");
+                        // console.log("yay");
                         sendMessage.init();
                     }
                 }
@@ -553,7 +557,7 @@ var APP = (function()
                     if (r.code)
                     {
                         //Logged in!
-                        console.log(r.message);
+                        // console.log(r.message);
                         hf.elCN("loginerror")[0].innerText = r.message;
 
                         document.body.innerHTML = "";
@@ -565,7 +569,7 @@ var APP = (function()
                     else
                     {
                         //Something failed
-                        console.log(r.message);
+                        // console.log(r.message);
                         hf.elCN("loginerror")[0].innerText = r.message;
                     }
                 }

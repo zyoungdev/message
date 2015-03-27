@@ -18,10 +18,8 @@ button{
 }
 .login-box, .module-container{
     @extend %a-100;
-    @extend %t-75;
-    @extend %d-66;
 
-    @extend %a-top-cent;
+    // @extend %a-top-cent;
     // @extend %t-cent-cent;
 
     @extend %a-p-20;
