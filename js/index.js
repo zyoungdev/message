@@ -211,18 +211,11 @@ var APP = (function()
 
                 if (hf.isInside(e, contactListContainer))
                 {
-                    if (hf.cN(e.parentNode, "contact-username"))
+                    if (hf.cN(e, "contact-username"))
                     {
-                        var index = Array.prototype.indexOf.call(contactListContainer.children, ev.target.parentNode);
-                        var user = ev.target.parentNode.children[0].innerText;
-                        if (hf.cN(e, "contact-delete-button"))
-                        {
-                            deleteContact(index, user);
-                        }
-                        else
-                        {
-                            sendMessage.init(user);
-                        }
+                        var user = ev.target.innerText;
+
+                        sendMessage.init(user);
                     }
                     else if (hf.cN(e, "add-contact-button"))
                     {
