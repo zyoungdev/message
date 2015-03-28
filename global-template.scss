@@ -86,6 +86,12 @@ button{
 
         button{
             @extend %a-20;
+            margin-bottom:10px;
+        }
+        .delete-multiple-messages-button{
+            @extend %a-100;
+            margin:0;
+            display:none;
         }
     }
     .message-list{
@@ -97,21 +103,28 @@ button{
             height:50px;
             line-height:50px;
 
+            .message-checkbox{
+                @extend %a-10;
+                width:3%;
+            }
             .message-username{
-                @extend %a-40;
+                @extend %a-45;
+                text-align:center;
             }
             .message-timestamp{
-                @extend %a-40;
+                @extend %a-45;
+                text-align: center;
             }
             .message-delete-button{
-                @extend %a-15;
-                @extend %a-cent-null;
-                height:30px;
+                // @extend %a-15;
+                // @extend %a-cent-null;
+                // height:30px;
             }
         }
     }
 }
 .contact-list-container{
+    @extend %a-100;
     .contact-list-controls{
         @extend %a-100;
 
@@ -128,6 +141,8 @@ button{
         }
     }
     .contact-list{
+        @extend %a-75;
+        @extend %a-null-cent;
         .contact{
             @extend %a-100;
     

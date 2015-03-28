@@ -55,7 +55,6 @@ var APP = (function()
     {
         var
         contactList,
-        checkBoxIndexes = [],
         buildList = function()
         {
             hf.ajax("GET", null, "templates/contactList.php", function(res)
@@ -215,7 +214,7 @@ var APP = (function()
                     {
                         var user = ev.target.innerText;
 
-                        sendMessage.init(user);
+                        messageDraft.init(user);
                     }
                     else if (hf.cN(e, "add-contact-button"))
                     {
@@ -235,7 +234,7 @@ var APP = (function()
             }
         };
     })(),
-    sendMessage = (function()
+    messageDraft = (function()
     {
         var
         imgs = [],
@@ -431,7 +430,7 @@ var APP = (function()
                 {
                     if (hf.cN(e, "view-message-reply-button"))
                     {
-                        sendMessage.init(currentMessage["sender"]);
+                        messageDraft.init(currentMessage["sender"]);
                     }
                     else if (hf.cN(e, "view-message-delete-button"))
                     {
@@ -475,14 +474,16 @@ var APP = (function()
                     {
                         var
                         msg = hf.cEL("div", {class: "message"}),
+                        selBut = hf.cEL("input", {class: "message-checkbox", type: "checkbox"}),
                         username = hf.cEL("div", {class: "message-username"}, user),
                         date = new Date(messageList[user][message].timestamp * 1000),
-                        timestamp = hf.cEL("div", {class: "message-timestamp"}, date.toLocaleString()),
-                        delBut = hf.cEL("button", {class: "message-delete-button"}, "Delete");
+                        timestamp = hf.cEL("div", {class: "message-timestamp"}, date.toLocaleString());
+                        // delBut = hf.cEL("button", {class: "message-delete-button"}, "Delete");
 
+                        msg.appendChild(selBut);
                         msg.appendChild(username);
                         msg.appendChild(timestamp);
-                        msg.appendChild(delBut);
+                        // msg.appendChild(delBut);
 
                         frag.appendChild(msg);
                     }
@@ -505,6 +506,23 @@ var APP = (function()
                 messageView.init(res);                
             });
         },
+        checkboxClick = function(e)
+        {
+            var
+            checkboxes = hf.elCN("message-checkbox"),
+            delBut = hf.elCN("delete-multiple-messages-button")[0];
+
+            //if any are selected view delete button
+            for (var i = 0, len = checkboxes.length; i < len; i++)
+            {
+                if (checkboxes[i].checked)
+                {
+                    delBut.style.display = "block";
+                    return;
+                }
+            }
+            delBut.style.display = "none";
+        }
         delMessage = function(u, t)
         {
             var
@@ -528,11 +546,59 @@ var APP = (function()
                 }
             });
         },
+        deleteMultipleMessages = function()
+        {
+            var
+            newMessageList = messageList,
+            fd = new FormData(),
+            backupMessageList = messageList,
+            checkboxes = hf.elCN("message-checkbox"),
+            delBut = hf.elCN("delete-multiple-messages-button")[0],
+            messageListContainer = hf.elCN("message-list")[0];
+
+            checkBoxIndexes = [];
+            for (var i = 0, len = checkboxes.length; i < len; i++)
+            {
+                if (checkboxes[i].checked)
+                {
+                    var
+                    user = checkboxes[i].parentNode.children[1].innerText,
+                    timestamp = new Date(checkboxes[i].parentNode.children[2].innerText).getTime() / 1000;
+                    
+                    delete newMessageList[user][timestamp];
+
+                }
+            }
+            for (var user in newMessageList)
+            {
+                if (newMessageList[user].length == 0)
+                {
+                    delete newMessageList[user];
+                }
+            }
+
+            messageList = newMessageList;
+            console.log(messageList);
+            fd.append("messages", JSON.stringify(messageList));
+            hf.ajax("POST", fd, "phpSrc/deleteMultipleMessages.php", function(res)
+            {
+                console.log(res);
+                res = JSON.parse(res);
+
+                if (res["code"] == 0)
+                {
+                    messageList = backupMessageList;
+                }
+                delBut.style.display = "none";
+                buildList();
+            });
+        },
         getList = function()
         {
             hf.ajax("GET", null, "phpSrc/listMessages.php", function(res)
             {
                 messageList = JSON.parse(res);
+                console.log(messageList);
                 buildList();
             });
         };
@@ -554,21 +620,13 @@ var APP = (function()
 
                 if (hf.isInside(e, messageListContainer))
                 {
-                    if (hf.cN(e.parentNode, "message"))
+                    if (hf.cN(e, "message-username") || hf.cN(e, "message-timestamp"))
                     {
-                        // var index = Array.prototype.indexOf.call(messageListContainer.children, e.parentNode);
                         var
-                        user = e.parentNode.children[0].innerText,
-                        time = new Date(e.parentNode.children[1].innerText).getTime() / 1000;
+                        user = e.parentNode.children[1].innerText,
+                        time = new Date(e.parentNode.children[2].innerText).getTime() / 1000;
 
-                        if (hf.cN(e, "message-delete-button"))
-                        {
-                            this.deleteMessage(user, time);
-                        }
-                        else
-                        {
-                            viewMessage(user, time);
-                        }
+                        viewMessage(user, time);
                     }
                     else if (hf.cN(e, "refresh-messages-button"))
                     {
@@ -576,7 +634,15 @@ var APP = (function()
                     }
                     else if (hf.cN(e, "create-message-button"))
                     {
-                        sendMessage.init();
+                        messageDraft.init();
+                    }
+                    else if (hf.cN(e, "message-checkbox"))
+                    {
+                        checkboxClick();
+                    }
+                    else if (hf.cN(e, "delete-multiple-messages-button"))
+                    {
+                        deleteMultipleMessages();
                     }
                 }
             }
@@ -660,7 +726,7 @@ var APP = (function()
         clicked: function(ev)
         {
             login.click(ev);
-            sendMessage.click(ev);
+            messageDraft.click(ev);
             messageList.click(ev);
             contactList.click(ev);
             messageView.click(ev);
