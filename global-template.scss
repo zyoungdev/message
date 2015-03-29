@@ -72,7 +72,36 @@ button{
         @extend %a-p-5;
     }
 }
+.navigation-container{
+    @extend %a-100;
+
+    div{
+        @extend %a-50;
+        background-color: #232323;
+        height: 100px;
+        cursor:pointer;
+
+        &:hover{
+            background-color: #343434;
+        }
+
+        p{
+            @extend %a-95;
+            @extend %a-cent-cent;
+            
+            text-align:center;
+            color: #efefef;
+
+        }
+    }
+    .active{
+        background-color: #FF005B;
+    }
+}
 .send-message-box{
+    textarea{
+        min-height:400px;
+    }
     .send-message-button, .add-files-button, .discard-message-button{
         @extend %a-30;
     }

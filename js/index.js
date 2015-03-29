@@ -103,6 +103,11 @@ var APP = (function()
         },
         getList = function()
         {
+            if (contactList)
+            {
+                buildList();
+                return;
+            }
             hf.ajax("GET", null, "phpSrc/listContacts.php", function(res)
             {
                 contactList = JSON.parse(res);
@@ -156,7 +161,7 @@ var APP = (function()
         },
         deleteMultipleContacts = function()
         {
-            console.log(contactList);
+            // console.log(contactList);
             var
             newContactList = {},
             fd = new FormData(),
@@ -195,7 +200,7 @@ var APP = (function()
             var
             checkboxes = hf.elCN("contact-checkbox"),
             delBut = hf.elCN("delete-multiple-contact-button")[0];
-            console.log(delBut);
+            // console.log(delBut);
 
             //if any are selected view delete button
             for (var i = 0, len = checkboxes.length; i < len; i++)
@@ -225,6 +230,7 @@ var APP = (function()
                     {
                         var user = ev.target.innerText;
 
+                        navigation.stateChange("compose");
                         messageDraft.init(user);
                     }
                     else if (hf.cN(e, "add-contact-button"))
@@ -252,9 +258,16 @@ var APP = (function()
         fls = [],
         fileList = [],
         imgList = [],
+        clearFiles = function()
+        {
+            imgs = [];
+            fls = [];
+            fileList = [];
+            imgList = [];
+        }
         sendPlaintext = function(rec, pt, el)
         {
-            console.log(fls);
+            // console.log(fls);
             if (imgs.length > 0)
             {
                 pt += "<div class=image-file-list>";
@@ -281,7 +294,7 @@ var APP = (function()
                 }
                 pt += "</div>";
             }
-            console.log(pt);
+            // console.log(pt);
             if (pt === "") return;
             var
             fd = new FormData();
@@ -369,7 +382,6 @@ var APP = (function()
             {
                 imgs[i] = "0".repeat(imgs[i].length);
             }
-            imgs = [];
             document.body.removeChild(e);
         }
         return{
@@ -416,12 +428,15 @@ var APP = (function()
                     }
                     else if (e == sub)
                     {
-                        sendPlaintext(rec.value, ta.value,e.parentNode);
                         e.disabled = true;
+                        sendPlaintext(rec.value, ta.value,e.parentNode);
+                        clearFiles();
                     }
                     else if (e == dis)
                     {
                         closeMessage(e.parentNode);
+                        clearFiles();
+                        navigation.stateChange("messages");
                     }
                 }
             }
@@ -482,10 +497,11 @@ var APP = (function()
         },
         closeMessage = function(e)
         {
-            document.body.removeChild(e.parentNode.parentNode);
+            // document.body.removeChild(e.parentNode.parentNode);
             
             //Clear the plaintext from memory, A little heavy handed
-            currentMessage["plaintext"] = "0".repeat(currentMessage["plaintext"].length);
+            // if (currentMessage)
+                // currentMessage["plaintext"] = "0".repeat(currentMessage["plaintext"].length);
             currentMessage = {};
         },
         imageClick = function(img)
@@ -503,7 +519,7 @@ var APP = (function()
         },
         fileClick = function(img)
         {
-            console.log(flFileList);
+            // console.log(flFileList);
             var
             fileContainer = hf.elCN("view-message-files-container")[0],
             index = Array.prototype.indexOf.call(fileContainer.children, img.parentNode);
@@ -535,10 +551,12 @@ var APP = (function()
                     {
                         deleteMessage(e);
                         closeMessage(e);
+                        navigation.stateChange("messages");
                     }
                     else if (hf.cN(e, "view-message-close-button"))
                     {
                         closeMessage(e);
+                        navigation.stateChange("messages");
                     }
                     else if (hf.isInside(e, imgContainer))
                     {
@@ -597,8 +615,8 @@ var APP = (function()
                         // delBut = hf.cEL("button", {class: "message-delete-button"}, "Delete");
 
                         msg.appendChild(selBut);
-                        msg.appendChild(username);
                         msg.appendChild(timestamp);
+                        msg.appendChild(username);
                         // msg.appendChild(delBut);
 
                         frag.appendChild(msg);
@@ -678,9 +696,10 @@ var APP = (function()
                 if (checkboxes[i].checked)
                 {
                     var
-                    user = checkboxes[i].parentNode.children[1].innerText,
-                    timestamp = new Date(checkboxes[i].parentNode.children[2].innerText).getTime() / 1000;
+                    user = checkboxes[i].parentNode.children[2].innerText,
+                    timestamp = new Date(checkboxes[i].parentNode.children[1].innerText).getTime() / 1000;
                     
+                    console.log(newMessageList);
                     delete newMessageList[user][timestamp];
 
                 }
@@ -694,11 +713,11 @@ var APP = (function()
             }
 
             messageList = newMessageList;
-            console.log(messageList);
+            // console.log(messageList);
             fd.append("messages", JSON.stringify(messageList));
             hf.ajax("POST", fd, "phpSrc/deleteMultipleMessages.php", function(res)
             {
-                console.log(res);
+                // console.log(res);
                 res = JSON.parse(res);
 
                 if (res["code"] == 0)
@@ -739,9 +758,10 @@ var APP = (function()
                     if (hf.cN(e, "message-username") || hf.cN(e, "message-timestamp"))
                     {
                         var
-                        user = e.parentNode.children[1].innerText,
-                        time = new Date(e.parentNode.children[2].innerText).getTime() / 1000;
+                        user = e.parentNode.children[2].innerText,
+                        time = new Date(e.parentNode.children[1].innerText).getTime() / 1000;
 
+                        navigation.stateChange("viewMessage");
                         viewMessage(user, time);
                     }
                     else if (hf.cN(e, "refresh-messages-button"))
@@ -759,6 +779,132 @@ var APP = (function()
                     else if (hf.cN(e, "delete-multiple-messages-button"))
                     {
                         deleteMultipleMessages();
+                    }
+                }
+            }
+        }
+    })(),
+    settings = (function()
+    {
+        return {
+            init: function()
+            {
+
+            }
+        }
+    })(),
+    navigation = (function()
+    {
+        var
+        buildNavigation = function(res)
+        {
+            var
+            container = hf.cEL("div", {class: "navigation-container"});
+            container.innerHTML = res;
+            document.body.appendChild(container);
+        },
+        getTemplate = function()
+        {
+            hf.ajax("GET", null, "templates/navigation.php", function(res){
+                buildNavigation(res);
+                changeState("messages", hf.elCN("nav-messages")[0]);
+            })
+        },
+        setState = function()
+        {
+            var
+            body = document.body,
+            nav = hf.elCN("navigation-container")[0];
+
+            (function()
+            {
+                for (var i = 1, len = body.children.length; i < len; i++)
+                {
+                    body.removeChild(body.children[i]);
+                }
+            })();
+
+            (function()
+            {
+                for (var i = 0, len = nav.children.length; i < len; i++)
+                {
+                    nav.children[i].classList.remove("active");
+                }
+            })();
+
+        },
+        changeState = function(state)
+        {
+            switch (state)
+            {
+                case "compose":
+                {
+                    setState();
+                    hf.elCN("nav-compose")[0].classList.add("active");
+                    messageDraft.init();
+                    break;
+                }
+                case "messages":
+                {
+                    setState();
+                    hf.elCN("nav-messages")[0].classList.add("active");
+                    messageList.init();
+                    break;
+                }
+                case "contacts":
+                {
+                    setState();
+                    hf.elCN("nav-contacts")[0].classList.add("active");
+                    contactList.init();
+                    break;
+                }
+                case "settings":
+                {
+                    setState();
+                    hf.elCN("nav-settings")[0].classList.add("active");
+                    settings.init();
+                    break;
+                }
+                case "viewMessage":
+                {
+                    setState();
+                    break;
+                }
+            }
+        };
+        return {
+            init: function()
+            {
+                getTemplate();
+            },
+            stateChange: function(state)
+            {
+                changeState(state);
+            },
+            click: function(ev)
+            {
+                var
+                e = ev.target,
+                clicked,
+                navContainer = hf.elCN("navigation-container")[0];
+
+                if (hf.isInside(e, navContainer))
+                {
+                    if (clicked = hf.rTarget(e, "nav-compose"))
+                    {
+                        changeState("compose");
+                    }
+                    else if (clicked = hf.rTarget(e, "nav-messages"))
+                    {
+                        changeState("messages");
+                    }
+                    else if (clicked = hf.rTarget(e, "nav-contacts"))
+                    {
+                        changeState("contacts");
+                    }
+                    else if (clicked = hf.rTarget(e, "nav-settings"))
+                    {
+                        changeState("settings");
                     }
                 }
             }
@@ -793,8 +939,9 @@ var APP = (function()
 
                         document.body.innerHTML = "";
                         // sendMessage.init();
-                        messageList.init();
-                        contactList.init();
+                        // messageList.init();
+                        // contactList.init();
+                        navigation.init();
 
                     }
                     else
@@ -842,6 +989,7 @@ var APP = (function()
         clicked: function(ev)
         {
             login.click(ev);
+            navigation.click(ev);
             messageDraft.click(ev);
             messageList.click(ev);
             contactList.click(ev);
