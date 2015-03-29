@@ -15,9 +15,20 @@ var APP = (function()
                     if (node == target) return true;
                 }
             },
+            rTarget: function(node, target)
+            {
+                for(; node != null; node = node.parentNode)
+                {
+                    if (node.className == target) return node;
+                }
+            },
             cN: function(e,cl)
             {
                 return e.className == cl;
+            },
+            tN: function(e,tag)
+            {
+                return e.tagName == tag;
             },
             cEL: function(el, attr)
             {
@@ -238,10 +249,18 @@ var APP = (function()
     {
         var
         imgs = [],
+        fls = [],
+        fileList = [],
+        imgList = [],
         sendPlaintext = function(rec, pt, el)
         {
+            console.log(fls);
             if (imgs.length > 0)
             {
+                pt += "<div class=image-file-list>";
+                pt += JSON.stringify(imgList);
+                pt += "</div>";
+
                 pt += "<div class=view-message-images-container>";
                 for (var i = 0, len = imgs.length; i < len; i++)
                 {
@@ -249,6 +268,20 @@ var APP = (function()
                 }
                 pt += "</div>";
             }
+            if (fls.length > 0)
+            {
+                pt += "<div class=file-file-list>";
+                pt += JSON.stringify(fileList);
+                pt += "</div>";
+
+                pt += "<div class=view-message-files-container>";
+                for (var i = 0, len = fls.length; i < len; i++)
+                {
+                    pt += fls[i];
+                }
+                pt += "</div>";
+            }
+            console.log(pt);
             if (pt === "") return;
             var
             fd = new FormData();
@@ -265,7 +298,7 @@ var APP = (function()
                 contactList.init();
             });
         },
-        addImage = function()
+        addFiles = function()
         {
             var
             fileInput = hf.elCN("file-upload-input")[0];
@@ -274,31 +307,60 @@ var APP = (function()
             fileInput.onchange = function()
             {
                 var
-                file = fileInput.files[0],
-                img = new Image();
+                files = fileInput.files;
 
-                img.file = file;
+                for (var i = 0, len = files.length; i < len; i++)
+                {
+                    if (files[i].type.match("image.*"))
+                    {
+                        imgList.push(files[i]);
 
-                var reader = new FileReader();
-                    reader.onload = (function(aImg) 
+                        var
+                        img = new Image(),
+                        reader = new FileReader();
+                        img.file = files[i];
+
+                        reader.onload = (function(aImg) 
                         { 
                             return function(e) 
-                                { 
-                                    // console.log(e.target.result);
-                                    aImg.src = e.target.result; 
+                            { 
+                                aImg.src = e.target.result; 
 
-                                    var
-                                    i = "<img src=";
-                                    i += e.target.result;
-                                    i += ">";
-                                    
-                                    imgs.push(i);
-                                    // console.log(imgs);
-                                }; 
+                                var
+                                i = "<div class=img-container><div class=img style=background-image:url(";
+                                i += e.target.result;
+                                i += ");><div><p>Download</p></div></div></div>";
+
+                                imgs.push(i);
+                            }; 
                         })(img);
-                    reader.readAsDataURL(fileInput.files[0]);
+                        reader.readAsDataURL(files[i]);
+                    }
+                    else
+                    {
+                        fileList.push(files[i]);
 
-                // console.log(fileInput.files);
+                        var
+                        reader = new FileReader();
+
+                        reader.onload = (function(file)
+                        {
+                            return function(res)
+                            {
+                                var
+                                f = "<div class=fl-container><a target=_blank href=";
+                                f += res.target.result;
+                                f += "><p>";
+                                f += file.name + "<br>";
+                                f += (file.size / 1000000).toFixed(2) + "MB";
+                                f += "</p></a></div>";
+
+                                fls.push(f);
+                            }
+                        })(files[i]);
+                        reader.readAsDataURL(files[i]);
+                    }
+                }
             }
         },
         closeMessage = function(e)
@@ -341,16 +403,16 @@ var APP = (function()
                     var
                     rec = sendMessageBox.getElementsByTagName("input")[0],
                     ta = sendMessageBox.getElementsByTagName("textarea")[0],
-                    img = sendMessageBox.getElementsByTagName("button")[0],
+                    file = sendMessageBox.getElementsByTagName("button")[0],
                     sub = sendMessageBox.getElementsByTagName("button")[1],
                     dis = sendMessageBox.getElementsByTagName("button")[2];
                     if (e == ta)
                     {
 
                     }
-                    else if (e == img)
+                    else if (e == file)
                     {
-                        addImage();
+                        addFiles();
                     }
                     else if (e == sub)
                     {
@@ -369,6 +431,8 @@ var APP = (function()
     {
         var
         currentMessage,
+        flFileList,
+        imgFileList;
         buildView = function()
         {
             hf.ajax("GET", null, "templates/viewMessage.php", function(res)
@@ -387,16 +451,29 @@ var APP = (function()
                 }
                 else
                 {
-                    hf.elCN("view-message-sender")[0].innerHTML = "";
-                    hf.elCN("view-message-timestamp")[0].innerHTML = "";
-                    hf.elCN("view-message-message")[0].innerHTML = "";
+                    sender.innerHTML = "";
+                    timestamp.innerHTML = "";
+                    message.innerHTML = "";
                 }
                 
                 if (contactList["code"] == 0) return;
 
-                hf.elCN("view-message-sender")[0].innerHTML = currentMessage["sender"];
-                hf.elCN("view-message-timestamp")[0].innerHTML = date.toLocaleString();
-                hf.elCN("view-message-message")[0].innerHTML = currentMessage["plaintext"];
+                var
+                sender = hf.elCN("view-message-sender")[0],
+                timestamp = hf.elCN("view-message-timestamp")[0],
+                message = hf.elCN("view-message-message")[0];
+
+                sender.innerHTML = currentMessage["sender"];
+                timestamp.innerHTML = date.toLocaleString();
+                message.innerHTML = currentMessage["plaintext"];
+
+                var
+                imgFileListContainer = hf.elCN("image-file-list")[0],
+                flFileListContainer = hf.elCN("file-file-list")[0];
+                if (imgFileListContainer)
+                    imgFileList = JSON.parse(imgFileListContainer.innerText);
+                if (flFileListContainer)
+                    flFileList = JSON.parse(flFileListContainer.innerText);
             });
         },
         deleteMessage = function(e)
@@ -410,6 +487,29 @@ var APP = (function()
             //Clear the plaintext from memory, A little heavy handed
             currentMessage["plaintext"] = "0".repeat(currentMessage["plaintext"].length);
             currentMessage = {};
+        },
+        imageClick = function(img)
+        {
+            var
+            anchor = hf.cEL("a", {target: "_blank"}),
+            style = window.getComputedStyle(img.children[0]).backgroundImage,
+            uri = style.slice(4, style.length-1);
+            container = hf.elCN("view-message-images-container")[0],
+            index = Array.prototype.indexOf.call(container.children, img);
+
+            anchor.download = imgFileList[index].name;
+            anchor.href = uri;
+            anchor.click();
+        },
+        fileClick = function(img)
+        {
+            console.log(flFileList);
+            var
+            fileContainer = hf.elCN("view-message-files-container")[0],
+            index = Array.prototype.indexOf.call(fileContainer.children, img.parentNode);
+
+            img.download = flFileList[index].name;
+            img.click();
         }
         return{
             init: function(res)
@@ -422,9 +522,8 @@ var APP = (function()
                 var
                 e = ev.target,
                 viewMessageContainer = hf.elCN("view-message-container")[0],
-                index;
-                if (viewMessageContainer)
-                    index = Array.prototype.indexOf.call(viewMessageContainer.children, e.parentNode);
+                fileContainer = hf.elCN("view-message-files-container")[0],
+                imgContainer = hf.elCN("view-message-images-container")[0];
 
                 if (hf.isInside(e, viewMessageContainer))
                 {
@@ -441,7 +540,24 @@ var APP = (function()
                     {
                         closeMessage(e);
                     }
-
+                    else if (hf.isInside(e, imgContainer))
+                    {
+                        ev.preventDefault();
+                        var img;
+                        if (img = hf.rTarget(e, "img-container"))
+                        {
+                            imageClick(img);
+                        }
+                    }
+                    else if (hf.isInside(e, fileContainer))
+                    {
+                        ev.preventDefault();
+                        var img;
+                        if (img = hf.rTarget(e, "fl-container"))
+                        {
+                            fileClick(img.children[0]);
+                        }
+                    }
                 }
             }
         }
@@ -598,7 +714,7 @@ var APP = (function()
             hf.ajax("GET", null, "phpSrc/listMessages.php", function(res)
             {
                 messageList = JSON.parse(res);
-                console.log(messageList);
+                // console.log(messageList);
                 buildList();
             });
         };
