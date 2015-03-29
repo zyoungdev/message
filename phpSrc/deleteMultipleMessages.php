@@ -30,15 +30,27 @@ class DeleteMultipleMessages{
     {
         $messages = json_decode($_POST["messages"]);
 
-        logThis($messages);
-
         $query = array("username" => $_SESSION["user"]["username"]);
         $projection = array('$set' => array("messages" => $messages));
 
-        if ($this->mongo["usersprivate"]->update($query, $projection))
-            return 1;
+        $ids = json_decode($_POST["deleteMessages"]);
+        
+        logThis($ids);
+        if ($this->mongo["messages"]->remove(array("id" => array('$in' => $ids))))
+        {
+            if ($this->mongo["usersprivate"]->update($query, $projection))
+            {
+                return 1;
+            }
+            else
+            {
+                return 0;            
+            }
+        }
         else
-            return 0;            
+        {
+            return 0;
+        }
     }
 }
 
@@ -58,7 +70,7 @@ function main()
     $ret->exitNow(1, "Messages Updated Successfully");
 }
 
-if ($_POST["messages"])
+if ($_POST["messages"] && $_POST["deleteMessages"])
 {
     main();
 }

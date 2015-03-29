@@ -365,7 +365,16 @@ var APP = (function()
                                 f += res.target.result;
                                 f += "><p>";
                                 f += file.name + "<br>";
-                                f += (file.size / 1000000).toFixed(2) + "MB";
+
+                                if (file.size > 10000)
+                                {
+                                    f += (file.size / 1000000).toFixed(2) + "MB";
+                                }
+                                else
+                                {
+                                    f += (file.size / 1000).toFixed(2) + "KB";
+                                }
+
                                 f += "</p></a></div>";
 
                                 fls.push(f);
@@ -684,6 +693,7 @@ var APP = (function()
         {
             var
             newMessageList = messageList,
+            deleteMessages = [],
             fd = new FormData(),
             backupMessageList = messageList,
             checkboxes = hf.elCN("message-checkbox"),
@@ -699,9 +709,9 @@ var APP = (function()
                     user = checkboxes[i].parentNode.children[2].innerText,
                     timestamp = new Date(checkboxes[i].parentNode.children[1].innerText).getTime() / 1000;
                     
-                    console.log(newMessageList);
+                    // console.log(newMessageList);
+                    deleteMessages.push(newMessageList[user][timestamp]["id"]);
                     delete newMessageList[user][timestamp];
-
                 }
             }
             for (var user in newMessageList)
@@ -715,6 +725,7 @@ var APP = (function()
             messageList = newMessageList;
             // console.log(messageList);
             fd.append("messages", JSON.stringify(messageList));
+            fd.append("deleteMessages", JSON.stringify(deleteMessages));
             hf.ajax("POST", fd, "phpSrc/deleteMultipleMessages.php", function(res)
             {
                 // console.log(res);

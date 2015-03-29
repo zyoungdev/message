@@ -96,10 +96,11 @@ class SendMessage{
 
         //Save the ciphertext separatesly in the messages Collection
         //Link it to the usersprivate Collection with an the _id
-        $mQuery = array("ciphertext" => $this->message["ciphertext"]);
+        $id = bin2hex(Sodium::randombytes_buf(16));
+        $mQuery = array("ciphertext" => $this->message["ciphertext"], 
+            "id" => $id);
         $this->mongo["messages"]->save($mQuery);
 
-        $id = $mQuery['_id'];
         $message["id"] = $id;
 
         $query = array('username' => $this->clean["un"]);

@@ -34,7 +34,7 @@ class ViewMessage{
 
 
             $id = $result["messages"]["$username"]["$timestamp"]["id"];
-            $mQuery = array('_id' => $id);
+            $mQuery = array('id' => $id);
             $this->message["ciphertext"] = $this->mongo["messages"]->findone($mQuery)["ciphertext"];
         }
         else
