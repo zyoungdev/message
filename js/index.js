@@ -59,6 +59,33 @@ var APP = (function()
                 xhr.open(type, uri, true);
                 if (fd) xhr.send(fd);
                 else xhr.send();
+            },
+            convertSize: function(size)
+            {
+                var s = size;
+                s /= 1000;
+                if (s > 1000)
+                {
+                    s /= 1000;
+                    s = Math.ceil(s) + " MB";
+                }
+                else
+                {
+                    s = Math.ceil(s) + " KB";
+                }
+                return s;
+            },
+            convertTime: function(time)
+            {
+                var
+                now = new Date();
+
+                now = now.getTime() / 1000;
+
+                if (now-1440 < time)
+                    return time.toLocaleTimeString(); 
+                else
+                    return time.toLocaleDateString();
             }
         };
     })(),
@@ -66,6 +93,7 @@ var APP = (function()
     {
         var
         contactList,
+        sorting = false,
         buildList = function()
         {
             hf.ajax("GET", null, "templates/contactList.php", function(res)
@@ -112,12 +140,19 @@ var APP = (function()
             {
                 contactList = JSON.parse(res);
                 // console.log(contactList);
+                sortContacts();
                 buildList();
             });
         },
         addContact = function(u)
         {
-            // console.log("yay");
+            if (contactList[u])
+            {
+                navigation.stateChange("compose");
+                messageDraft.init(u);
+                return;
+            }
+
             var
             fd = new FormData();
 
@@ -131,7 +166,9 @@ var APP = (function()
                     contactList = JSON.parse(r);
                     if (contactList["code"] == null)
                     {
-                        // console.log(contactList);
+                        console.log(contactList);
+                        sorting = false;
+                        sortContacts();
                         buildList();
                     }
                 });
@@ -195,9 +232,54 @@ var APP = (function()
                 buildList();
             });
         },
+        selectAll = function(e)
+        {
+            var checkboxes = hf.elCN("contact-checkbox"),
+            delBut = hf.elCN("delete-multiple-contact-button")[0];
+
+            if (e.checked)
+            {
+                delBut.style.display = "block";
+                for (var i = 0, len = checkboxes.length; i < len; i++)
+                {
+                    checkboxes[i].checked = true;
+                }
+            }
+            else
+            {
+                for (var i = 0, len = checkboxes.length; i < len; i++)
+                {
+                    checkboxes[i].checked = false;
+                }
+                delBut.style.display = "none";
+            }
+        },
+        sortContacts = function()
+        {
+            var
+            newContactList = {},
+            keys = [];
+
+            for (var key in contactList)
+            {
+                if (contactList.hasOwnProperty(key))
+                    keys.push(key);
+            }
+            keys.sort();
+
+            if (sorting)
+                keys.reverse();
+            for (var i = 0, len = keys.length; i < len; i++)
+            {
+                newContactList[keys[i]] = contactList[keys[i]];
+            }
+            contactList = newContactList;
+            sorting = !sorting;
+        },
         checkboxClick = function(e)
         {
             var
+            selectAllCheck = hf.elCN("contact-list-heading-checkbox")[0],
             checkboxes = hf.elCN("contact-checkbox"),
             delBut = hf.elCN("delete-multiple-contact-button")[0];
             // console.log(delBut);
@@ -211,6 +293,7 @@ var APP = (function()
                     return;
                 }
             }
+            selectAllCheck.checked = false;
             delBut.style.display = "none";
         }
         return {
@@ -238,6 +321,15 @@ var APP = (function()
                         var
                         user = hf.elCN("add-contact-input")[0].value;
                         addContact(user)
+                    }
+                    else if (hf.cN(e, "contact-list-heading-checkbox"))
+                    {
+                        selectAll(e);
+                    }
+                    else if (hf.cN(e, "contact-list-heading-username"))
+                    {
+                        sortContacts();
+                        buildList();
                     }
                     else if (hf.cN(e, "contact-checkbox"))
                     {
@@ -299,9 +391,19 @@ var APP = (function()
             var
             fd = new FormData();
 
-
             fd.append("plaintext", pt);
             fd.append("recipient", rec);
+
+            var size = pt.length;
+            for (var i=pt.length-1; i >= 0; i--) 
+            {
+                var code = pt.charCodeAt(i);
+                if (code > 0x7f && code <= 0x7ff) size++;
+                else if (code > 0x7ff && code <= 0xffff) size+=2;
+                if (code >= 0xDC00 && code <= 0xDFFF) i--;
+            }
+
+            fd.append("messageSize", size);
 
             hf.ajax("POST", fd, "phpSrc/sendMessage.php", function(res)
             {
@@ -464,6 +566,7 @@ var APP = (function()
                 var
                 container = hf.cEL("div", {class: "module-container view-message-container"}),
                 frag = document.createDocumentFragment(),
+                s = currentMessage["size"],
                 date = new Date(currentMessage["timestamp"] * 1000),
                 containerExists = hf.elCN("view-message-container")[0];
 
@@ -485,10 +588,12 @@ var APP = (function()
                 var
                 sender = hf.elCN("view-message-sender")[0],
                 timestamp = hf.elCN("view-message-timestamp")[0],
+                size = hf.elCN("view-message-size")[0],
                 message = hf.elCN("view-message-message")[0];
 
                 sender.innerHTML = currentMessage["sender"];
                 timestamp.innerHTML = date.toLocaleString();
+                size.innerHTML = hf.convertSize(currentMessage["size"]);
                 message.innerHTML = currentMessage["plaintext"];
 
                 var
@@ -617,15 +722,19 @@ var APP = (function()
                     {
                         var
                         msg = hf.cEL("div", {class: "message"}),
-                        selBut = hf.cEL("input", {class: "message-checkbox", type: "checkbox"}),
+                        check = hf.cEL("input", {class: "message-checkbox", type: "checkbox"}),
                         username = hf.cEL("div", {class: "message-username"}, user),
+                        size = hf.cEL("div", {class: "message-size"}, hf.convertSize(messageList[user][message]["size"])),
                         date = new Date(messageList[user][message].timestamp * 1000),
-                        timestamp = hf.cEL("div", {class: "message-timestamp"}, date.toLocaleString());
+                        timestamp = hf.cEL("div", {class: "message-timestamp"}, hf.convertTime(date));
                         // delBut = hf.cEL("button", {class: "message-delete-button"}, "Delete");
 
-                        msg.appendChild(selBut);
-                        msg.appendChild(timestamp);
+                        timestamp.dataset.timestamp = messageList[user][message].timestamp;
+
+                        msg.appendChild(check);
+                        msg.appendChild(size);
                         msg.appendChild(username);
+                        msg.appendChild(timestamp);
                         // msg.appendChild(delBut);
 
                         frag.appendChild(msg);
@@ -652,6 +761,7 @@ var APP = (function()
         checkboxClick = function(e)
         {
             var
+            selectAllCheck = hf.elCN("message-list-heading-checkbox")[0],
             checkboxes = hf.elCN("message-checkbox"),
             delBut = hf.elCN("delete-multiple-messages-button")[0];
 
@@ -664,8 +774,31 @@ var APP = (function()
                     return;
                 }
             }
+            selectAllCheck.checked = false;
             delBut.style.display = "none";
-        }
+        },
+        selectAll = function(e)
+        {
+            var checkboxes = hf.elCN("message-checkbox"),
+            delBut = hf.elCN("delete-multiple-messages-button")[0];
+
+            if (e.checked)
+            {
+                delBut.style.display = "block";
+                for (var i = 0, len = checkboxes.length; i < len; i++)
+                {
+                    checkboxes[i].checked = true;
+                }
+            }
+            else
+            {
+                for (var i = 0, len = checkboxes.length; i < len; i++)
+                {
+                    checkboxes[i].checked = false;
+                }
+                delBut.style.display = "none";
+            }
+        },
         delMessage = function(u, t)
         {
             var
@@ -707,7 +840,7 @@ var APP = (function()
                 {
                     var
                     user = checkboxes[i].parentNode.children[2].innerText,
-                    timestamp = new Date(checkboxes[i].parentNode.children[1].innerText).getTime() / 1000;
+                    timestamp = checkboxes[i].parentNode.children[3].dataset.timestamp;
                     
                     // console.log(newMessageList);
                     deleteMessages.push(newMessageList[user][timestamp]["id"]);
@@ -744,7 +877,7 @@ var APP = (function()
             hf.ajax("GET", null, "phpSrc/listMessages.php", function(res)
             {
                 messageList = JSON.parse(res);
-                // console.log(messageList);
+                console.log(messageList);
                 buildList();
             });
         };
@@ -766,11 +899,11 @@ var APP = (function()
 
                 if (hf.isInside(e, messageListContainer))
                 {
-                    if (hf.cN(e, "message-username") || hf.cN(e, "message-timestamp"))
+                    if (hf.cN(e, "message-username") || hf.cN(e, "message-timestamp") || hf.cN(e, "message-timestamp"))
                     {
                         var
                         user = e.parentNode.children[2].innerText,
-                        time = new Date(e.parentNode.children[1].innerText).getTime() / 1000;
+                        time = e.parentNode.children[3].dataset.timestamp;
 
                         navigation.stateChange("viewMessage");
                         viewMessage(user, time);
@@ -782,6 +915,10 @@ var APP = (function()
                     else if (hf.cN(e, "create-message-button"))
                     {
                         messageDraft.init();
+                    }
+                    else if (hf.cN(e, "message-list-heading-checkbox"))
+                    {
+                        selectAll(e);
                     }
                     else if (hf.cN(e, "message-checkbox"))
                     {

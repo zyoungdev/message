@@ -15,6 +15,11 @@ button{
     background:rgb(77, 144, 254);
     color:white;
     height:50px;
+    box-shadow: 0 0 3px #565656;
+
+    &:hover{
+        box-shadow: 0 0 5px #232323;
+    }
 }
 .login-box, .module-container{
     @extend %a-100;
@@ -74,7 +79,7 @@ button{
 }
 .navigation-container{
     @extend %a-100;
-
+    box-shadow: 0 0 5px #000000;
     div{
         @extend %a-50;
         background-color: #232323;
@@ -96,6 +101,7 @@ button{
     }
     .active{
         background-color: #FF005B;
+        box-shadow:inset 0 0 5px #232323;
     }
 }
 .send-message-box{
@@ -123,25 +129,56 @@ button{
             display:none;
         }
     }
+    .message-list-heading{
+        @extend %a-80;
+        @extend %a-null-cent;
+        height:50px;
+        line-height: 50px;
+        background-color: #646464;
+        color:#cdcdcd;
+        .message-list-heading-checkbox{
+            float:left;
+            width:25px;
+            margin-left:10px;
+        }
+        .message-list-size{
+            @extend %a-15;
+            text-align:center;
+        }
+        .message-list-username{
+            @extend %a-50;
+            text-align:center;
+        }
+        .message-list-timestamp{
+            @extend %a-30;
+            text-align: center;
+        }
+    }
     .message-list{
         @extend %a-100;
-
+        
         .message{
-            @extend %a-75;
+            @extend %a-80;
             @extend %a-null-cent;
             height:50px;
             line-height:50px;
 
             .message-checkbox{
-                @extend %a-5;
+                float:left;
+                width:25px;
+                margin-left:10px;
+            }
+            .message-size{
+                @extend %a-15;
+                text-align:center;
             }
             .message-username{
-                @extend %a-45;
-                // text-align:center;
+                @extend %a-50;
+                text-align:center;
             }
             .message-timestamp{
-                @extend %a-45;
-                // text-align: center;
+                @extend %a-30;
+                text-align: center;
             }
             .message-delete-button{
                 // @extend %a-15;
@@ -168,21 +205,42 @@ button{
             display:none;
         }
     }
+    .contact-list-heading{
+        @extend %a-75;
+        @extend %a-null-cent;
+        height: 50px;
+        line-height:50px;
+        text-align:center;
+        background-color: #646464;
+        .contact-list-heading-checkbox{
+            @extend %a-10;
+            width:25px;
+            height:25px !important;
+            margin:0;
+            margin-left:10px;
+            top:0;
+        }
+        .contact-list-heading-username{
+            @extend %a-90;
+            color:#cdcdcd;
+        }
+    }
     .contact-list{
         @extend %a-75;
         @extend %a-null-cent;
+
         .contact{
             @extend %a-100;
     
-            @extend %a-p-10;
-
-            height:40px;
+            height:50px;
             line-height:40px;
             text-align: center;
             
             .contact-checkbox{
                 @extend %a-10;
-                width:3%;
+                width:25px;
+                margin:0;
+                margin-left:10px;
             }
             .contact-username{
                 @extend %a-90;
@@ -205,15 +263,23 @@ button{
         }
     }
     .view-message-sender{
-        @extend %a-100;
+        @extend %a-90;
+        @extend %a-null-cent;
         @extend %a-p-10;
     }
     .view-message-timestamp{
-        @extend %a-100;
+        @extend %a-90;
+        @extend %a-null-cent;
+        @extend %a-p-10;
+    }
+    .view-message-size{
+        @extend %a-90;
+        @extend %a-null-cent;
         @extend %a-p-10;
     }
     .view-message-message{
-        @extend %a-100;
+        @extend %a-95;
+        @extend %a-null-cent;
         @extend %a-p-10;
         
         .image-file-list{
@@ -235,6 +301,7 @@ button{
                     background-repeat: no-repeat;
                     width:100%;
                     height:100%;
+                    box-shadow: 0 0 5px #232323;
 
                     &:hover div{
                         display:block;
@@ -269,6 +336,7 @@ button{
                 @extend %a-25;
                 @extend %a-p-10;
                 height:200px;
+                box-shadow: 0 0 5px #232323;
                 a{
                     @extend %a-100;
                     height:100%;

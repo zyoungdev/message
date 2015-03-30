@@ -27,6 +27,7 @@ class Login{
     public $dirty = array();
     public $mongo = array();
     public $challenge = "This is the challenge";
+    public $protectedUN = array("admin", "administrator", "root");
 
     public function __construct()
     {
@@ -56,6 +57,11 @@ class Login{
     public function userExists()
     {
         //check DB if username exists
+        foreach ($this->protectedUN as $key => $value) {
+            if (strtolower($this->clean["un"]) == strtolower($value))
+                return 0;
+        }
+
         if ($this->mongo["userspublic"]->findone(array("username" => $this->clean["un"])))
         {
             if ($user = $this->mongo["usersprivate"]->findone(array("username" => $this->clean["un"])))

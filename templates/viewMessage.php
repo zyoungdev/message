@@ -7,4 +7,5 @@
 <!-- Dynamically generated message -->
 <div class="view-message-sender"></div>
 <div class="view-message-timestamp"></div>
+<div class="view-message-size"></div>
 <div class="view-message-message"></div>

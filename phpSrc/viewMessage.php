@@ -57,6 +57,7 @@ class ViewMessage{
             $this->plaintext["sender"] = $this->message["sender"]["username"];
             $this->plaintext["plaintext"] = html_entity_decode($pt);
             $this->plaintext["timestamp"] = $this->message["timestamp"];
+            $this->plaintext["size"] = $this->message["size"];
 
             Sodium::sodium_memzero($keypair);
             Sodium::sodium_memzero($nonce);
