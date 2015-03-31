@@ -207,6 +207,25 @@ button{
             }
         }
     }
+    .message-list-page-container{
+        @extend %a-100;
+        .page-controls{
+            @extend %a-95;
+            @extend %a-null-cent;
+            button{
+                @extend %a-20;
+                float:right;
+                @extend %a-top-right;
+                margin:0;
+            }
+            .prev{
+                // display:none;
+            }
+            .next{
+
+            }
+        }
+    }
 }
 .contact-list-container{
     @extend %a-100;

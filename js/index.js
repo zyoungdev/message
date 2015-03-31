@@ -118,11 +118,9 @@ var APP = (function()
                     selBut = hf.cEL("input", {class: "contact-checkbox", type: "checkbox"}),
                     contact = hf.cEL("div", {class: "contact"}),
                     username = hf.cEL("div", {class: "contact-username"}, user);
-                    // delBut = hf.cEL("button", {class: "contact-delete-button"}, "Delete");
 
                     contact.appendChild(selBut);
                     contact.appendChild(username);
-                    // contact.appendChild(delBut);
 
                     frag.appendChild(contact);
                 }
@@ -153,9 +151,7 @@ var APP = (function()
                 return;
             }
 
-            var
-            fd = new FormData();
-
+            var fd = new FormData();
             fd.append("contact", u);
 
             hf.ajax("POST", fd, "phpSrc/addContact.php", function(res)
@@ -176,9 +172,7 @@ var APP = (function()
         },
         deleteContact = function(i, u)
         {
-            var
-            fd = new FormData();
-
+            var fd = new FormData();
             fd.append("username", u);
 
             hf.ajax("POST", fd, "phpSrc/deleteContact.php", function(res)
@@ -240,17 +234,15 @@ var APP = (function()
             if (e.checked)
             {
                 delBut.style.display = "block";
+
                 for (var i = 0, len = checkboxes.length; i < len; i++)
-                {
                     checkboxes[i].checked = true;
-                }
             }
             else
             {
                 for (var i = 0, len = checkboxes.length; i < len; i++)
-                {
                     checkboxes[i].checked = false;
-                }
+
                 delBut.style.display = "none";
             }
         },
@@ -269,10 +261,10 @@ var APP = (function()
 
             if (sorting)
                 keys.reverse();
+
             for (var i = 0, len = keys.length; i < len; i++)
-            {
                 newContactList[keys[i]] = contactList[keys[i]];
-            }
+
             contactList = newContactList;
             sorting = !sorting;
         },
@@ -318,8 +310,7 @@ var APP = (function()
                     }
                     else if (hf.cN(e, "add-contact-button"))
                     {
-                        var
-                        user = hf.elCN("add-contact-input")[0].value;
+                        var user = hf.elCN("add-contact-input")[0].value;
                         addContact(user)
                     }
                     else if (hf.cN(e, "contact-list-heading-checkbox"))
@@ -367,10 +358,10 @@ var APP = (function()
                 pt += "</div>";
 
                 pt += "<div class=view-message-images-container>";
+
                 for (var i = 0, len = imgs.length; i < len; i++)
-                {
                     pt += imgs[i];
-                }
+
                 pt += "</div>";
             }
             if (fls.length > 0)
@@ -380,21 +371,22 @@ var APP = (function()
                 pt += "</div>";
 
                 pt += "<div class=view-message-files-container>";
+
                 for (var i = 0, len = fls.length; i < len; i++)
-                {
                     pt += fls[i];
-                }
+
                 pt += "</div>";
             }
             // console.log(pt);
             if (pt === "") return;
-            var
-            fd = new FormData();
+
+            var 
+            fd = new FormData(),
+            size = pt.length;
 
             fd.append("plaintext", pt);
             fd.append("recipient", rec);
 
-            var size = pt.length;
             for (var i=pt.length-1; i >= 0; i--) 
             {
                 var code = pt.charCodeAt(i);
@@ -445,7 +437,6 @@ var APP = (function()
                         { 
                             return function(e) 
                             { 
-
                                 var
                                 i = "<div class=img-container><div class=img style=background-image:url(";
                                 i += e.target.result;
@@ -460,7 +451,6 @@ var APP = (function()
                                 ii += ");><div><p>Delete</p></div></div></div>";
 
                                 imageStage.innerHTML += ii;
-
                             }; 
                         })(img);
                         reader.readAsDataURL(files[i]);
@@ -520,9 +510,8 @@ var APP = (function()
         closeMessage = function(e)
         {
             for (var i = 0, len = imgs.length; i < len; i++)
-            {
                 imgs[i] = "0".repeat(imgs[i].length);
-            }
+
             document.body.removeChild(e);
         },
         imageClickStage = function(img)
@@ -777,51 +766,8 @@ var APP = (function()
         sizeSorting = true,
         userSorting = true,
         sortType = "time",
-        // buildList = function()
-        // {
-        //     hf.ajax("GET", null, "templates/messageList.php", function(res)
-        //     {
-        //         var
-        //         container = hf.cEL("div", {class: "module-container message-list-container"}),
-        //         frag = document.createDocumentFragment(),
-        //         containerExists = hf.elCN("message-list-container")[0];
-
-        //         container.innerHTML = res;
-
-        //         if (!containerExists)
-        //             document.body.appendChild(container);
-        //         else
-        //             hf.elCN("message-list")[0].innerHTML = "";
-                
-        //         if (messageList["code"] == 0) return;
-
-        //         for (var user in messageList)
-        //         {
-        //             for (var message in messageList[user])
-        //             {
-        //                 var
-        //                 msg = hf.cEL("div", {class: "message"}),
-        //                 check = hf.cEL("input", {class: "message-checkbox", type: "checkbox"}),
-        //                 username = hf.cEL("div", {class: "message-username"}, user),
-        //                 size = hf.cEL("div", {class: "message-size"}, hf.convertSize(messageList[user][message]["size"])),
-        //                 date = new Date(messageList[user][message].timestamp * 1000),
-        //                 timestamp = hf.cEL("div", {class: "message-timestamp"}, hf.convertTime(date));
-        //                 // delBut = hf.cEL("button", {class: "message-delete-button"}, "Delete");
-
-        //                 timestamp.dataset.timestamp = messageList[user][message].timestamp;
-
-        //                 msg.appendChild(check);
-        //                 msg.appendChild(size);
-        //                 msg.appendChild(username);
-        //                 msg.appendChild(timestamp);
-        //                 // msg.appendChild(delBut);
-
-        //                 frag.appendChild(msg);
-        //             }
-        //         }
-        //         hf.elCN("message-list")[0].appendChild(frag);
-        //     });
-        // },
+        mPerPage = 3,
+        currentPage = 0,
         buildItem = function(u, t)
         {
             var
@@ -831,7 +777,6 @@ var APP = (function()
             size = hf.cEL("div", {class: "message-size"}, hf.convertSize(messageList[u][t]["size"])),
             date = new Date(messageList[u][t].timestamp * 1000),
             timestamp = hf.cEL("div", {class: "message-timestamp"}, hf.convertTime(date));
-            // delBut = hf.cEL("button", {class: "message-delete-button"}, "Delete");
 
             timestamp.dataset.timestamp = messageList[u][t].timestamp;
 
@@ -839,7 +784,6 @@ var APP = (function()
             msg.appendChild(size);
             msg.appendChild(username);
             msg.appendChild(timestamp);
-            // msg.appendChild(delBut);
 
             return msg;
         }
@@ -861,44 +805,77 @@ var APP = (function()
                 
                 if (messageList["code"] == 0) return;
 
+                var 
+                i = Math.floor(currentPage*mPerPage),
+                count = 0;
+
                 if (sortType == "time")
                 {
-                    for (var i = 0, len = timestamps.length; i < len; i++)
+                    for (var len = timestamps.length; i < len; i++)
                     {
+                        if (count >= mPerPage)
+                            break;
                         for (var user in messageList)
                         {
                             if (!messageList[user][timestamps[i]])
                                 continue;
-                            
                             frag.appendChild(buildItem(user, timestamps[i]));
+                            count++;
                         }
                     }
                 }
                 else if (sortType == "size")
                 {
-                    for (var i = 0, len = sizes.length; i < len; i++)
+                    for (var len = sizes.length; i < len; i++)
                     {
+                        if (count >= mPerPage)
+                            break;
                         for (var user in messageList)
                         {
                             for (var time in messageList[user])
-                            {
+                            {   
                                 if (messageList[user][time]["size"] == sizes[i])
+                                {
                                     frag.appendChild(buildItem(user, time));
+                                    count++;
+                                }
                             }
                         }
                     }
                 }
                 else if (sortType == "user")
                 {
-                    for (var i = 0 , len = users.length; i < len; i++)
+                    console.log("user", i, currentPage);
+                    for (var len = users.length; i < len; i++)
                     {
-                        for (var time in messageList[users[i]])
+                        if (count >= mPerPage)
+                            break;
+                        for (var u in messageList)
                         {
-                            frag.appendChild(buildItem(users[i], time));
-                        }
+                            for (var t in messageList[u])
+                            {
+                                if (messageList[u][t] == users[i])
+                                {
+                                    if (count >= mPerPage)
+                                        break;
+                                    frag.appendChild(buildItem(u, t));
+                                    count++;
+                                }
+                            }
+                        }   
                     }
                 }
                 hf.elCN("message-list")[0].appendChild(frag);
+
+                if (currentPage == 0)
+                    hf.elCN("prev")[0].style.visibility = "hidden";
+                else
+                    hf.elCN("prev")[0].style.visibility = "visible";
+                if (currentPage == Math.ceil(timestamps.length / mPerPage)-1)
+                    hf.elCN("next")[0].style.visibility = "hidden";
+                else
+                    hf.elCN("next")[0].style.visibility = "visible";
+
             });
         },
         viewMessage = function(u,t)
@@ -912,7 +889,6 @@ var APP = (function()
             hf.ajax("POST", fd, "phpSrc/viewMessage.php", function(res)
             {
                 res = JSON.parse(res);
-
                 messageView.init(res);                
             });
         },
@@ -944,23 +920,19 @@ var APP = (function()
             {
                 delBut.style.display = "block";
                 for (var i = 0, len = checkboxes.length; i < len; i++)
-                {
                     checkboxes[i].checked = true;
-                }
             }
             else
             {
                 for (var i = 0, len = checkboxes.length; i < len; i++)
-                {
                     checkboxes[i].checked = false;
-                }
+
                 delBut.style.display = "none";
             }
         },
         delMessage = function(u, t)
         {
-            var
-            fd = new FormData();
+            var fd = new FormData();
 
             fd.append("timestamp", t);
             fd.append("username", u);
@@ -1008,13 +980,11 @@ var APP = (function()
             for (var user in newMessageList)
             {
                 if (newMessageList[user].length == 0)
-                {
                     delete newMessageList[user];
-                }
             }
 
             messageList = newMessageList;
-            // console.log(messageList);
+
             fd.append("messages", JSON.stringify(messageList));
             fd.append("deleteMessages", JSON.stringify(deleteMessages));
             hf.ajax("POST", fd, "phpSrc/deleteMultipleMessages.php", function(res)
@@ -1023,9 +993,8 @@ var APP = (function()
                 res = JSON.parse(res);
 
                 if (res["code"] == 0)
-                {
                     messageList = backupMessageList;
-                }
+
                 delBut.style.display = "none";
                 buildList();
             });
@@ -1062,9 +1031,12 @@ var APP = (function()
             sizes = [];
             for (var user in messageList)
                 for(var time in messageList[user])
-                    sizes.push(messageList[user][time]["size"]);
+                    sizes.push(parseInt(messageList[user][time]["size"]));
 
-            sizes.sort();
+            sizes.sort(function(a, b)
+            {
+                return a-b;
+            });
 
             if (sizeSorting)
                 sizes.reverse();
@@ -1072,6 +1044,7 @@ var APP = (function()
             sizeSorting = !sizeSorting;
             timeSorting = true;
             userSorting = true;
+            currentPage = 0;
             sortType = "size";
         },
         sortMessageListUser = function()
@@ -1085,10 +1058,45 @@ var APP = (function()
             if (userSorting)
                 users.reverse();
 
+            var tempUsers = [];
+            for (var i = 0, len = users.length; i < len; i++)
+            {
+                for (var time in messageList[users[i]])
+                    tempUsers.push(messageList[users[i]][time]);
+            }
+            users = tempUsers;
+
             userSorting = !userSorting;
             timeSorting = true;
             sizeSorting = true;
             sortType = "user";
+        },
+        turnPage = function(dir)
+        {
+            var 
+            items = timestamps.length,
+            maxPages = Math.ceil(items / mPerPage),
+            prev = hf.elCN("prev")[0],
+            next = hf.elCN("next")[0];
+
+            if (dir == "prev")
+            {
+                currentPage--;
+                if (currentPage < 0)
+                {
+                    currentPage = 0;
+                    return;
+                }
+            }
+            else if (dir == "next")
+            {
+                currentPage++;
+                if (currentPage >= maxPages)
+                {
+                    currentPage = maxPages-1;
+                    return;
+                }
+            }
         }
 
         return{
@@ -1136,6 +1144,8 @@ var APP = (function()
                     else if (hf.cN(e, "delete-multiple-messages-button"))
                     {
                         deleteMultipleMessages();
+                        sortMessageListTimestamp();
+                        buildList();
                     }
                     else if (hf.cN(e, "message-list-timestamp"))
                     {
@@ -1150,6 +1160,16 @@ var APP = (function()
                     else if (hf.cN(e, "message-list-size"))
                     {
                         sortMessageListSize();
+                        buildList();
+                    }
+                    else if (hf.cN(e, "prev"))
+                    {
+                        turnPage("prev")
+                        buildList();
+                    }
+                    else if (hf.cN(e, "next"))
+                    {
+                        turnPage("next");
                         buildList();
                     }
                 }
@@ -1191,19 +1211,14 @@ var APP = (function()
             (function()
             {
                 for (var i = 1, len = body.children.length; i < len; i++)
-                {
                     body.removeChild(body.children[i]);
-                }
             })();
 
             (function()
             {
                 for (var i = 0, len = nav.children.length; i < len; i++)
-                {
                     nav.children[i].classList.remove("active");
-                }
             })();
-
         },
         changeState = function(state)
         {
@@ -1291,8 +1306,7 @@ var APP = (function()
             if (pw === "") return;
 
             //send creds to phpSrc/login.php
-            var
-            fd = new FormData();
+            var fd = new FormData();
 
             fd.append("username", un);
             fd.append("password", pw);
@@ -1306,15 +1320,10 @@ var APP = (function()
                     if (r.code)
                     {
                         //Logged in!
-                        // console.log(r.message);
                         hf.elCN("loginerror")[0].innerText = r.message;
 
                         document.body.innerHTML = "";
-                        // sendMessage.init();
-                        // messageList.init();
-                        // contactList.init();
                         navigation.init();
-
                     }
                     else
                     {
@@ -1324,9 +1333,6 @@ var APP = (function()
                     }
                 }
             })
-            
-
-
         }
         return{
             click: function(ev)

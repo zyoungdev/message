@@ -13,3 +13,10 @@
 
 <!-- We will put the message in this list -->
 <div class="message-list"></div>
+
+<!-- Pagination -->
+<div class="message-list-page-container">
+    <div class="page-controls">
+        <button class="next">&gt; &gt;</button><button class="prev">&lt; &lt;</button>
+    </div>
+</div>
