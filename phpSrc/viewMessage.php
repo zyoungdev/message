@@ -89,7 +89,7 @@ function main()
     $view->getMessage();
     if (!$view->decryptmessage())
     {
-        $return->exit(0, "Could not decrypt message\n");
+        $return->exitNow(0, "Could not decrypt message\n");
     }
     $view->returnMessage();
 }
