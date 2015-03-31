@@ -3,6 +3,8 @@
 *                   Global Template
 *
 ***************************************************************************************/
+
+
 html,body{
     height:100%;
 }
@@ -110,6 +112,12 @@ button{
     }
     .send-message-button, .add-files-button, .discard-message-button{
         @extend %a-30;
+    }
+    .image-stage{
+        @extend %images-container-module;
+    }
+    .file-stage{
+        @extend %files-container-module;
     }
 }
 .message-list-container{
@@ -286,74 +294,15 @@ button{
             display:none;
         }
         .view-message-images-container{
-            @extend %a-100;
-            @extend %a-null-cent;
-            @extend %a-p-20;
-            .img-container{
-                @extend %a-25;
-                @extend %a-p-10;
-                
-                height:200px;
-                
-                .img{
-                    background-size: cover;
-                    background-position: center center;
-                    background-repeat: no-repeat;
-                    width:100%;
-                    height:100%;
-                    box-shadow: 0 0 5px #232323;
-
-                    &:hover div{
-                        display:block;
-                    }
-                    div{
-                        display:none;
-                        height:100%;
-                        width:100%;
-                        background-color: rgba(0,0,0,.5);
-                        cursor:pointer;
-                        
-                        p{
-                            @extend %a-95;
-                            @extend %a-cent-cent;
-                            color:white;
-                            font-weight: bold;
-                            font-size:1.5em;
-                            text-align:center;
-                        }
-                    }
-                }
-            }
+            @extend %images-container-module;
         }
         .file-file-list{
             display:none;
         }
         .view-message-files-container{
-            @extend %a-100;
-            @extend %a-null-cent;
-            @extend %a-p-20;
-            .fl-container{
-                @extend %a-25;
-                @extend %a-p-10;
-                height:200px;
-                box-shadow: 0 0 5px #232323;
-                a{
-                    @extend %a-100;
-                    height:100%;
-                    border:solid 1px black;
-                    text-decoration: none;
-                    p{
-                        @extend %a-95;
-                        @extend %a-cent-cent;
-                        @extend %a-p-5;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                        word-wrap:break-word;
-                        color:black;
-                        text-align:center;
-                    }
-                }
-            }
+            @extend %files-container-module;
         }
     }
 }
+
+

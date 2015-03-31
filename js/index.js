@@ -422,7 +422,13 @@ var APP = (function()
             fileInput.onchange = function()
             {
                 var
-                files = fileInput.files;
+                files = fileInput.files,
+                sendMessageBox = hf.elCN("send-message-box")[0],
+                imageStage = hf.cEL("div", {class: "image-stage"});
+                fileStage = hf.cEL("div", {class: "file-stage"});
+
+                sendMessageBox.appendChild(imageStage);
+                sendMessageBox.appendChild(fileStage);
 
                 for (var i = 0, len = files.length; i < len; i++)
                 {
@@ -439,7 +445,6 @@ var APP = (function()
                         { 
                             return function(e) 
                             { 
-                                aImg.src = e.target.result; 
 
                                 var
                                 i = "<div class=img-container><div class=img style=background-image:url(";
@@ -447,6 +452,15 @@ var APP = (function()
                                 i += ");><div><p>Download</p></div></div></div>";
 
                                 imgs.push(i);
+
+                                //Add images to stage
+                                var
+                                ii = "<div class=img-container><div class=img style=background-image:url(";
+                                ii += e.target.result;
+                                ii += ");><div><p>Delete</p></div></div></div>";
+
+                                imageStage.innerHTML += ii;
+
                             }; 
                         })(img);
                         reader.readAsDataURL(files[i]);
@@ -476,10 +490,26 @@ var APP = (function()
                                 {
                                     f += (file.size / 1000).toFixed(2) + "KB";
                                 }
+                                f += "</p><p>Download</p></a></div>";
 
-                                f += "</p></a></div>";
+                                var
+                                ff = "<div class=fl-container><a target=_blank href=";
+                                ff += res.target.result;
+                                ff += "><p>";
+                                ff += file.name + "<br>";
+
+                                if (file.size > 10000)
+                                {
+                                    ff += (file.size / 1000000).toFixed(2) + "MB";
+                                }
+                                else
+                                {
+                                    ff += (file.size / 1000).toFixed(2) + "KB";
+                                }
+                                ff += "</p><p>Delete</p></a></div>";
 
                                 fls.push(f);
+                                fileStage.innerHTML += ff;
                             }
                         })(files[i]);
                         reader.readAsDataURL(files[i]);
@@ -494,6 +524,26 @@ var APP = (function()
                 imgs[i] = "0".repeat(imgs[i].length);
             }
             document.body.removeChild(e);
+        },
+        imageClickStage = function(img)
+        {
+            var
+            container = hf.elCN("image-stage")[0],
+            index = Array.prototype.indexOf.call(container.children, img);
+
+            imgs.splice(index, 1);
+            imgList.splice(index, 1);
+            container.removeChild(container.children[index]);
+        },
+        fileClickStage = function(file)
+        {
+            var
+            container = hf.elCN("file-stage")[0],
+            index = Array.prototype.indexOf.call(container.children, file);
+
+            fls.splice(index, 1);
+            fileList.splice(index, 1);
+            container.removeChild(container.children[index]);
         }
         return{
             init: function(rec)
@@ -528,7 +578,9 @@ var APP = (function()
                     ta = sendMessageBox.getElementsByTagName("textarea")[0],
                     file = sendMessageBox.getElementsByTagName("button")[0],
                     sub = sendMessageBox.getElementsByTagName("button")[1],
-                    dis = sendMessageBox.getElementsByTagName("button")[2];
+                    dis = sendMessageBox.getElementsByTagName("button")[2],
+                    fileContainer = hf.elCN("file-stage")[0],
+                    imgContainer = hf.elCN("image-stage")[0];
                     if (e == ta)
                     {
 
@@ -548,6 +600,25 @@ var APP = (function()
                         closeMessage(e.parentNode);
                         clearFiles();
                         navigation.stateChange("messages");
+                    }
+                    else if (hf.isInside(e, imgContainer))
+                    {
+                        ev.preventDefault();
+                        var img;
+                        if (img = hf.rTarget(e, "img-container"))
+                        {
+                            console.log("message draft");
+                            imageClickStage(img);
+                        }
+                    }
+                    else if (hf.isInside(e, fileContainer))
+                    {
+                        ev.preventDefault();
+                        var file;
+                        if (file = hf.rTarget(e, "fl-container"))
+                        {
+                            fileClickStage(file.children[0]);
+                        }
                     }
                 }
             }
@@ -631,15 +702,15 @@ var APP = (function()
             anchor.href = uri;
             anchor.click();
         },
-        fileClick = function(img)
+        fileClick = function(file)
         {
             // console.log(flFileList);
             var
             fileContainer = hf.elCN("view-message-files-container")[0],
-            index = Array.prototype.indexOf.call(fileContainer.children, img.parentNode);
+            index = Array.prototype.indexOf.call(fileContainer.children, file.parentNode);
 
-            img.download = flFileList[index].name;
-            img.click();
+            file.download = flFileList[index].name;
+            file.click();
         }
         return{
             init: function(res)
@@ -678,16 +749,17 @@ var APP = (function()
                         var img;
                         if (img = hf.rTarget(e, "img-container"))
                         {
+                            console.log("view-message");
                             imageClick(img);
                         }
                     }
                     else if (hf.isInside(e, fileContainer))
                     {
                         ev.preventDefault();
-                        var img;
-                        if (img = hf.rTarget(e, "fl-container"))
+                        var file;
+                        if (file = hf.rTarget(e, "fl-container"))
                         {
-                            fileClick(img.children[0]);
+                            fileClick(file.children[0]);
                         }
                     }
                 }
