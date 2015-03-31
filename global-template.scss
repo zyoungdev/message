@@ -152,14 +152,26 @@ button{
         .message-list-size{
             @extend %a-15;
             text-align:center;
+            cursor:pointer;
+            &:hover{
+                color:#efefef;
+            }
         }
         .message-list-username{
             @extend %a-50;
             text-align:center;
+            cursor:pointer;
+            &:hover{
+                color:#efefef;
+            }
         }
         .message-list-timestamp{
             @extend %a-30;
             text-align: center;
+            cursor:pointer;
+            &:hover{
+                color:#efefef;
+            }
         }
     }
     .message-list{

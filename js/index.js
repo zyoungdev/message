@@ -770,6 +770,79 @@ var APP = (function()
     {
         var
         messageList,
+        timestamps = [],
+        sizes = [],
+        users = [],
+        timeSorting = true,
+        sizeSorting = true,
+        userSorting = true,
+        sortType = "time",
+        // buildList = function()
+        // {
+        //     hf.ajax("GET", null, "templates/messageList.php", function(res)
+        //     {
+        //         var
+        //         container = hf.cEL("div", {class: "module-container message-list-container"}),
+        //         frag = document.createDocumentFragment(),
+        //         containerExists = hf.elCN("message-list-container")[0];
+
+        //         container.innerHTML = res;
+
+        //         if (!containerExists)
+        //             document.body.appendChild(container);
+        //         else
+        //             hf.elCN("message-list")[0].innerHTML = "";
+                
+        //         if (messageList["code"] == 0) return;
+
+        //         for (var user in messageList)
+        //         {
+        //             for (var message in messageList[user])
+        //             {
+        //                 var
+        //                 msg = hf.cEL("div", {class: "message"}),
+        //                 check = hf.cEL("input", {class: "message-checkbox", type: "checkbox"}),
+        //                 username = hf.cEL("div", {class: "message-username"}, user),
+        //                 size = hf.cEL("div", {class: "message-size"}, hf.convertSize(messageList[user][message]["size"])),
+        //                 date = new Date(messageList[user][message].timestamp * 1000),
+        //                 timestamp = hf.cEL("div", {class: "message-timestamp"}, hf.convertTime(date));
+        //                 // delBut = hf.cEL("button", {class: "message-delete-button"}, "Delete");
+
+        //                 timestamp.dataset.timestamp = messageList[user][message].timestamp;
+
+        //                 msg.appendChild(check);
+        //                 msg.appendChild(size);
+        //                 msg.appendChild(username);
+        //                 msg.appendChild(timestamp);
+        //                 // msg.appendChild(delBut);
+
+        //                 frag.appendChild(msg);
+        //             }
+        //         }
+        //         hf.elCN("message-list")[0].appendChild(frag);
+        //     });
+        // },
+        buildItem = function(u, t)
+        {
+            var
+            msg = hf.cEL("div", {class: "message"}),
+            check = hf.cEL("input", {class: "message-checkbox", type: "checkbox"}),
+            username = hf.cEL("div", {class: "message-username"}, u),
+            size = hf.cEL("div", {class: "message-size"}, hf.convertSize(messageList[u][t]["size"])),
+            date = new Date(messageList[u][t].timestamp * 1000),
+            timestamp = hf.cEL("div", {class: "message-timestamp"}, hf.convertTime(date));
+            // delBut = hf.cEL("button", {class: "message-delete-button"}, "Delete");
+
+            timestamp.dataset.timestamp = messageList[u][t].timestamp;
+
+            msg.appendChild(check);
+            msg.appendChild(size);
+            msg.appendChild(username);
+            msg.appendChild(timestamp);
+            // msg.appendChild(delBut);
+
+            return msg;
+        }
         buildList = function()
         {
             hf.ajax("GET", null, "templates/messageList.php", function(res)
@@ -788,28 +861,41 @@ var APP = (function()
                 
                 if (messageList["code"] == 0) return;
 
-                for (var user in messageList)
+                if (sortType == "time")
                 {
-                    for (var message in messageList[user])
+                    for (var i = 0, len = timestamps.length; i < len; i++)
                     {
-                        var
-                        msg = hf.cEL("div", {class: "message"}),
-                        check = hf.cEL("input", {class: "message-checkbox", type: "checkbox"}),
-                        username = hf.cEL("div", {class: "message-username"}, user),
-                        size = hf.cEL("div", {class: "message-size"}, hf.convertSize(messageList[user][message]["size"])),
-                        date = new Date(messageList[user][message].timestamp * 1000),
-                        timestamp = hf.cEL("div", {class: "message-timestamp"}, hf.convertTime(date));
-                        // delBut = hf.cEL("button", {class: "message-delete-button"}, "Delete");
-
-                        timestamp.dataset.timestamp = messageList[user][message].timestamp;
-
-                        msg.appendChild(check);
-                        msg.appendChild(size);
-                        msg.appendChild(username);
-                        msg.appendChild(timestamp);
-                        // msg.appendChild(delBut);
-
-                        frag.appendChild(msg);
+                        for (var user in messageList)
+                        {
+                            if (!messageList[user][timestamps[i]])
+                                continue;
+                            
+                            frag.appendChild(buildItem(user, timestamps[i]));
+                        }
+                    }
+                }
+                else if (sortType == "size")
+                {
+                    for (var i = 0, len = sizes.length; i < len; i++)
+                    {
+                        for (var user in messageList)
+                        {
+                            for (var time in messageList[user])
+                            {
+                                if (messageList[user][time]["size"] == sizes[i])
+                                    frag.appendChild(buildItem(user, time));
+                            }
+                        }
+                    }
+                }
+                else if (sortType == "user")
+                {
+                    for (var i = 0 , len = users.length; i < len; i++)
+                    {
+                        for (var time in messageList[users[i]])
+                        {
+                            frag.appendChild(buildItem(users[i], time));
+                        }
                     }
                 }
                 hf.elCN("message-list")[0].appendChild(frag);
@@ -950,9 +1036,60 @@ var APP = (function()
             {
                 messageList = JSON.parse(res);
                 console.log(messageList);
+                sortMessageListTimestamp();
                 buildList();
             });
-        };
+        },
+        sortMessageListTimestamp = function()
+        {
+            timestamps = [];
+            for (var user in messageList)
+                for (var time in messageList[user])
+                    timestamps.push(time);
+
+            timestamps.sort();
+
+            if (timeSorting)
+                timestamps.reverse();
+
+            timeSorting = !timeSorting;
+            sizeSorting = true;
+            userSorting = true;
+            sortType = "time";
+        },
+        sortMessageListSize = function()
+        {
+            sizes = [];
+            for (var user in messageList)
+                for(var time in messageList[user])
+                    sizes.push(messageList[user][time]["size"]);
+
+            sizes.sort();
+
+            if (sizeSorting)
+                sizes.reverse();
+
+            sizeSorting = !sizeSorting;
+            timeSorting = true;
+            userSorting = true;
+            sortType = "size";
+        },
+        sortMessageListUser = function()
+        {
+            users = [];
+            for (var user in messageList)
+                users.push(user);
+
+            users.sort();
+
+            if (userSorting)
+                users.reverse();
+
+            userSorting = !userSorting;
+            timeSorting = true;
+            sizeSorting = true;
+            sortType = "user";
+        }
 
         return{
             init: function()
@@ -999,6 +1136,21 @@ var APP = (function()
                     else if (hf.cN(e, "delete-multiple-messages-button"))
                     {
                         deleteMultipleMessages();
+                    }
+                    else if (hf.cN(e, "message-list-timestamp"))
+                    {
+                        sortMessageListTimestamp();
+                        buildList();
+                    }
+                    else if (hf.cN(e, "message-list-username"))
+                    {
+                        sortMessageListUser();
+                        buildList();
+                    }
+                    else if (hf.cN(e, "message-list-size"))
+                    {
+                        sortMessageListSize();
+                        buildList();
                     }
                 }
             }
