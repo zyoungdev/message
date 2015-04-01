@@ -7,7 +7,7 @@
 </h1>
 <!-- <input type="text" class="settings-display-name"> -->
 <h2>Change Password</h2>
-<input type="password" class="settings-oldpw" placeholder="Old Password">
+<!-- <input type="password" class="settings-oldpw" placeholder="Old Password"> -->
 <input type="password" class="settings-newpw" placeholder="New Password">
 <input type="password" class="settings-newpw-double" placeholder="Type New Password Again">
 <button class="settings-changepw-button">Change</button>

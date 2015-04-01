@@ -44,6 +44,7 @@ class SendMessage{
                 array("username" => $this->clean["un"])))
         {
             $this->message["recipient"]["username"] = $this->recipient["username"];
+            logThis($this->recipient);
             return 1;
         } 
         else
@@ -76,7 +77,7 @@ class SendMessage{
         $user = $this->message["recipient"]["username"];
 
         $query = array('username' => $_SESSION["user"]["username"]);
-        $update = array('$set' => array("contacts.$user" => array("public" => $this->recipient["key"]["public"])));
+        $update = array('$set' => array("contacts.$user" => array()));
 
         $this->mongo["usersprivate"]->update($query, $update);
     }

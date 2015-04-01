@@ -407,7 +407,7 @@ var APP = (function()
 
             hf.ajax("POST", fd, "phpSrc/sendMessage.php", function(res)
             {
-                // console.log(res);
+                console.log(res);
                 document.body.removeChild(el);
                 imgs = [];
                 contactList.init();
@@ -1013,7 +1013,7 @@ var APP = (function()
             hf.ajax("GET", null, "phpSrc/listMessages.php", function(res)
             {
                 messageList = JSON.parse(res);
-                console.log(messageList);
+                // console.log(messageList);
                 sortMessageListTimestamp();
                 buildList();
             });
@@ -1235,6 +1235,7 @@ var APP = (function()
             reader = new FileReader(),
             fd = new FormData(),
             avatarInput = hf.elCN("avatar-input")[0],
+            navAvatar = hf.elCN("nav-avatar")[0],
             avatarImg = hf.elCN("avatar")[0];
 
             avatarInput.click();
@@ -1252,6 +1253,7 @@ var APP = (function()
                     r = JSON.parse(r);
                     if (r.code)
                         avatarImg.style.backgroundImage = "url(" + settings.avatar + ")";
+                        navAvatar.style.backgroundImage = "url(" + settings.avatar + ")";
                 })
             }
             })();
@@ -1266,6 +1268,31 @@ var APP = (function()
                 a.download = "Decrypted-Messages.txt";
                 a.click();
             })
+        },
+        changePassword = function()
+        {   
+            var
+            newpw = hf.elCN("settings-newpw")[0],
+            newpwagain = hf.elCN("settings-newpw-double")[0];
+
+            if (newpw.value != newpwagain.value)
+            {
+                console.log("Passwords don't match");
+                return;
+            }
+            var fd = new FormData();
+            fd.append("password", newpw.value);
+            fd.append("changepassword", 1);
+
+            hf.ajax("POST", fd, "phpSrc/login.php", function(res)
+            {
+                console.log("Reloading page in 3 seconds...");
+                var del = setTimeout(function()
+                {
+                    window.location.reload();
+                },3000);
+            })
+
         };
         return {
             user: "",
@@ -1292,6 +1319,10 @@ var APP = (function()
                     {
                         changeAvatar();
                     }
+                    else if (hf.cN(e, "settings-changepw-button"))
+                    {
+                        changePassword();
+                    }
                     else if (hf.cN(e, "settings-download-creds"))
                     {
 
@@ -1307,7 +1338,7 @@ var APP = (function()
     navigation = (function()
     {
         var
-        buildNavigation = function(res)
+        buildNavigation = function(res ,callback)
         {
             var
             container = hf.cEL("div", {class: "navigation-container"}),
@@ -1315,13 +1346,19 @@ var APP = (function()
             container.innerHTML = res;
 
             document.body.appendChild(container);
-            avatar.style.backgroundImage = "url(" + settings.avatar + ")";
+            if (avatar)
+            {
+                avatar.style.backgroundImage = "url(" + settings.avatar + ")";
+                callback();
+            } 
         },
         getTemplate = function()
         {
             hf.ajax("GET", null, "templates/navigation.php", function(res){
-                buildNavigation(res);
-                changeState("messages", hf.elCN("nav-messages")[0]);
+                buildNavigation(res, function()
+                {
+                    changeState("messages", hf.elCN("nav-messages")[0]);
+                });
             })
         },
         setState = function()

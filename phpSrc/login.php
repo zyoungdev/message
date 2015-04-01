@@ -23,15 +23,17 @@ include "./helper.php";
 
 
 class Login{
-    public $clean = array();
-    public $dirty = array();
-    public $mongo = array();
+    // public $clean = array();
+    // public $dirty = array();
+    // public $mongo = array();
     public $challenge = "This is the challenge";
     public $protectedUN = array("admin", "administrator", "root");
 
     public function __construct()
     {
         session_start();
+        unset($_SESSION["user"]["key"]);
+        // logThis($_SESSION);
         $this->mongo = openDB();
         $this->dirty["pw"] = $_POST["password"];
     }
@@ -87,7 +89,7 @@ class Login{
             if ($user = $this->mongo["usersprivate"]->findone($query, $projection))
             {
                 $_SESSION["user"] = $user;
-                $_SESSION["user"]["key"]["public"] = $_SESSION["user"]["key"]["public"];
+                // $_SESSION["user"]["key"]["public"] = $_SESSION["user"]["key"]["public"];
                 return 1;
             }
             else
@@ -219,6 +221,36 @@ class Login{
             return 0;
         }
     }
+    public function updatePassword()
+    {
+        $query = array("username" => $_SESSION["user"]["username"]);
+        $privateuser = array('key' => array(
+                'hashedPW' => $_SESSION["user"]["key"]["hashedPW"],
+                'public' => $_SESSION["user"]["key"]["public"],
+                'salt' => $_SESSION["user"]["key"]["salt"],
+                'challenge' => $_SESSION["user"]["key"]["challenge"],
+                'nonce' => $_SESSION["user"]["key"]["nonce"]
+            ));
+        $publicuser = array('key' => array(
+                'public' => $_SESSION["user"]["key"]["public"]
+            ));
+        $pripro = array('$set' => $privateuser);
+        $pubpro = array('$set' => $publicuser);
+
+        if ($res = $this->mongo["usersprivate"]->update($query, $pripro))
+        {
+            logThis($res);
+            if ($this->mongo["userspublic"]->update($query, $pubpro))
+            {
+                $this->mongo["usersprivate"]->update($query, array('$set' => array("messages" => new stdClass())));
+                return 1;
+            }
+        }
+        else
+        {
+            return 0;
+        }
+    }
     public function cleanup()
     {
         if(isset($_SESSION["user"]["key"]["hashedPW"]))
@@ -242,8 +274,6 @@ class Login{
 //accepts $_POST["username"] and $_POST["password"]
 function logUserIn()
 {
-
-
     $login = new Login;
     $return = new Returning;
     if (!$login->usernameIsClean())
@@ -294,7 +324,30 @@ function logUserIn()
         $return->exitNow(1, "Welcome! " . $_SESSION["user"]["username"]);
     }
 }
-if ($_POST["username"] && $_POST["password"])
+
+function changePassword()
+{
+    $login = new Login;
+    $return = new Returning;
+
+    $login->hashPW();
+
+    $login->createSaltNonce();
+    $login->createMasterKeys();
+    $login->createSigningKeys();
+    $login->encryptChallenge();
+    if (!$login->updatePassword())
+    {
+        $return->exitNow(0, "Unable to change password");
+    }
+    $return->exitNow(1, "Updated Password");
+}
+
+if (isset($_POST["username"]) && isset($_POST["password"]))
 {
     logUserIn();
+}
+else if (isset($_POST["password"]) && isset($_POST["changepassword"]))
+{
+    changePassword();
 }

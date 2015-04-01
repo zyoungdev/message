@@ -49,6 +49,7 @@ class AddContact{
     public function addContact()
     {
         $user = $this->contact["username"];
+        unset($user["contact"]);
 
         $query = array('username' => $_SESSION["user"]["username"]);
         $update = array('$set' => array("contacts.$user" => array("public" => $this->contact["public"])));
