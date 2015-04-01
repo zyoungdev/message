@@ -1219,15 +1219,15 @@ var APP = (function()
             hf.ajax("POST", avFD, "phpSrc/getAvatar.php", function(res)
             {
                 settings.avatar = res;
-            })
+                hf.ajax("GET", null, "phpSrc/getSettings.php", function(res)
+                {
+                    // console.log(res);
+                    res = JSON.parse(res);
+                    settings.mNum = res["mPerPage"];
+                    navigation.init();
 
-            hf.ajax("GET", null, "phpSrc/getSettings.php", function(res)
-            {
-                // console.log(res);
-                res = JSON.parse(res);
-                settings.mNum = res["mPerPage"];
-
-            })
+                });
+            });
         },
         changeAvatar = function()
         {
@@ -1257,9 +1257,16 @@ var APP = (function()
             })();
             reader.readAsDataURL(avatarInput.files[0]);
             }
-
-        }
-
+        },
+        downloadMessages = function()
+        {
+            hf.ajax("GET", null, "phpSrc/downloadMessages.php", function(res)
+            {
+                var a = hf.cEL("a", {target: "_blank", href: 'data:text/plain;charset=utf-8,' + encodeURIComponent(res)});
+                a.download = "Decrypted-Messages.txt";
+                a.click();
+            })
+        };
         return {
             user: "",
             avatar: "",
@@ -1285,6 +1292,14 @@ var APP = (function()
                     {
                         changeAvatar();
                     }
+                    else if (hf.cN(e, "settings-download-creds"))
+                    {
+
+                    }
+                    else if (hf.cN(e, "settings-download-messages"))
+                    {
+                        downloadMessages();
+                    }
                 }
             }
         }
@@ -1295,9 +1310,12 @@ var APP = (function()
         buildNavigation = function(res)
         {
             var
-            container = hf.cEL("div", {class: "navigation-container"});
+            container = hf.cEL("div", {class: "navigation-container"}),
+            avatar = hf.elCN("nav-avatar")[0];
             container.innerHTML = res;
+
             document.body.appendChild(container);
+            avatar.style.backgroundImage = "url(" + settings.avatar + ")";
         },
         getTemplate = function()
         {
@@ -1397,6 +1415,10 @@ var APP = (function()
                     {
                         changeState("settings");
                     }
+                    else if (hf.isInside(e, hf.elCN("nav-avatar-container")[0]))
+                    {
+                        changeState("settings");
+                    }
                 }
             }
         }
@@ -1427,7 +1449,6 @@ var APP = (function()
                         hf.elCN("loginerror")[0].innerText = r.message;
 
                         document.body.innerHTML = "";
-                        navigation.init();
                         settings.user = un;
                         settings.getUserSettings();
                     }

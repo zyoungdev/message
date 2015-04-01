@@ -2,7 +2,6 @@
 include "./helper.php";
 
 class DeleteMultipleMessages{
-    public $mongo;
     public function __construct()
     {
         session_start();

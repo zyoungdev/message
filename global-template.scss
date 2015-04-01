@@ -83,7 +83,8 @@ button{
     @extend %a-100;
     box-shadow: 0 0 5px #000000;
     div{
-        @extend %a-50;
+
+        @extend %a-40;
         background-color: #232323;
         height: 100px;
         cursor:pointer;
@@ -99,6 +100,21 @@ button{
             text-align:center;
             color: #efefef;
 
+        }
+    }
+    .nav-avatar-container{
+        @extend %a-20;
+        height:200px;
+        .nav-avatar{
+            @extend %a-p-10;
+            @extend %a-cent-cent;
+            width:150px;
+            height:150px;
+            border-radius: 50%;
+            box-shadow: 0 0 5px black;
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
         }
     }
     .active{
@@ -373,7 +389,11 @@ button{
         @extend %a-null-cent;
         margin-bottom:50px;
     }
-    .settings-download-key{
+    .settings-download-creds{
+        @extend %a-null-cent;
+        margin-bottom:50px;
+    }
+    .settings-download-messages{
         @extend %a-null-cent;
         margin-bottom:50px;
     }

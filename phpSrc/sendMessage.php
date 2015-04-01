@@ -3,7 +3,6 @@ include "./helper.php";
 
 class SendMessage{
     public $clean = array();
-    public $mongo = array();
     public $message = array();
     public $recipient;
 

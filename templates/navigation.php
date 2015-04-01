@@ -1,3 +1,6 @@
+<div class="nav-avatar-container">
+    <div class="nav-avatar"></div>
+</div>
 <div class="nav-compose"><p>Compose</p></div>
 <div class="nav-messages"><p>Messages</p></div>
 <div class="nav-contacts"><p>Contacts</p></div>

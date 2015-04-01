@@ -13,7 +13,10 @@
 <button class="settings-changepw-button">Change</button>
 
 <h2>Manage Your Own Credentials</h2>
-<button class="settings-download-key">Download Credentials</button>
+<button class="settings-download-creds">Download Credentials</button>
+
+<h2>Decrypt and Download Your Messages</h2>
+<button class="settings-download-messages">Download Messages</button>
 
 <label for="mPerPage"><h2>Messages Per Page</h2></label>
 <input type="number" min="1", max="25" class="mPerPage">

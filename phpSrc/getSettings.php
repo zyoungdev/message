@@ -3,7 +3,6 @@ include "./helper.php";
 
 
 class GetSettings{
-    public $mongo;
     public function __construct()
     {
         session_start();

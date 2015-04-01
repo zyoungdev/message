@@ -2,7 +2,6 @@
 include "./helper.php";
 
 class ChangeAvatar{
-    public $mongo;
     public function __construct()
     {
         session_start();
