@@ -46,13 +46,13 @@ function main()
 
     if (!$del->contactsAreClean())
     {
-        $ret->exitNow(0, "Contacts aren't clean");
+        $ret->exitNow(0, "The contacts your provided contain spaces or symbols. Usernames can only contain letters and numbers.");
     }
     if (!$del->updateContacts())
     {
-        $ret->exitNow(0, "Could not delete Contacts");
+        $ret->exitNow(0, "The contacts could not be deleted at this time.");
     }
-    $ret->exitNow(1, "Contacts Updated Successfully");
+    $ret->exitNow(1, "Contacts Removed Successfully");
 }
 
 if ($_POST["contacts"])

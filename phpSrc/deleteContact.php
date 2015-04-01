@@ -50,12 +50,13 @@ function main()
 
     if (!$del->isClean())
     {
-        $return->exitNow(0, "Username is not clean\n");
+        $return->exitNow(0, "The username you provided contains spaces or symbols. Username can only contain letters and numbers.\n");
     }
     if (!$del->deleteContact())
     {
-        $return->exitNow(0, "Could  not delete contact\n");
+        $return->exitNow(0, "The contact could not be deleted at this time.\n");
     }
+    $return->exitNow(1, "Contact removed.");
 }
 
 if ($_POST["username"])

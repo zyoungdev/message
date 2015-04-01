@@ -12,8 +12,8 @@
 <input type="password" class="settings-newpw-double" placeholder="Type New Password Again">
 <button class="settings-changepw-button">Change</button>
 
-<h2>Manage Your Own Credentials</h2>
-<button class="settings-download-creds">Download Credentials</button>
+<!-- <h2>Manage Your Own Credentials</h2> -->
+<!-- <button class="settings-download-creds">Download Credentials</button> -->
 
 <h2>Decrypt and Download Your Messages</h2>
 <button class="settings-download-messages">Download Messages</button>

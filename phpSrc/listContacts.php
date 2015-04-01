@@ -47,7 +47,7 @@ function main()
 
     if (!$contacts->getContacts())
     {
-        $return->exitNow(0, "Could not get contacts\n");
+        $return->exitNow(0, "There are no contacts to be displayed.\n");
     }
     $contacts->send();
 }

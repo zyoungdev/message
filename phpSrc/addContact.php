@@ -49,7 +49,8 @@ class AddContact{
     public function addContact()
     {
         $user = $this->contact["username"];
-        unset($user["contact"]);
+        if (isset($user["contact"]))
+            unset($user["contact"]);
 
         $query = array('username' => $_SESSION["user"]["username"]);
         $update = array('$set' => array("contacts.$user" => array("public" => $this->contact["public"])));
@@ -72,15 +73,15 @@ function main()
 
     if (!$add->contactIsClean())
     {
-        $return->exitNow(0, "Contact is not clean\n");
+        $return->exitNow(0, "The username you provided contains spaces or symbols. Usernames can only contain letters and numbers.\n");
     }
     if (!$add->userExists())
     {
-        $return->exitNow(0, "User Doesn't Exist\n");
+        $return->exitNow(0, "The username you provided does not exist.\n");
     }
     if (!$add->addContact())
     {
-        $return->exitNow(0, "Could not add the contact\n");
+        $return->exitNow(0, "The username could not be added at this time.\n");
     }
 }
 

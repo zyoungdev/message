@@ -411,5 +411,27 @@ button{
         margin-bottom:50px;
     }
 }
+.error-container{
+    @extend %a-100;
+    @extend %a-bot-cent;
+    background-color: #fff;
+    box-shadow: 0 0 5px #232323;
+    position:fixed;
+    cursor:pointer;
+    .error-close{
+        @extend %a-100;
+        @extend %a-p-10;
+        text-align: right;
+        &:hover{
+            color:#a0a;
+        }
+    }
+    .error-message{
+        @extend %a-75;
+        @extend %a-null-cent;
+        padding-bottom:20px;
+        text-align: center;
+    }
+}
 
 

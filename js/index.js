@@ -86,15 +86,8 @@ var APP = (function()
                     return time.toLocaleTimeString(); 
                 else
                     return time.toLocaleDateString();
-            },
-            getAvatar: function(usr, callback)
-            {
-                var fd = new FormData();
-
-                fd.append("user", usr);
-
-                hf.ajax("POST", fd, "phpSrc/getAvatar.php", callback);
             }
+            
         };
     })(),
     contactList = (function()
@@ -118,7 +111,7 @@ var APP = (function()
                 else
                     hf.elCN("contact-list")[0].innerHTML = "";
                 
-                if (contactList["code"] == 0) return;
+                if (contactList.code == 0) return;
 
                 for (var user in contactList)
                 {
@@ -145,7 +138,10 @@ var APP = (function()
             hf.ajax("GET", null, "phpSrc/listContacts.php", function(res)
             {
                 contactList = JSON.parse(res);
-                console.log(contactList);
+                if (contactList.code != null)
+                {
+                    error.init(contactList.message, 5);
+                }
                 sortContacts();
                 buildList();
             });
@@ -164,16 +160,18 @@ var APP = (function()
 
             hf.ajax("POST", fd, "phpSrc/addContact.php", function(res)
             {
-                console.log(res);
                 hf.ajax("GET", null, "phpSrc/listContacts.php", function(r)
                 {
                     contactList = JSON.parse(r);
-                    if (contactList["code"] == null)
+                    if (contactList.code == null)
                     {
-                        console.log(contactList);
                         sorting = false;
                         sortContacts();
                         buildList();
+                    }
+                    else if (contactList.code == 0 || contactList.code == -1)
+                    {
+                        error.init(contactList.message);
                     }
                 });
             });
@@ -187,14 +185,14 @@ var APP = (function()
             {
                 // console.log(res);
                 // res = JSON.parse(res);
-                if (res["code"] == null)
+                if (res.code == null)
                 {
                     delete contactList[u];
                     buildList();
                 }
                 else
                 {
-                    // console.log(res);
+                    error.init(res.message, 3);
                 }
             });
         },
@@ -223,13 +221,18 @@ var APP = (function()
             fd.append("contacts", JSON.stringify(contactList));
             hf.ajax("POST", fd, "phpSrc/deleteMultipleContacts.php", function(res)
             {
-                console.log(res);
                 res = JSON.parse(res);
 
-                if (res["code"] == 0)
+                if (res.code == 0 || res.code == -1)
                 {
                     contactList = backupContactList;
+                    error.init(res.message);
                 }
+                else
+                {
+                    error.init(res.message, 3);
+                }
+
                 delBut.style.display = "none";
                 buildList();
             });
@@ -407,10 +410,14 @@ var APP = (function()
 
             hf.ajax("POST", fd, "phpSrc/sendMessage.php", function(res)
             {
-                console.log(res);
+                res = JSON.parse(res);
+                if (res.code != null)
+                {
+                    error.init(res.message, 3);
+                }
                 document.body.removeChild(el);
                 imgs = [];
-                contactList.init();
+                navigation.stateChange("contacts");
             });
         },
         addFiles = function()
@@ -652,7 +659,7 @@ var APP = (function()
                     message.innerHTML = "";
                 }
                 
-                if (contactList["code"] == 0) return;
+                if (contactList.code == 0) return;
 
                 var
                 sender = hf.elCN("view-message-sender")[0],
@@ -813,7 +820,7 @@ var APP = (function()
                 else
                     hf.elCN("message-list")[0].innerHTML = "";
                 
-                if (messageList["code"] == 0) return;
+                if (messageList.code == 0) return;
 
                 var 
                 i = Math.floor(currentPage*settings.mNum),
@@ -898,8 +905,11 @@ var APP = (function()
 
             hf.ajax("POST", fd, "phpSrc/viewMessage.php", function(res)
             {
-                // console.log(res);
                 res = JSON.parse(res);
+                if (res.code != null)
+                {
+                    error.init(res.message);
+                }
                 messageView.init(res);                
             });
         },
@@ -952,14 +962,16 @@ var APP = (function()
             {
                 // console.log(res);
                 // res = JSON.parse(res);
-                if (res["code"] == null)
+                if (res.code == null)
                 {
                     delete messageList[u][t];
+                    sortType = "time";
+                    timeSorting = true;
                     buildList();
                 }
                 else
                 {
-                    // console.log(res);
+                    error.init(res.message, 3);
                 }
             });
         },
@@ -1000,13 +1012,18 @@ var APP = (function()
             fd.append("deleteMessages", JSON.stringify(deleteMessages));
             hf.ajax("POST", fd, "phpSrc/deleteMultipleMessages.php", function(res)
             {
-                // console.log(res);
                 res = JSON.parse(res);
 
-                if (res["code"] == 0)
+                if (res.code != null)
+                {
                     messageList = backupMessageList;
+                    error.init(res.message, 3);
+                }
+
 
                 delBut.style.display = "none";
+                sortType = "time";
+                timeSorting = true;
                 buildList();
             });
         },
@@ -1015,7 +1032,10 @@ var APP = (function()
             hf.ajax("GET", null, "phpSrc/listMessages.php", function(res)
             {
                 messageList = JSON.parse(res);
-                // console.log(messageList);
+                if (messageList.code != null)
+                {
+                    error.init(messageList.message, 5);
+                }
                 sortMessageListTimestamp();
                 buildList();
             });
@@ -1113,6 +1133,7 @@ var APP = (function()
         return{
             init: function()
             {
+                sortType = "time";
                 timeSorting = true;
                 getList();
             },
@@ -1223,11 +1244,14 @@ var APP = (function()
             hf.ajax("POST", avFD, "phpSrc/getAvatar.php", function(res)
             {
                 settings.avatar = res;
-                hf.ajax("GET", null, "phpSrc/getSettings.php", function(res)
+                hf.ajax("GET", null, "phpSrc/getSettings.php", function(r)
                 {
-                    // console.log(res);
-                    res = JSON.parse(res);
-                    settings.mNum = res["mPerPage"];
+                    r = JSON.parse(r);
+                    if (r.code != null)
+                    {
+                        error.init(r.message, 3);
+                    }
+                    settings.mNum = r["mPerPage"];
                     navigation.init();
 
                 });
@@ -1246,6 +1270,11 @@ var APP = (function()
 
             avatarInput.onchange = function()
             {
+            if (!avatarInput.files[0].type.match("image.*"))
+            {
+                error.init("The file you selected is not an image file.", 3);
+                return;                
+            }
             reader.onload = (function()
             {
             return function(res)
@@ -1255,9 +1284,15 @@ var APP = (function()
                 hf.ajax("POST", fd, "phpSrc/changeAvatar.php", function(r)
                 {
                     r = JSON.parse(r);
-                    if (r.code)
+                    if (r.code == 1)
+                    {
                         avatarImg.style.backgroundImage = "url(" + settings.avatar + ")";
                         navAvatar.style.backgroundImage = "url(" + settings.avatar + ")";
+                    }
+                    else if (r.code == 0 || r.code == -1)
+                    {
+                        error.init(r.message, 3);
+                    }
                 })
             }
             })();
@@ -1269,6 +1304,12 @@ var APP = (function()
             hf.ajax("GET", null, "phpSrc/downloadMessages.php", function(res)
             {
                 var a = hf.cEL("a", {target: "_blank", href: 'data:text/plain;charset=utf-8,' + encodeURIComponent(res)});
+                res = JSON.parse(res);
+                if (res.code != null)
+                {
+                    error.init(res.message, 5);
+                    return;
+                }
                 a.download = "Decrypted-Messages.txt";
                 a.click();
             })
@@ -1290,6 +1331,14 @@ var APP = (function()
 
             hf.ajax("POST", fd, "phpSrc/login.php", function(res)
             {
+                res = JSON.parse(res);
+                if (res.code == 0 || res.code == -1)
+                {
+                    error.init(res.message, 3);
+                    return;
+                }
+
+                error.init("Password has been changed successfully. Reloading the page in 3 seconds...");
                 console.log("Reloading page in 3 seconds...");
                 var del = setTimeout(function()
                 {
@@ -1311,7 +1360,11 @@ var APP = (function()
                     fd.append("mPerPage", numInput.value);
                     hf.ajax("POST", fd, "phpSrc/updateSettings.php", function(res)
                     {
-                        console.log(res);
+                        res = JSON.parse(res);
+                        if (res.code != null)
+                        {
+                            error.init(res.message);
+                        }
                     });
                 },1000);
             }
@@ -1370,7 +1423,6 @@ var APP = (function()
             var avatar = hf.elCN("nav-avatar")[0];
             if (avatar)
             {
-                console.log("avatar");
                 avatar.style.backgroundImage = "url(" + settings.avatar + ")";
                 callback();
             } 
@@ -1380,7 +1432,7 @@ var APP = (function()
             hf.ajax("GET", null, "templates/navigation.php", function(res){
                 buildNavigation(res, function()
                 {
-                    changeState("messages", hf.elCN("nav-messages")[0]);
+                    changeState("messages");
                 });
             })
         },
@@ -1392,8 +1444,12 @@ var APP = (function()
 
             (function()
             {
-                for (var i = 1, len = body.children.length; i < len; i++)
+                for (var i = body.children.length-1; i > 0; i--)
+                {
+                    if (hf.cN(body.children[i], "navigation-container"))
+                        continue;
                     body.removeChild(body.children[i]);
+                }
             })();
 
             (function()
@@ -1483,6 +1539,53 @@ var APP = (function()
             }
         }
     })(),
+    error = (function()
+    {   
+        var
+        message,
+        delay,
+        errorMessageContainer,
+        getTemplate = function()
+        {
+            hf.ajax("GET", null, "templates/error.php", function(res)
+            {
+                errorMessageContainer = hf.cEL("div", {class: "error-container"});
+                errorMessageContainer.innerHTML = res;
+                document.body.appendChild(errorMessageContainer);
+
+                var errorMessage = hf.elCN("error-message")[0];
+                errorMessage.innerHTML = message;
+
+                if (delay)
+                {
+                    var timeout = setTimeout(function()
+                    {
+                        if (errorMessageContainer)
+                            document.body.removeChild(errorMessageContainer);
+                        delay = null;
+                    },delay * 1000);
+                }
+
+            });
+        };
+        return {
+            init: function(msg, del)
+            {
+                message = msg;
+                delay = del;
+                getTemplate();
+            },
+            click: function(ev)
+            {
+                var e = ev.target;
+
+                if (hf.isInside(e, errorMessageContainer))
+                {
+                    document.body.removeChild(errorMessageContainer);
+                }
+            }
+        }
+    })(),
     login = (function()
     {
         var
@@ -1508,10 +1611,10 @@ var APP = (function()
                 {
                     var
                     r = JSON.parse(res);
-                    if (r.code)
+                    if (r.code == 1)
                     {
                         //Logged in!
-                        hf.elCN("loginerror")[0].innerText = r.message;
+                        error.init(r.message, 3);
                         settings.user = un;
 
                         init();
@@ -1519,8 +1622,7 @@ var APP = (function()
                     else
                     {
                         //Something failed
-                        // console.log(r.message);
-                        hf.elCN("loginerror")[0].innerText = r.message;
+                        error.init(r.message, 3);
                     }
                 }
             })
@@ -1564,6 +1666,7 @@ var APP = (function()
             contactList.click(ev);
             messageView.click(ev);
             settings.click(ev);
+            error.click(ev);
         }
     };
 })();

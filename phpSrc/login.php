@@ -278,7 +278,7 @@ function logUserIn()
     $return = new Returning;
     if (!$login->usernameIsClean())
     {
-        $return->exitNow(0, "Username is not clean\n");
+        $return->exitNow(0, "Username can only contain letters and numbers. \n");
     }
 
     //check if user is in the DB
@@ -288,7 +288,7 @@ function logUserIn()
         // verify password
         if (!$login->passwordIsCorrect())
         {
-            $return->exitNow(0, "Password is incorrect\n");
+            $return->exitNow(0, "The password you provided is incorrect.\n");
         }
         $login->getSalt();
         $login->createMasterKeys();
@@ -313,7 +313,7 @@ function logUserIn()
         $login->encryptChallenge();
         if (!$login->createNewUser())
         {
-            $return->exitNow(0, "Could not create new user in DB\n");
+            $return->exitNow(0, "The new user could not be created.\n");
         }
         if (!challengeIsDecrypted($login->mongo))
         {
@@ -340,7 +340,7 @@ function changePassword()
     {
         $return->exitNow(0, "Unable to change password");
     }
-    $return->exitNow(1, "Updated Password");
+    $return->exitNow(1, "Password has been updated.");
 }
 
 if (isset($_POST["username"]) && isset($_POST["password"]))

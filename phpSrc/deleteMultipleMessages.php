@@ -66,7 +66,7 @@ function main()
     {
         $ret->exitNow(0, "Could not delete Messages");
     }
-    $ret->exitNow(1, "Messages Updated Successfully");
+    $ret->exitNow(1, "Messages Removed Successfully");
 }
 
 if ($_POST["messages"] && $_POST["deleteMessages"])
