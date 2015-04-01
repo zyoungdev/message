@@ -18,7 +18,7 @@ class ViewMessage{
     }
     public function __destruct()
     {
-        session_write_close();
+        // session_write_close();
         closeDB($this->mongo["client"]);
     }
     public function getMessage()
@@ -31,7 +31,6 @@ class ViewMessage{
         if ($result = $this->mongo["usersprivate"]->findone($query, $projection))
         {
             $this->message = $result["messages"]["$username"]["$timestamp"];
-
 
             $id = $result["messages"]["$username"]["$timestamp"]["id"];
             $mQuery = array('id' => $id);
@@ -51,6 +50,8 @@ class ViewMessage{
 
         $ciphertext = hex2bin($this->message["ciphertext"]);
         $nonce = hex2bin($this->message["nonce"]);
+
+        logThis($this->message);
 
         if ($pt = Sodium::crypto_box_open($ciphertext,$nonce,$keypair))
         {
@@ -84,12 +85,12 @@ class ViewMessage{
 function main()
 {
     $view = new ViewMessage;
-    $return = new Returning;
+    $ret = new Returning;
 
     $view->getMessage();
     if (!$view->decryptmessage())
     {
-        $return->exitNow(0, "Could not decrypt message\n");
+        $ret->exitNow(0, "Could not decrypt message\n");
     }
     $view->returnMessage();
 }

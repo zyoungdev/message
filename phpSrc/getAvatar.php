@@ -5,6 +5,7 @@ class GetAvatar{
     public $mongo;
     public function __construct()
     {
+        session_start();
         $this->mongo = openDB();
     }
     public function __destruct()

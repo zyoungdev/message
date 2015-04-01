@@ -6,6 +6,8 @@ class ChangeAvatar{
     public function __construct()
     {
         session_start();
+        logThis($_SESSION);
+
         $this->mongo = openDB();
 
         if (!challengeIsDecrypted($this->mongo))
@@ -24,7 +26,7 @@ class ChangeAvatar{
         $image = $_POST["avatar"];
 
         $query = array("username" => $_SESSION["user"]["username"]);
-        $projection = array("avatar" => $image);
+        $projection = array('$set' => array("avatar" => $image));
 
         if ($this->mongo["userspublic"]->update($query, $projection))
             return 1;

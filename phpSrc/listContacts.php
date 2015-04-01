@@ -11,7 +11,7 @@ class ListContacts{
      }
     public function __destruct()
     {
-        session_write_close();
+        // session_write_close();
         closeDB($this->mongo["client"]);
     }
     public function getContacts()

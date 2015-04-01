@@ -86,6 +86,14 @@ var APP = (function()
                     return time.toLocaleTimeString(); 
                 else
                     return time.toLocaleDateString();
+            },
+            getAvatar: function(usr, callback)
+            {
+                var fd = new FormData();
+
+                fd.append("user", usr);
+
+                hf.ajax("POST", fd, "phpSrc/getAvatar.php", callback);
             }
         };
     })(),
@@ -137,7 +145,7 @@ var APP = (function()
             hf.ajax("GET", null, "phpSrc/listContacts.php", function(res)
             {
                 contactList = JSON.parse(res);
-                // console.log(contactList);
+                console.log(contactList);
                 sortContacts();
                 buildList();
             });
@@ -399,7 +407,7 @@ var APP = (function()
 
             hf.ajax("POST", fd, "phpSrc/sendMessage.php", function(res)
             {
-                // console.log("Response recieved for sent message");
+                // console.log(res);
                 document.body.removeChild(el);
                 imgs = [];
                 contactList.init();
@@ -437,6 +445,7 @@ var APP = (function()
                         { 
                             return function(e) 
                             { 
+                                console.log(e.target.result);
                                 var
                                 i = "<div class=img-container><div class=img style=background-image:url(";
                                 i += e.target.result;
@@ -766,7 +775,6 @@ var APP = (function()
         sizeSorting = true,
         userSorting = true,
         sortType = "time",
-        mPerPage = 3,
         currentPage = 0,
         buildItem = function(u, t)
         {
@@ -806,14 +814,14 @@ var APP = (function()
                 if (messageList["code"] == 0) return;
 
                 var 
-                i = Math.floor(currentPage*mPerPage),
+                i = Math.floor(currentPage*settings.mNum),
                 count = 0;
 
                 if (sortType == "time")
                 {
                     for (var len = timestamps.length; i < len; i++)
                     {
-                        if (count >= mPerPage)
+                        if (count >= settings.mNum)
                             break;
                         for (var user in messageList)
                         {
@@ -828,7 +836,7 @@ var APP = (function()
                 {
                     for (var len = sizes.length; i < len; i++)
                     {
-                        if (count >= mPerPage)
+                        if (count >= settings.mNum)
                             break;
                         for (var user in messageList)
                         {
@@ -848,7 +856,7 @@ var APP = (function()
                     console.log("user", i, currentPage);
                     for (var len = users.length; i < len; i++)
                     {
-                        if (count >= mPerPage)
+                        if (count >= settings.mNum)
                             break;
                         for (var u in messageList)
                         {
@@ -856,7 +864,7 @@ var APP = (function()
                             {
                                 if (messageList[u][t] == users[i])
                                 {
-                                    if (count >= mPerPage)
+                                    if (count >= settings.mNum)
                                         break;
                                     frag.appendChild(buildItem(u, t));
                                     count++;
@@ -871,7 +879,7 @@ var APP = (function()
                     hf.elCN("prev")[0].style.visibility = "hidden";
                 else
                     hf.elCN("prev")[0].style.visibility = "visible";
-                if (currentPage == Math.ceil(timestamps.length / mPerPage)-1)
+                if (currentPage == Math.ceil(timestamps.length / settings.mNum)-1)
                     hf.elCN("next")[0].style.visibility = "hidden";
                 else
                     hf.elCN("next")[0].style.visibility = "visible";
@@ -888,6 +896,7 @@ var APP = (function()
 
             hf.ajax("POST", fd, "phpSrc/viewMessage.php", function(res)
             {
+                // console.log(res);
                 res = JSON.parse(res);
                 messageView.init(res);                
             });
@@ -1075,7 +1084,7 @@ var APP = (function()
         {
             var 
             items = timestamps.length,
-            maxPages = Math.ceil(items / mPerPage),
+            maxPages = Math.ceil(items / settings.mNum),
             prev = hf.elCN("prev")[0],
             next = hf.elCN("next")[0];
 
@@ -1178,10 +1187,105 @@ var APP = (function()
     })(),
     settings = (function()
     {
+        var
+        getTemplate = function()
+        {
+            hf.ajax("GET", null, "templates/settings.php", function(res)
+            {
+                var
+                container = hf.cEL("div", {class: "module-container settings-container"}),
+                containerExists = hf.elCN("settings-container")[0];
+
+                container.innerHTML = res;
+
+                if (!containerExists)
+                    document.body.appendChild(container);
+
+                var
+                avatar = hf.elCN("avatar-container")[0].children[0],
+                username = hf.elCN("settings-username")[0],
+                messageNum = hf.elCN("mPerPage")[0];
+
+                avatar.style.backgroundImage = "url(" + settings.avatar + ")";
+                username.innerHTML = settings.user;
+                messageNum.value = settings.mNum;
+                
+            })
+        },
+        getSettings = function()
+        {
+            var avFD = new FormData();
+            avFD.append("user", settings.user);
+            hf.ajax("POST", avFD, "phpSrc/getAvatar.php", function(res)
+            {
+                settings.avatar = res;
+            })
+
+            hf.ajax("GET", null, "phpSrc/getSettings.php", function(res)
+            {
+                // console.log(res);
+                res = JSON.parse(res);
+                settings.mNum = res["mPerPage"];
+
+            })
+        },
+        changeAvatar = function()
+        {
+            var
+            reader = new FileReader(),
+            fd = new FormData(),
+            avatarInput = hf.elCN("avatar-input")[0],
+            avatarImg = hf.elCN("avatar")[0];
+
+            avatarInput.click();
+
+            avatarInput.onchange = function()
+            {
+            reader.onload = (function()
+            {
+            return function(res)
+            {
+                fd.append("avatar", res.target.result);
+                settings.avatar = res.target.result;
+                hf.ajax("POST", fd, "phpSrc/changeAvatar.php", function(r)
+                {
+                    r = JSON.parse(r);
+                    if (r.code)
+                        avatarImg.style.backgroundImage = "url(" + settings.avatar + ")";
+                })
+            }
+            })();
+            reader.readAsDataURL(avatarInput.files[0]);
+            }
+
+        }
+
         return {
+            user: "",
+            avatar: "",
+            mNum: 10,
             init: function()
             {
+                getTemplate();
+            },
+            getUserSettings: function()
+            {
+                getSettings();
+            },
+            click: function(ev)
+            {
+                var
+                e = ev.target,
+                settingsModule = hf.elCN("settings-container")[0],
+                avatarContainer = hf.elCN("avatar-container")[0];
 
+                if (hf.isInside(e, settingsModule))
+                {
+                    if (hf.isInside(e, avatarContainer))
+                    {
+                        changeAvatar();
+                    }
+                }
             }
         }
     })(),
@@ -1324,6 +1428,8 @@ var APP = (function()
 
                         document.body.innerHTML = "";
                         navigation.init();
+                        settings.user = un;
+                        settings.getUserSettings();
                     }
                     else
                     {
@@ -1339,14 +1445,14 @@ var APP = (function()
             {
                 var
                 e = ev.target,
-                loginBox = hf.elCN("login-box")[0];
+                loginModule = hf.elCN("login-box")[0];
 
-                if (hf.isInside(e, loginBox))
+                if (hf.isInside(e, loginModule))
                 {
                     var
-                    un = loginBox.getElementsByTagName("input")[0],
-                    pw = loginBox.getElementsByTagName("input")[1],
-                    sub = loginBox.getElementsByTagName("button")[0];
+                    un = loginModule.getElementsByTagName("input")[0],
+                    pw = loginModule.getElementsByTagName("input")[1],
+                    sub = loginModule.getElementsByTagName("button")[0];
                     if (e == un)
                     {
 
@@ -1357,6 +1463,7 @@ var APP = (function()
                     }
                     else if (e == sub)
                     {
+                        settings.getUserSettings();
                         submitCreds(un.value, pw.value);
                     }
                 }
@@ -1372,6 +1479,7 @@ var APP = (function()
             messageList.click(ev);
             contactList.click(ev);
             messageView.click(ev);
+            settings.click(ev);
         }
     };
 })();

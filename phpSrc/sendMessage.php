@@ -160,6 +160,7 @@ function sendMessage()
     {
         $return->exitNow(0, "Cloud not send the message\n");
     }
+    $return->exitNow(1, "Message Successfully sent");
 }
 
 if ($_POST["recipient"] && $_POST["plaintext"] && $_POST["messageSize"])

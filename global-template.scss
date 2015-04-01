@@ -335,5 +335,48 @@ button{
         }
     }
 }
+.settings-container{
+    .avatar-container{
+        @extend %a-200-f;
+        @extend %a-null-cent;
+        height:200px;
+        .avatar{
+            @extend %a-100;
+            height:100%;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            box-shadow: 0 0 5px;
+            &:hover p{
+                display:block;
+            }
+            p{
+                @extend %a-cent-null;
+                color:#dedede;
+                display:none;
+                text-align:center;
+                text-shadow:0 0 3px black;
+            }
+        }
+    }
+    .settings-username{
+        @extend %a-100;
+        text-align:center;
+    }
+    h2{
+        @extend %a-95;
+        @extend %a-null-cent;
+        text-align:center;
+    }
+    .settings-changepw-button{
+        @extend %a-null-cent;
+        margin-bottom:50px;
+    }
+    .settings-download-key{
+        @extend %a-null-cent;
+        margin-bottom:50px;
+    }
+}
 
 

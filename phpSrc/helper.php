@@ -13,10 +13,10 @@ class Returning{
         if ($this->code == 0)
         {
             // unloadSession();
-            session_regenerate_id();
         }
         else if ($this->code == -1)
         {
+            session_regenerate_id();
             unloadSession();
         }
         echo json_encode($this);
