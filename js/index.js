@@ -1113,6 +1113,7 @@ var APP = (function()
         return{
             init: function()
             {
+                timeSorting = true;
                 getList();
             },
             deleteMessage: function(user,time)
@@ -1190,6 +1191,7 @@ var APP = (function()
     settings = (function()
     {
         var
+        mPerPageTimeout,
         getTemplate = function()
         {
             hf.ajax("GET", null, "templates/settings.php", function(res)
@@ -1211,7 +1213,7 @@ var APP = (function()
                 avatar.style.backgroundImage = "url(" + settings.avatar + ")";
                 username.innerHTML = settings.user;
                 messageNum.value = settings.mNum;
-                
+                mPerPageChange();
             })
         },
         getSettings = function()
@@ -1294,7 +1296,25 @@ var APP = (function()
                     window.location.reload();
                 },3000);
             })
+        },
+        mPerPageChange = function()
+        {
+            var numInput = hf.elCN("mPerPage")[0];
 
+            numInput.onchange = function()
+            {
+                clearTimeout(mPerPageTimeout);
+                mPerPageTimeout = setTimeout(function()
+                {
+                    var fd = new FormData();
+
+                    fd.append("mPerPage", numInput.value);
+                    hf.ajax("POST", fd, "phpSrc/updateSettings.php", function(res)
+                    {
+                        console.log(res);
+                    });
+                },1000);
+            }
         };
         return {
             user: "",
@@ -1343,13 +1363,14 @@ var APP = (function()
         buildNavigation = function(res ,callback)
         {
             var
-            container = hf.cEL("div", {class: "navigation-container"}),
-            avatar = hf.elCN("nav-avatar")[0];
+            container = hf.cEL("div", {class: "navigation-container"});
             container.innerHTML = res;
 
             document.body.appendChild(container);
+            var avatar = hf.elCN("nav-avatar")[0];
             if (avatar)
             {
+                console.log("avatar");
                 avatar.style.backgroundImage = "url(" + settings.avatar + ")";
                 callback();
             } 
@@ -1465,6 +1486,11 @@ var APP = (function()
     login = (function()
     {
         var
+        init = function()
+        {
+            document.body.innerHTML = "";
+            settings.getUserSettings();
+        },
         submitCreds = function(un, pw)
         {
             if (un === "") return;
@@ -1486,10 +1512,9 @@ var APP = (function()
                     {
                         //Logged in!
                         hf.elCN("loginerror")[0].innerText = r.message;
-
-                        document.body.innerHTML = "";
                         settings.user = un;
-                        settings.getUserSettings();
+
+                        init();
                     }
                     else
                     {
@@ -1523,7 +1548,6 @@ var APP = (function()
                     }
                     else if (e == sub)
                     {
-                        settings.getUserSettings();
                         submitCreds(un.value, pw.value);
                     }
                 }
