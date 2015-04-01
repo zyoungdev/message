@@ -782,6 +782,7 @@ var APP = (function()
             msg = hf.cEL("div", {class: "message"}),
             check = hf.cEL("input", {class: "message-checkbox", type: "checkbox"}),
             username = hf.cEL("div", {class: "message-username"}, u),
+            fingerprint = hf.cEL("div", {class: "message-fingerprint"}, messageList[u][t]["id"].slice(0,7))
             size = hf.cEL("div", {class: "message-size"}, hf.convertSize(messageList[u][t]["size"])),
             date = new Date(messageList[u][t].timestamp * 1000),
             timestamp = hf.cEL("div", {class: "message-timestamp"}, hf.convertTime(date));
@@ -791,6 +792,7 @@ var APP = (function()
             msg.appendChild(check);
             msg.appendChild(size);
             msg.appendChild(username);
+            msg.appendChild(fingerprint);
             msg.appendChild(timestamp);
 
             return msg;
@@ -979,7 +981,7 @@ var APP = (function()
                 {
                     var
                     user = checkboxes[i].parentNode.children[2].innerText,
-                    timestamp = checkboxes[i].parentNode.children[3].dataset.timestamp;
+                    timestamp = checkboxes[i].parentNode.children[4].dataset.timestamp;
                     
                     // console.log(newMessageList);
                     deleteMessages.push(newMessageList[user][timestamp]["id"]);
@@ -1129,7 +1131,7 @@ var APP = (function()
                     {
                         var
                         user = e.parentNode.children[2].innerText,
-                        time = e.parentNode.children[3].dataset.timestamp;
+                        time = e.parentNode.children[4].dataset.timestamp;
 
                         navigation.stateChange("viewMessage");
                         viewMessage(user, time);

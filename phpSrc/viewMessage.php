@@ -31,6 +31,7 @@ class ViewMessage{
         if ($result = $this->mongo["usersprivate"]->findone($query, $projection))
         {
             $this->message = $result["messages"]["$username"]["$timestamp"];
+            logThis($result);
 
             $id = $result["messages"]["$username"]["$timestamp"]["id"];
             $mQuery = array('id' => $id);

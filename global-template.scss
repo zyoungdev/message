@@ -108,8 +108,8 @@ button{
         .nav-avatar{
             @extend %a-p-10;
             @extend %a-cent-cent;
-            width:150px;
-            height:150px;
+            width:15vw;
+            height:15vw;
             border-radius: 50%;
             box-shadow: 0 0 5px black;
             background-size: cover;
@@ -154,7 +154,7 @@ button{
         }
     }
     .message-list-heading{
-        @extend %a-80;
+        @extend %a-90;
         @extend %a-null-cent;
         height:50px;
         line-height: 50px;
@@ -174,7 +174,15 @@ button{
             }
         }
         .message-list-username{
-            @extend %a-50;
+            @extend %a-40;
+            text-align:center;
+            cursor:pointer;
+            &:hover{
+                color:#efefef;
+            }
+        }
+        .message-list-fingerprint{
+            @extend %a-10;
             text-align:center;
             cursor:pointer;
             &:hover{
@@ -194,7 +202,7 @@ button{
         @extend %a-100;
         
         .message{
-            @extend %a-80;
+            @extend %a-90;
             @extend %a-null-cent;
             height:50px;
             line-height:50px;
@@ -209,8 +217,13 @@ button{
                 text-align:center;
             }
             .message-username{
-                @extend %a-50;
+                @extend %a-40;
                 text-align:center;
+            }
+            .message-fingerprint{
+                @extend %a-10;
+                text-align:center;
+                font-family: monospace;
             }
             .message-timestamp{
                 @extend %a-30;

@@ -8,6 +8,12 @@ class ListMessages{
     {
         session_start();        
         $this->mongo = openDB();
+
+        if (!challengeIsDecrypted($this->mongo))
+        {
+            $ret = new Returning;
+            $ret->exitNow(-1, "Challenge could not be decrypted");
+        }
     }
     public function __destruct()
     {
@@ -41,15 +47,7 @@ class ListMessages{
     }
     public function send()
     {
-        if (!challengeIsDecrypted($this->mongo))
-        {
-            $ret = new Returning;
-            $ret->exitNow(-1, "Challenge could not be decrypted");
-        }
-        else
-        {
-            echo json_encode($this->messages);
-        }
+        echo json_encode($this->messages);
     }
 }
 

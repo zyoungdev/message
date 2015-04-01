@@ -85,7 +85,7 @@ class Login{
         if (Sodium::crypto_pwhash_scryptsalsa208sha256_str_verify(hex2bin($_SESSION["user"]["key"]["hashedPW"]), $this->dirty["pw"]))
         {
             $query = array("username" => $_SESSION["user"]["username"]);
-            $projection = array("messages" => 0);
+            $projection = array("messages" => 0,"contacts" => 0);
             if ($user = $this->mongo["usersprivate"]->findone($query, $projection))
             {
                 $_SESSION["user"] = $user;
