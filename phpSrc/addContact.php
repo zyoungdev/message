@@ -83,6 +83,7 @@ function main()
     {
         $return->exitNow(0, "The username could not be added at this time.\n");
     }
+    $return->exitNow(1, "Contact has been added.");
 }
 
 if ($_POST["contact"])

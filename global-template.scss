@@ -23,6 +23,9 @@ button{
         box-shadow: 0 0 5px #232323;
     }
 }
+input, textarea{
+    background-color: #fff;
+}
 .login-box, .module-container{
     @extend %a-100;
 

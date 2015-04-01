@@ -160,20 +160,33 @@ var APP = (function()
 
             hf.ajax("POST", fd, "phpSrc/addContact.php", function(res)
             {
-                hf.ajax("GET", null, "phpSrc/listContacts.php", function(r)
+                res = JSON.parse(res);
+                if (res.code == 0 || res.code == -1)
                 {
-                    contactList = JSON.parse(r);
-                    if (contactList.code == null)
-                    {
-                        sorting = false;
-                        sortContacts();
-                        buildList();
-                    }
-                    else if (contactList.code == 0 || contactList.code == -1)
-                    {
-                        error.init(contactList.message);
-                    }
-                });
+                    error.init(res.message, 3);
+                }
+                else
+                {
+                    // error.init(res.message, 3);
+                    contactList[u] = [];
+                    buildList();
+                }
+
+
+                // hf.ajax("GET", null, "phpSrc/listContacts.php", function(r)
+                // {
+                //     contactList = JSON.parse(r);
+                //     if (contactList.code == null)
+                //     {
+                //         sorting = false;
+                //         sortContacts();
+                //         buildList();
+                //     }
+                //     else if (contactList.code == 0 || contactList.code == -1)
+                //     {
+                //         error.init(contactList.message);
+                //     }
+                // });
             });
         },
         deleteContact = function(i, u)
@@ -314,7 +327,7 @@ var APP = (function()
                 {
                     if (hf.cN(e, "contact-username"))
                     {
-                        var user = ev.target.innerText;
+                        var user = ev.target.textContent;
 
                         navigation.stateChange("compose");
                         messageDraft.init(user);
@@ -406,6 +419,17 @@ var APP = (function()
                 if (code >= 0xDC00 && code <= 0xDFFF) i--;
             }
 
+            if (size > 15000000)
+            {
+                error.init("Messages can not be greater than 15MB in size", 3);
+                return;
+            }
+            if (hf.elCN("send-message-box")[0].children[0].value == "")
+            {
+                error.init("You must specify a recipient for this message.", 3);
+                return;
+            }
+
             fd.append("messageSize", size);
 
             hf.ajax("POST", fd, "phpSrc/sendMessage.php", function(res)
@@ -452,7 +476,6 @@ var APP = (function()
                         { 
                             return function(e) 
                             { 
-                                console.log(e.target.result);
                                 var
                                 i = "<div class=img-container><div class=img style=background-image:url(";
                                 i += e.target.result;
@@ -500,7 +523,7 @@ var APP = (function()
 
                                 var
                                 ff = "<div class=fl-container><a target=_blank href=";
-                                ff += res.target.result;
+                                // ff += res.target.result;
                                 ff += "><p>";
                                 ff += file.name + "<br>";
 
@@ -596,7 +619,6 @@ var APP = (function()
                     }
                     else if (e == sub)
                     {
-                        e.disabled = true;
                         sendPlaintext(rec.value, ta.value,e.parentNode);
                         clearFiles();
                     }
@@ -622,7 +644,7 @@ var APP = (function()
                         var file;
                         if (file = hf.rTarget(e, "fl-container"))
                         {
-                            fileClickStage(file.children[0]);
+                            fileClickStage(file);
                         }
                     }
                 }
@@ -862,7 +884,6 @@ var APP = (function()
                 }
                 else if (sortType == "user")
                 {
-                    console.log("user", i, currentPage);
                     for (var len = users.length; i < len; i++)
                     {
                         if (count >= settings.mNum)
@@ -1149,11 +1170,11 @@ var APP = (function()
 
                 if (hf.isInside(e, messageListContainer))
                 {
-                    if (hf.cN(e, "message-username") || hf.cN(e, "message-timestamp") || hf.cN(e, "message-timestamp"))
+                    if (target = hf.rTarget(e, "message"))
                     {
                         var
-                        user = e.parentNode.children[2].innerText,
-                        time = e.parentNode.children[4].dataset.timestamp;
+                        user = target.children[2].textContent,
+                        time = target.children[4].dataset.timestamp;
 
                         navigation.stateChange("viewMessage");
                         viewMessage(user, time);
@@ -1279,6 +1300,20 @@ var APP = (function()
             {
             return function(res)
             {
+                var size = res.target.result.length;
+                for (var i=res.target.result.length-1; i >= 0; i--) 
+                {
+                    var code = res.target.result.charCodeAt(i);
+                    if (code > 0x7f && code <= 0x7ff) size++;
+                    else if (code > 0x7ff && code <= 0xffff) size+=2;
+                    if (code >= 0xDC00 && code <= 0xDFFF) i--;
+                }
+                if (size > 200000)
+                {
+                    error.init("The image can not be larger than 200KB in size.", 3);
+                    return;
+                }
+
                 fd.append("avatar", res.target.result);
                 settings.avatar = res.target.result;
                 hf.ajax("POST", fd, "phpSrc/changeAvatar.php", function(r)
@@ -1542,7 +1577,7 @@ var APP = (function()
     error = (function()
     {   
         var
-        message,
+        errorMessageText,
         delay,
         errorMessageContainer,
         getTemplate = function()
@@ -1551,17 +1586,21 @@ var APP = (function()
             {
                 errorMessageContainer = hf.cEL("div", {class: "error-container"});
                 errorMessageContainer.innerHTML = res;
-                document.body.appendChild(errorMessageContainer);
+
+                if (!hf.elCN("error-container")[0])
+                {
+                    document.body.appendChild(errorMessageContainer);
+                }
 
                 var errorMessage = hf.elCN("error-message")[0];
-                errorMessage.innerHTML = message;
+                errorMessage.innerHTML = errorMessageText;
 
                 if (delay)
                 {
                     var timeout = setTimeout(function()
                     {
-                        if (errorMessageContainer)
-                            document.body.removeChild(errorMessageContainer);
+                        if (hf.elCN("error-container")[0])
+                            document.body.removeChild(hf.elCN("error-container")[0]);
                         delay = null;
                     },delay * 1000);
                 }
@@ -1571,7 +1610,7 @@ var APP = (function()
         return {
             init: function(msg, del)
             {
-                message = msg;
+                errorMessageText = msg;
                 delay = del;
                 getTemplate();
             },

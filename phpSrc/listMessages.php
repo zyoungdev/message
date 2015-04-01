@@ -58,7 +58,7 @@ function main()
 
     if (!$list->getMessages())
     {
-        $return->exitNow(0, "Could not get message\n");
+        $return->exitNow(0, "There are no messages to retrieve\n");
     }
     $list->send();
 
