@@ -1,6 +1,7 @@
 var APP = (function()
 {
     var
+    appState = "login",
     hf = (function()
     {
         return{
@@ -95,6 +96,7 @@ var APP = (function()
         var
         contactList,
         sorting = false,
+        addContactTimeout,
         buildList = function()
         {
             hf.ajax("GET", null, "templates/contactList.php", function(res)
@@ -171,22 +173,6 @@ var APP = (function()
                     contactList[u] = [];
                     buildList();
                 }
-
-
-                // hf.ajax("GET", null, "phpSrc/listContacts.php", function(r)
-                // {
-                //     contactList = JSON.parse(r);
-                //     if (contactList.code == null)
-                //     {
-                //         sorting = false;
-                //         sortContacts();
-                //         buildList();
-                //     }
-                //     else if (contactList.code == 0 || contactList.code == -1)
-                //     {
-                //         error.init(contactList.message);
-                //     }
-                // });
             });
         },
         deleteContact = function(i, u)
@@ -239,7 +225,7 @@ var APP = (function()
                 if (res.code == 0 || res.code == -1)
                 {
                     contactList = backupContactList;
-                    error.init(res.message);
+                    error.init(res.message,3);
                 }
                 else
                 {
@@ -335,7 +321,12 @@ var APP = (function()
                     else if (hf.cN(e, "add-contact-button"))
                     {
                         var user = hf.elCN("add-contact-input")[0].value;
-                        addContact(user)
+
+                        clearTimeout(addContactTimeout);
+                        addContactTimeout = setTimeout(function()
+                        {
+                            addContact(user)
+                        }, 500);
                     }
                     else if (hf.cN(e, "contact-list-heading-checkbox"))
                     {
@@ -402,7 +393,11 @@ var APP = (function()
                 pt += "</div>";
             }
             // console.log(pt);
-            if (pt === "") return;
+            if (pt === "")
+            {
+                error.init("Your message is empty.", 3);
+                return;
+            } 
 
             var 
             fd = new FormData(),
@@ -439,7 +434,6 @@ var APP = (function()
                 {
                     error.init(res.message, 3);
                 }
-                document.body.removeChild(el);
                 imgs = [];
                 navigation.stateChange("contacts");
             });
@@ -932,7 +926,7 @@ var APP = (function()
                 res = JSON.parse(res);
                 if (res.code != null)
                 {
-                    error.init(res.message);
+                    error.init(res.message,3);
                 }
                 messageView.init(res);                
             });
@@ -1301,7 +1295,7 @@ var APP = (function()
             {
             if (!avatarInput.files[0].type.match("image.*"))
             {
-                error.init("The file you selected is not an image file.", 3);
+                error.init("The file you selected is not an image file.", 5);
                 return;                
             }
             reader.onload = (function()
@@ -1365,7 +1359,12 @@ var APP = (function()
 
             if (newpw.value != newpwagain.value)
             {
-                console.log("Passwords don't match");
+                error.init("Those passwords don't match.", 3);
+                return;
+            }
+            if (newpw.value == "" || newpwagain.value == "")
+            {
+                error.init("One of the password fields is empty.", 3);
                 return;
             }
             var fd = new FormData();
@@ -1503,39 +1502,36 @@ var APP = (function()
         },
         changeState = function(state)
         {
+            setState();
+            appState = state;
             switch (state)
             {
                 case "compose":
                 {
-                    setState();
                     hf.elCN("nav-compose")[0].classList.add("active");
                     messageDraft.init();
                     break;
                 }
                 case "messages":
                 {
-                    setState();
                     hf.elCN("nav-messages")[0].classList.add("active");
                     messageList.init();
                     break;
                 }
                 case "contacts":
                 {
-                    setState();
                     hf.elCN("nav-contacts")[0].classList.add("active");
                     contactList.init();
                     break;
                 }
                 case "settings":
                 {
-                    setState();
                     hf.elCN("nav-settings")[0].classList.add("active");
                     settings.init();
                     break;
                 }
                 case "viewMessage":
                 {
-                    setState();
                     break;
                 }
             }
@@ -1700,20 +1696,58 @@ var APP = (function()
                         submitCreds(un.value, pw.value);
                     }
                 }
+            },
+            keypress: function(ev)
+            {
+                if (hf.isInside(ev.target, hf.elCN("login-password")[0]))
+                {
+                    if (ev.keyCode == 13)
+                    {
+                        hf.elCN("login-submit-button")[0].click();
+                    }
+                }
             }
         };
     })();
     return {
         clicked: function(ev)
         {
+            switch (appState)
+            {
+                case "compose":
+                {
+                    messageDraft.click(ev);
+                    break;
+                }
+                case "messages":
+                {
+                    messageList.click(ev);
+                    break;
+                }
+                case "viewMessage":
+                {
+                    messageView.click(ev);
+                    break;
+                }
+                case "contacts":
+                {
+                    contactList.click(ev);
+                    break;
+                }
+                case "settings":
+                {
+                    settings.click(ev);
+                    break;
+                }
+            }
             login.click(ev);
             navigation.click(ev);
-            messageDraft.click(ev);
-            messageList.click(ev);
-            contactList.click(ev);
-            messageView.click(ev);
-            settings.click(ev);
             error.click(ev);
+        },
+        keypress: function(ev)
+        {
+
+            login.keypress(ev);
         }
     };
 })();
@@ -1721,4 +1755,8 @@ var APP = (function()
 window.onclick = function(ev)
 {
     APP.clicked(ev);
+}
+window.onkeypress = function(ev)
+{
+    APP.keypress(ev);
 }

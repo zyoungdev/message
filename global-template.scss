@@ -10,7 +10,11 @@ html,body{
     min-width:300px;
     font-family: sans-serif;
 }
-button{
+.button-container{
+    @extend %a-100;
+}
+button, .button-container button{
+    @extend %a-40;
     color:$charcoal;
     height:50px;
     padding:0;
@@ -20,60 +24,73 @@ button{
     color:$ivory;
     cursor:pointer;
     border:none;
+    box-shadow:0 0 2px $charcoal * 2;
     &:hover{
         background-color: $charcoal / 1.25;
-        box-shadow: 0 0 5px $charcoal;
+        box-shadow: 0 0 5px $charcoal / 2;
         color:$highlight;
-        text-shadow:0 0 1px $highlight;
     }
 }
 input, textarea{
-    padding:10px;
+    @extend %a-90;
+    @extend %t-75;
+    @extend %d-60;
+    @extend %a-p-10;
+    @extend %a-null-cent;
+    margin-bottom:10px;
     background-color: #fff;
+    // border:solid 1px $charcoal / 2;
+    border:none;
+    color:$charcoal;
+    min-height:50px;
+    box-shadow: 0 0 2px $charcoal * 2;
+    &:hover{
+        border:solid 1px $charcoal * 2;
+    }
+    &:focus{
+        border:solid 1px $highlight;
+    }
 }
-.login-box, .module-container{
+input[type="checkbox"]{
+    box-shadow:none;
+}
+::-webkit-input-placeholder {
+    color:    $charcoal * 1.5;
+}
+::-moz-placeholder { 
+   color:    $charcoal * 1.5;
+   opacity:  1;
+}
+::-moz-placeholder { 
+   color:    $charcoal * 1.5;
+   opacity:  1;
+}
+::-ms-input-placeholder { 
+   color:    $charcoal * 1.5;
+}
+.module-container{
     @extend %a-100;
-    @extend %a-p-20;
-    input, textarea{
-        @extend %a-100;
-        @extend %t-75;
-        @extend %d-75;
-
-        @extend %t-null-cent;
-
-        margin-bottom:10px;
-        border:solid 1px ;
-        color:$charcoal / 2;
-        min-height:50px;
-
-        &:hover{
-            border:solid 1px #454545;
-        }
-        &:focus{
-            border:solid 1px $highlight;
-        }
-
-    }
-    >button{
-        @extend %a-45;
-
-    }
+    margin-top:10px;
 }
 .login-box{
-    button{
-        @extend %a-null-cent;
+    .login-submit-container{
+        @extend %a-100;
+        button{
+            @extend %a-null-cent;
+        }
     }
 }
 .navigation-container{
     @extend %a-100;
     box-shadow: 0 0 5px #000000;
     div{
-
         @extend %a-40;
         @extend %t-20;
         background-color: $charcoal;
         height: 50px;
         cursor:pointer;
+        border-left:solid 1px $charcoal * 2;
+        border-bottom:solid 1px $charcoal * 2;
 
         &:hover{
             background-color: $charcoal * 1.25;
@@ -219,6 +236,7 @@ input, textarea{
                 @extend %a-25;
                 text-align:center;
                 cursor:pointer;
+                font-family:monospace;
             }
             .message-fingerprint{
                 @extend %a-25;
@@ -262,8 +280,11 @@ input, textarea{
     textarea{
         min-height:250px;
     }
-    .send-message-button, .add-files-button, .discard-message-button{
-        @extend %a-33;
+    .send-message-controls{
+        @extend %a-100;
+        .send-message-button, .add-files-button, .discard-message-button{
+            @extend %a-33;
+        }
     }
     .image-stage{
         @extend %images-container-module;
@@ -344,6 +365,7 @@ input, textarea{
             }
             .contact-username{
                 @extend %a-90;
+                font-family:monospace;
             }
             .contact-delete-button{
                 // @extend %a-20;
@@ -370,6 +392,7 @@ input, textarea{
             border:none;
         }
     }
+
     .view-message-sender{
         @extend %a-90;
         @extend %t-90;
@@ -377,6 +400,7 @@ input, textarea{
         @extend %a-null-cent;
         @extend %a-p-10;
         border-bottom:solid 1px $ivory;
+        font-family:monospace;
     }
     .view-message-timestamp{
         @extend %a-90;
@@ -397,7 +421,8 @@ input, textarea{
     .view-message-message{
         @extend %a-90;
         @extend %t-90;
-        @extend %d-60;
+        @extend %d-65;
+        @extend %a-p-20;
         @extend %a-null-cent;
         margin-bottom:50px;
         
@@ -445,6 +470,7 @@ input, textarea{
     .settings-username{
         @extend %a-100;
         text-align:center;
+        font-family:monospace;                
     }
     h2{
         @extend %a-95;
@@ -469,22 +495,15 @@ input, textarea{
     }
 }
 .error-container{
-    @extend %a-100;
+    @extend %a-90;
     @extend %a-bot-cent;
-    background-color: #232323;
-    color:#dedede;
-    box-shadow: 0 0 5px #232323;
+    margin-bottom:20px;
+    background-color: $charcoal;
+    color:$ivory;
+    box-shadow: 0 0 5px $highlight / 2;
     position:fixed;
     cursor:pointer;
     z-index:3;
-    .error-close{
-        @extend %a-100;
-        @extend %a-p-10;
-        text-align: right;
-        &:hover{
-            color:#a0a;
-        }
-    }
     .error-message{
         @extend %a-75;
         @extend %a-null-cent;

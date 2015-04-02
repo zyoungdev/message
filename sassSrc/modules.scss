@@ -2,14 +2,14 @@
     @extend %a-100;
     @extend %a-null-cent;
     .img-container{
-        @extend %a-135-f;
-        @extend %t-210-f;
-        @extend %d-275-f;
+        @extend %a-115-f;
+        @extend %t-200-f;
+        @extend %d-225-f;
         @extend %a-p-5;
         @extend %ml-p-10;
         @extend %t-p-15;
         @extend %d-p-5;
-        height:135px;
+        height:115px;
         
         .img{
             background-size: cover;
@@ -45,14 +45,14 @@
     @extend %a-100;
     @extend %a-null-cent;
     .fl-container{
-        @extend %a-135-f;
-        @extend %t-210-f;
-        @extend %d-275-f;
+        @extend %a-115-f;
+        @extend %t-200-f;
+        @extend %d-225-f;
         @extend %a-p-5;
         @extend %ml-p-10;
         @extend %t-p-15;
         @extend %d-p-5;
-        height:135px;
+        height:115px;
         a{
             @extend %a-100;
             height:100%;

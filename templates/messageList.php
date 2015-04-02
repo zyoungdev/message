@@ -1,6 +1,8 @@
 <div class="message-list-controls-container">
     <!-- <button type="" class="create-message-button">New Message</button> -->
-    <button type="" class="refresh-messages-button">Refresh</button>
+    <div class="button-container">
+        <button type="" class="refresh-messages-button">Refresh</button>
+    </div>
     <button type="" class="delete-multiple-messages-button">Delete</button>
 </div>
 
