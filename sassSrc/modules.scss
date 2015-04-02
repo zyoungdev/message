@@ -1,12 +1,15 @@
 %images-container-module{
     @extend %a-100;
     @extend %a-null-cent;
-    @extend %a-p-20;
     .img-container{
-        @extend %a-25;
-        @extend %a-p-10;
-        
-        height:200px;
+        @extend %a-135-f;
+        @extend %t-210-f;
+        @extend %d-275-f;
+        @extend %a-p-5;
+        @extend %ml-p-10;
+        @extend %t-p-15;
+        @extend %d-p-5;
+        height:135px;
         
         .img{
             background-size: cover;
@@ -41,11 +44,15 @@
 %files-container-module{
     @extend %a-100;
     @extend %a-null-cent;
-    @extend %a-p-20;
     .fl-container{
-        @extend %a-25;
-        @extend %a-p-10;
-        height:200px;
+        @extend %a-135-f;
+        @extend %t-210-f;
+        @extend %d-275-f;
+        @extend %a-p-5;
+        @extend %ml-p-10;
+        @extend %t-p-15;
+        @extend %d-p-5;
+        height:135px;
         a{
             @extend %a-100;
             height:100%;

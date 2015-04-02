@@ -8,7 +8,7 @@
     <input type="checkbox" class="message-list-heading-checkbox">
     <div class="message-list-size">Size</div>
     <div class="message-list-username">Username</div>
-    <div class="message-list-fingerprint">Fingerprint</div>
+    <div class="message-list-fingerprint">Message</div>
     <div class="message-list-timestamp">Timestamp</div>
 </div>
 

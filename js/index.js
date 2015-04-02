@@ -476,6 +476,7 @@ var APP = (function()
                         { 
                             return function(e) 
                             { 
+                                console.log(e.target.result);
                                 var
                                 i = "<div class=img-container><div class=img style=background-image:url(";
                                 i += e.target.result;
@@ -591,6 +592,7 @@ var APP = (function()
                     hf.elCN("send-message-button").disabled = false;
                     if (rec)
                         hf.elCN("send-message-box")[0].children[0].value = rec;
+                    clearFiles();
                 });
             },
             click: function(ev)
@@ -796,7 +798,7 @@ var APP = (function()
     messageList = (function()
     {
         var
-        messageList,
+        messageList = null,
         timestamps = [],
         sizes = [],
         users = [],
@@ -805,6 +807,7 @@ var APP = (function()
         userSorting = true,
         sortType = "time",
         currentPage = 0,
+        getListTimeout,
         buildItem = function(u, t)
         {
             var
@@ -1172,6 +1175,11 @@ var APP = (function()
                 {
                     if (target = hf.rTarget(e, "message"))
                     {
+                        if (hf.cN(e, "message-checkbox"))
+                        {
+                            checkboxClick();
+                            return;
+                        }
                         var
                         user = target.children[2].textContent,
                         time = target.children[4].dataset.timestamp;
@@ -1181,7 +1189,10 @@ var APP = (function()
                     }
                     else if (hf.cN(e, "refresh-messages-button"))
                     {
-                        getList();
+                        clearTimeout(getListTimeout);
+                        getListTimeout = setTimeout(function(){
+                            getList();
+                        },1000);
                     }
                     else if (hf.cN(e, "create-message-button"))
                     {
@@ -1191,10 +1202,7 @@ var APP = (function()
                     {
                         selectAll(e);
                     }
-                    else if (hf.cN(e, "message-checkbox"))
-                    {
-                        checkboxClick();
-                    }
+                    
                     else if (hf.cN(e, "delete-multiple-messages-button"))
                     {
                         deleteMultipleMessages();
@@ -1398,7 +1406,7 @@ var APP = (function()
                         res = JSON.parse(res);
                         if (res.code != null)
                         {
-                            error.init(res.message);
+                            error.init(res.message, 3);
                         }
                     });
                 },1000);

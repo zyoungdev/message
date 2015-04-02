@@ -150,7 +150,7 @@ $i: $increments;
 @media screen and (orientation: portrait)
 {
     //Constrain to Mobile
-    .m-hide{
+    %m-hide{
         display:none;
     }
 }

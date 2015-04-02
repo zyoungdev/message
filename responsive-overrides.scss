@@ -14,7 +14,161 @@
 {
     @media (min-width:nth($breakpoints, 1)){
         //Cascading properties
+        .navigation-container{
+            div{
+                &:hover{
+                }
 
+                p{
+
+                }
+            }
+            .nav-avatar-container{
+                .nav-avatar{
+                }
+            }
+            .active{
+            }
+        }
+        .message-list-container{
+
+            .message-list-controls-container{
+                button{
+                }
+                .delete-multiple-messages-button{
+                }
+            }
+            .message-list-heading{
+                
+                .message-list-heading-checkbox{
+                }
+                .message-list-size{
+                    &:hover{
+                    }
+                }
+                .message-list-username{
+                    &:hover{
+                    }
+                }
+                .message-list-fingerprint{
+                    &:hover{
+                    }
+                }
+                .message-list-timestamp{
+                    &:hover{
+                    }
+                }
+            }
+            .message-list{
+                .message{
+                    .message-checkbox{
+                    }
+                    .message-size{
+                    }
+                    .message-username{
+                    }
+                    .message-fingerprint{
+                    }
+                    .message-timestamp{
+                    }
+                    .message-delete-button{
+                    }
+                }
+            }
+            .message-list-page-container{
+                .page-controls{
+                    button{
+                    }
+                    .prev{
+                    }
+                    .next{
+                    }
+                }
+            }
+        }
+        
+        .view-message-container{
+            .view-message-controls{
+                button{
+                }
+            }
+            .view-message-sender{
+            }
+            .view-message-timestamp{
+            }
+            .view-message-size{
+            }
+            .view-message-message{
+                .image-file-list{
+                }
+                .file-file-list{
+                }
+                .image-stage, .view-message-images-container{
+                    .img-container{
+                        .img{
+                            &:hover div{
+                            }
+                            div{
+                                p{
+                                }
+                            }
+                        }
+                    }
+                }
+                .files-stage{
+                    .fl-container{
+                        a{
+                            &:hover p:nth-child(1){
+                            }
+                            &:hover p:nth-child(2){
+                            }
+                            p{
+                                &:nth-child(2){
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .send-message-box{
+            textarea{
+            }
+            .send-message-button, .add-files-button, .discard-message-button{
+            }
+            .image-stage, .view-message-images-container{
+            }
+            .file-stage, .view-message-files-container{
+            }
+        }
+        .contact-list-container{
+            .contact-list-controls{
+                input{
+                }
+                button{
+                }
+                .delete-multiple-contact-button{
+                }
+            }
+            .contact-list-heading{
+                .contact-list-heading-checkbox{
+                }
+                .contact-list-heading-username{
+                }
+            }
+            .contact-list{
+                .contact{
+                    .contact-checkbox{
+                    }
+                    .contact-username{
+                    }
+                    .contact-delete-button{
+                        // @extend %a-20;
+                        // height:30px;
+                    }
+                }
+            }
+        }
         //Constrain to Mobile Landscape
         @media (max-width:( nth($breakpoints, 2)-0.00001 )){
             
@@ -30,7 +184,182 @@
 {
     @media (min-width:nth($breakpoints, 2)){
         //Cascading Properties
+        .navigation-container{
+            div{
+                height:75px;
+                &:hover{
+                }
 
+                p{
+
+                }
+            }
+            .nav-avatar-container{
+                height:75px;
+                .nav-avatar{
+                    width:50px;
+                    height:50px;
+                }
+            }
+            .active{
+            }
+        }
+        .message-list-container{
+            .message-list-controls-container{
+                button{
+                }
+                .delete-multiple-messages-button{
+                }
+            }
+            .message-list-heading{
+                font-size:1em;
+                height:40px;
+                line-height: 40px;
+                .message-list-heading-checkbox{
+                    margin-left:15px;
+                    width:1em;
+                }
+                .message-list-size{
+                    &:hover{
+                    }
+                }
+                .message-list-username{
+                    &:hover{
+                    }
+                }
+                .message-list-fingerprint{
+                    &:hover{
+                    }
+                }
+                .message-list-timestamp{
+                    &:hover{
+                    }
+                }
+            }
+            .message-list{
+                font-size:1em;
+                .message{
+                    .message-checkbox{
+                        margin-left:15px;
+                        width:1em;
+                    }
+                    .message-size{
+                    }
+                    .message-username{
+                    }
+                    .message-fingerprint{
+                    }
+                    .message-timestamp{
+                    }
+                    .message-delete-button{
+                    }
+                }
+            }
+            .message-list-page-container{
+                .page-controls{
+                    button{
+                    }
+                    .prev{
+                    }
+                    .next{
+                    }
+                }
+            }
+        }
+        
+        .view-message-container{
+            font-size:1em;
+            .view-message-controls{
+                button{
+                    margin-left:15px;
+                    margin-right:15px;
+                }
+            }
+            .view-message-sender{
+            }
+            .view-message-timestamp{
+            }
+            .view-message-size{
+            }
+            .view-message-message{
+                .image-file-list{
+                }
+                .file-file-list{
+                }
+                .image-stage, .view-message-images-container{
+                    .img-container{
+                        height:210px;
+                        .img{
+                            &:hover div{
+                            }
+                            div{
+                                p{
+                                }
+                            }
+                        }
+                    }
+                }
+                .files-stage{
+                    .fl-container{
+                        height:210px;
+                        a{
+                            &:hover p:nth-child(1){
+                            }
+                            &:hover p:nth-child(2){
+                            }
+                            p{
+                                &:nth-child(2){
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .send-message-box{
+            textarea{
+            }
+            .send-message-button, .add-files-button, .discard-message-button{
+            }
+            .image-stage, .view-message-images-container{
+            }
+            .file-stage, .view-message-files-container{
+            }
+        }
+        .contact-list-container{
+            .contact-list-controls{
+                input{
+                }
+                button{
+                }
+                .delete-multiple-contact-button{
+                }
+            }
+            .contact-list-heading{
+                height:50px;
+                line-height:50px;
+                font-size:1em;
+                .contact-list-heading-checkbox{
+                }
+                .contact-list-heading-username{
+                }
+            }
+            .contact-list{
+                font-size:1em;
+                .contact{
+                    height:50px;
+                    line-height:50px;
+                    .contact-checkbox{
+                    }
+                    .contact-username{
+                    }
+                    .contact-delete-button{
+                        // @extend %a-20;
+                        // height:30px;
+                    }
+                }
+            }
+        }
         //Constrain to Tablet
         @media (max-width:( nth($breakpoints, 3)-0.00001 )){
             
@@ -46,6 +375,166 @@
 {
     @media (min-width:nth($breakpoints, 3)){
         //Cascading Properties
-        
+        .navigation-container{
+            div{
+                &:hover{
+                }
+
+                p{
+
+                }
+            }
+            .nav-avatar-container{
+                .nav-avatar{
+                }
+            }
+            .active{
+            }
+        }
+        .message-list-container{
+            .message-list-controls-container{
+                button{
+                }
+                .delete-multiple-messages-button{
+                }
+            }
+            .message-list-heading{
+                height:50px;
+                line-height: 50px;
+                .message-list-heading-checkbox{
+                    margin-left:25px;
+                }
+                .message-list-size{
+                    &:hover{
+                    }
+                }
+                .message-list-username{
+                    &:hover{
+                    }
+                }
+                .message-list-fingerprint{
+                    &:hover{
+                    }
+                }
+                .message-list-timestamp{
+                    &:hover{
+                    }
+                }
+            }
+            .message-list{
+                .message{
+                    .message-checkbox{
+                        margin-left:25px;
+
+                    }
+                    .message-size{
+                    }
+                    .message-username{
+                    }
+                    .message-fingerprint{
+                    }
+                    .message-timestamp{
+                    }
+                    .message-delete-button{
+                    }
+                }
+            }
+            .message-list-page-container{
+                .page-controls{
+                    button{
+                    }
+                    .prev{
+                    }
+                    .next{
+                    }
+                }
+            }
+        }
+        .view-message-container{
+            .view-message-controls{
+                button{
+                }
+            }
+            .view-message-sender{
+            }
+            .view-message-timestamp{
+            }
+            .view-message-size{
+            }
+            .view-message-message{
+                .image-file-list{
+                }
+                .file-file-list{
+                }
+                .image-stage, .view-message-images-container{
+                    .img-container{
+                        height:275px;
+                        .img{
+                            &:hover div{
+                            }
+                            div{
+                                p{
+                                }
+                            }
+                        }
+                    }
+                }
+                .files-stage{
+                    .fl-container{
+                        height:275px;
+                        a{
+                            &:hover p:nth-child(1){
+                            }
+                            &:hover p:nth-child(2){
+                            }
+                            p{
+                                &:nth-child(2){
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .send-message-box{
+            textarea{
+            }
+            .send-message-button, .add-files-button, .discard-message-button{
+            }
+            .image-stage, .view-message-images-container{
+            }
+            .file-stage, .view-message-files-container{
+            }
+        }
+        .contact-list-container{
+            .contact-list-controls{
+                input{
+                }
+                button{
+                }
+                .delete-multiple-contact-button{
+                }
+            }
+            .contact-list-heading{
+                font-size:1.5em;
+                .contact-list-heading-checkbox{
+                }
+                .contact-list-heading-username{
+                }
+            }
+            .contact-list{
+                font-size:1.5em;
+                .contact{
+                    .contact-checkbox{
+                    }
+                    .contact-username{
+                    }
+                    .contact-delete-button{
+                        // @extend %a-20;
+                        // height:30px;
+                    }
+                }
+            }
+        }
     }
 }
