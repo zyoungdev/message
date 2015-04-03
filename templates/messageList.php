@@ -1,8 +1,8 @@
 <div class="message-list-controls-container">
     <!-- <button type="" class="create-message-button">New Message</button> -->
-    <div class="button-container">
         <button type="" class="refresh-messages-button">Refresh</button>
-    </div>
+        <input type="text" class="find-message-input" placeholder="Fingerprint i.e jc74b30c">
+        <button class="find-message-button">Find</button>
     <button type="" class="delete-multiple-messages-button">Delete</button>
 </div>
 

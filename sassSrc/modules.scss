@@ -2,13 +2,11 @@
     @extend %a-100;
     @extend %a-null-cent;
     .img-container{
-        @extend %a-115-f;
-        @extend %t-200-f;
-        @extend %d-225-f;
-        @extend %a-p-5;
-        @extend %ml-p-10;
-        @extend %t-p-15;
-        @extend %d-p-5;
+        @extend %a-45;
+        @extend %t-30;
+        margin-left:2.5%;
+        margin-right:2.5%;
+        margin-bottom:10px;
         height:115px;
         
         .img{
@@ -45,13 +43,11 @@
     @extend %a-100;
     @extend %a-null-cent;
     .fl-container{
-        @extend %a-115-f;
-        @extend %t-200-f;
-        @extend %d-225-f;
-        @extend %a-p-5;
-        @extend %ml-p-10;
-        @extend %t-p-15;
-        @extend %d-p-5;
+        @extend %a-45;
+        @extend %t-30;
+        margin-left:2.5%;
+        margin-right:2.5%;
+        margin-bottom:10px;
         height:115px;
         a{
             @extend %a-100;

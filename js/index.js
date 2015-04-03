@@ -193,7 +193,7 @@ var APP = (function()
                 
                 if (contactList.code == 0) return;
 
-                console.log(contactList);
+                // console.log(contactList);
                 for (var user in contactList)
                 {
                     var
@@ -552,7 +552,7 @@ var APP = (function()
                         { 
                             return function(e) 
                             { 
-                                console.log(e.target.result);
+                                // console.log(e.target.result);
                                 var
                                 i = "<div class=img-container><div class=img style=background-image:url(";
                                 i += e.target.result;
@@ -712,7 +712,7 @@ var APP = (function()
                         var img;
                         if (img = hf.rTarget(e, "img-container"))
                         {
-                            console.log("message draft");
+                            // console.log("message draft");
                             imageClickStage(img);
                         }
                     }
@@ -858,7 +858,7 @@ var APP = (function()
                         var img;
                         if (img = hf.rTarget(e, "img-container"))
                         {
-                            console.log("view-message");
+                            // console.log("view-message");
                             imageClick(img);
                         }
                     }
@@ -961,6 +961,8 @@ var APP = (function()
                             {   
                                 if (temp[user][time]["size"] == sizes[i])
                                 {
+                                    if (count >= settings.mNum)
+                                        break;
                                     frag.appendChild(buildItem(user, time));
                                     delete temp[user][time];
                                     count++;
@@ -1236,7 +1238,22 @@ var APP = (function()
                     return;
                 }
             }
-        }
+        },
+        findMessage = function(mes)
+        {
+            for (var user in messageList)
+            {
+                for (var time in messageList[user])
+                {
+                    if (messageList[user][time]["id"].match(mes))
+                    {
+                        navigation.stateChange("viewMessage");
+                        viewMessage(user, time);                        
+                    }
+
+                }
+            }
+        };
         
         return{
             init: function()
@@ -1275,6 +1292,8 @@ var APP = (function()
                     {
                         clearTimeout(getListTimeout);
                         getListTimeout = setTimeout(function(){
+                            sortType = "time";
+                            timeSorting = true;
                             getList();
                         },1000);
                     }
@@ -1317,6 +1336,10 @@ var APP = (function()
                     {
                         turnPage("next");
                         buildList();
+                    }
+                    else if (hf.cN(e, "find-message-button"))
+                    {
+                        findMessage(hf.elCN("find-message-input")[0].value);
                     }
                 }
             }
@@ -1392,24 +1415,15 @@ var APP = (function()
                 error.init("The file you selected is not an image file.", 5);
                 return;                
             }
+            if (avatarInput.files[0].size > 500000)
+            {
+                error.init("The image can not be larger than 500KB in size.", 3);
+                return;
+            }
             reader.onload = (function()
             {
             return function(res)
             {
-                var size = res.target.result.length;
-                for (var i=res.target.result.length-1; i >= 0; i--) 
-                {
-                    var code = res.target.result.charCodeAt(i);
-                    if (code > 0x7f && code <= 0x7ff) size++;
-                    else if (code > 0x7ff && code <= 0xffff) size+=2;
-                    if (code >= 0xDC00 && code <= 0xDFFF) i--;
-                }
-                if (size > 200000)
-                {
-                    error.init("The image can not be larger than 200KB in size.", 3);
-                    return;
-                }
-
                 fd.append("avatar", res.target.result);
                 settings.avatar = res.target.result;
                 hf.ajax("POST", fd, "phpSrc/changeAvatar.php", function(r)
@@ -1475,7 +1489,7 @@ var APP = (function()
                 }
 
                 error.init("Password has been changed successfully. Reloading the page in 3 seconds...");
-                console.log("Reloading page in 3 seconds...");
+                // console.log("Reloading page in 3 seconds...");
                 var del = setTimeout(function()
                 {
                     window.location.reload();
@@ -1489,7 +1503,7 @@ var APP = (function()
             displayNameInput = hf.elCN("settings-displayname")[0];
 
             var fd = new FormData();
-            console.log(displayNameInput.value);
+            // console.log(displayNameInput.value);
 
             fd.append("mPerPage", numInput.value);
             fd.append("displayName", displayNameInput.value);

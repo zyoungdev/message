@@ -145,18 +145,30 @@ input[type="checkbox"]{
     @extend %a-100;
     padding:0;
     padding-top:10px;
-    div{
-        overflow:hidden;
-    }
     .message-list-controls-container{
         @extend %a-100;
         @extend %a-null-cent;
 
         button{
-            @extend %a-30;
-            margin-left:10px;
-            margin-bottom:10px;
+            @extend %a-20;
+            margin-left:1.66666%;
+            margin-bottom:1.66666%;
             border:none;
+        }
+        
+        .find-message-input{
+            @extend %a-50;
+            @extend %a-null-null;
+            text-align: center;
+            box-shadow:0 0 3px $charcoal;
+            margin-left:1.66666%;
+            margin-right:1.66666%;
+
+        }
+        .find-message-button{
+            @extend %a-20;
+            margin-left:1.66666%;
+            margin-right:1.66666%;
         }
         .delete-multiple-messages-button{
             @extend %a-100;
@@ -189,7 +201,7 @@ input[type="checkbox"]{
             text-align:center;
             cursor:pointer;
             &:hover{
-                color:#efefef;
+                color:$highlight;
             }
         }
         .message-list-username{
@@ -197,7 +209,7 @@ input[type="checkbox"]{
             text-align:center;
             cursor:pointer;
             &:hover{
-                color:#efefef;
+                color:$highlight;
             }
         }
         .message-list-fingerprint{
@@ -206,7 +218,7 @@ input[type="checkbox"]{
             text-align:center;
             cursor:pointer;
             &:hover{
-                color:#efefef;
+                color:$highlight;
             }
         }
         .message-list-timestamp{
@@ -214,7 +226,7 @@ input[type="checkbox"]{
             text-align: center;
             cursor:pointer;
             &:hover{
-                color:#efefef;
+                color:$highlight;
             }
         }
     }
@@ -303,7 +315,9 @@ input[type="checkbox"]{
     .send-message-controls{
         @extend %a-100;
         .send-message-button, .add-files-button, .discard-message-button{
-            @extend %a-33;
+            @extend %a-30;
+            margin-left:1.66666%;
+            margin-right:1.66666%;
         }
     }
     .image-stage{
@@ -358,10 +372,16 @@ input[type="checkbox"]{
         .contact-list-heading-displayname{
             @extend %a-45;
             color:$ivory;
+            &:hover{
+                color:$highlight;
+            }
         }
         .contact-list-heading-username{
             @extend %a-45;
             color:$ivory;
+            &:hover{
+                color:$highlight;
+            }
         }
     }
     .contact-list{
@@ -409,7 +429,9 @@ input[type="checkbox"]{
         @extend %a-100;
         margin-bottom:20px;
         button{
-            @extend %a-50;
+            @extend %a-40;
+            margin-left:5%;
+            margin-right:5%;
         }
     }
     .avatar-container{
@@ -477,8 +499,8 @@ input[type="checkbox"]{
         margin-bottom:20px;
         button{
             @extend %a-30;
-            margin-left:5px;
-            margin-right:5px;
+            margin-left:1.66666%;
+            margin-right:1.66666%;
             border:none;
         }
     }
@@ -512,7 +534,7 @@ input[type="checkbox"]{
     .view-message-message{
         @extend %a-90;
         @extend %t-90;
-        @extend %d-65;
+        @extend %d-55;
         @extend %a-p-20;
         @extend %a-null-cent;
         margin-bottom:50px;
@@ -595,8 +617,8 @@ input[type="checkbox"]{
     @extend %a-90;
     @extend %a-bot-cent;
     margin-bottom:20px;
-    background-color: $charcoal;
-    color:$ivory;
+    background-color: $highlight;
+    color:$charcoal;
     box-shadow: 0 0 5px $highlight / 2;
     position:fixed;
     cursor:pointer;
