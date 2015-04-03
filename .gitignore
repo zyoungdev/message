@@ -8,3 +8,5 @@ test*
 */*.css
 
 phpSrc/log
+!README
+!LICENSE
