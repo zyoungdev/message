@@ -1106,10 +1106,10 @@ var APP = (function()
                 if (checkboxes[i].checked)
                 {
                     var
-                    user = checkboxes[i].parentNode.children[2].innerText,
+                    user = checkboxes[i].parentNode.children[2].dataset.username,
                     timestamp = checkboxes[i].parentNode.children[4].dataset.timestamp;
                     
-                    // console.log(newMessageList);
+                    // console.log(user, timestamp);
                     deleteMessages.push(newMessageList[user][timestamp]["id"]);
                     delete newMessageList[user][timestamp];
                 }

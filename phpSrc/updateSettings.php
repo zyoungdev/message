@@ -22,8 +22,15 @@ class UpdateSettings{
     {
         if (isset($_POST["mPerPage"])) 
             $this->settings["mPerPage"] = (int) $_POST["mPerPage"];
-        if (isset($_POST["displayName"])) 
+        if (isset($_POST["displayName"]))
+        {
+            if (strlen($_POST["displayName"]) > 64)
+            {
+                $ret = new Returning;
+                $ret->exitNow(0, "You display name can only be 64 characters in length");
+            }
             $this->settings["displayName"] = $_POST["displayName"];
+        } 
 
         return 1;
     }
