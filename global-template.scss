@@ -169,8 +169,11 @@ input[type="checkbox"]{
             @extend %a-20;
         }
         .delete-multiple-messages-button{
-            @extend %a-100;
+            @extend %a-30;
             margin:0;
+            margin-left:35%;
+            margin-right:35%;
+            margin-bottom:10px;
             display:none;
         }
     }
@@ -370,9 +373,11 @@ input[type="checkbox"]{
             @extend %a-20;
         }
         .delete-multiple-contact-button{
-            @extend %a-100;
+            @extend %a-30;
             margin:0;
-            margin-bottom:5px;
+            margin-left:35%;
+            margin-right:35%;
+            margin-bottom:10px;
             display:none;
         }
     }
