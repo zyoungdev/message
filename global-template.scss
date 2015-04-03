@@ -235,6 +235,7 @@ input[type="checkbox"]{
             }
 
             .message-checkbox{
+                @extend %ellipsis;
                 @extend %a-cent-null;
                 @extend %a-fl-L;
                 width:1.3em;
@@ -242,22 +243,26 @@ input[type="checkbox"]{
                 border-radius: 0;
             }
             .message-size{
+                @extend %ellipsis;
                 @extend %a-15;
                 text-align:center;
                 cursor:pointer;
             }
             .message-username{
+                @extend %ellipsis;
                 @extend %a-25;
                 text-align:center;
                 cursor:pointer;
                 font-family:monospace;
             }
             .message-fingerprint{
+                @extend %ellipsis;
                 @extend %a-25;
                 text-align:center;
                 cursor:pointer;
             }
             .message-timestamp{
+                @extend %ellipsis;
                 @extend %a-25;
                 text-align: center;
                 cursor:pointer;
@@ -382,10 +387,12 @@ input[type="checkbox"]{
                 margin-left:10px;
             }
             .contact-displayname{
+                @extend %ellipsis;
                 @extend %a-45;
                 font-family:monospace;
             }
             .contact-username{
+                @extend %ellipsis;
                 @extend %a-45;
                 font-family:monospace;
             }
