@@ -85,6 +85,7 @@ input[type="checkbox"]{
     margin-top:10px;
 }
 .login-box{
+    @extend %a-cent-cent;
     .login-submit-container{
         @extend %a-100;
         button{

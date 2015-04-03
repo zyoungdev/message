@@ -1,5 +1,8 @@
+
+
 var APP = (function()
 {
+    
     var
     appState = "login",
     hf = (function()
@@ -92,7 +95,6 @@ var APP = (function()
                 else
                     return date[1] + " " + date[2];
             }
-            
         };
     })(),
     viewContact = (function()
@@ -876,7 +878,7 @@ var APP = (function()
     messageList = (function()
     {
         var
-        messageList = null,
+        messageList = {},
         timestamps = [],
         sizes = [],
         users = [],
@@ -948,17 +950,19 @@ var APP = (function()
                 }
                 else if (sortType == "size")
                 {
+                    var temp = JSON.parse(JSON.stringify(messageList));
                     for (var len = sizes.length; i < len; i++)
                     {
                         if (count >= settings.mNum)
                             break;
-                        for (var user in messageList)
+                        for (var user in temp)
                         {
-                            for (var time in messageList[user])
+                            for (var time in temp[user])
                             {   
-                                if (messageList[user][time]["size"] == sizes[i])
+                                if (temp[user][time]["size"] == sizes[i])
                                 {
                                     frag.appendChild(buildItem(user, time));
+                                    delete temp[user][time];
                                     count++;
                                 }
                             }
@@ -1233,7 +1237,7 @@ var APP = (function()
                 }
             }
         }
-
+        
         return{
             init: function()
             {
@@ -1547,7 +1551,9 @@ var APP = (function()
                     }
                     else if (hf.cN(e, "settings-changepw-button"))
                     {
-                        changePassword();
+                        var check = confirm("All your messages will be deleted due to a change in your secret key. Do you wish to continue?");
+                        if (check)
+                            changePassword();
                     }
                     else if (hf.cN(e, "settings-download-creds"))
                     {
@@ -1697,6 +1703,7 @@ var APP = (function()
         errorMessageText,
         delay,
         errorMessageContainer,
+        errorTimeout,
         getTemplate = function()
         {
             hf.ajax("GET", null, "templates/error.php", function(res)
@@ -1714,7 +1721,8 @@ var APP = (function()
 
                 if (delay)
                 {
-                    var timeout = setTimeout(function()
+                    clearTimeout(errorTimeout);
+                    errorTimeout = setTimeout(function()
                     {
                         if (hf.elCN("error-container")[0])
                             document.body.removeChild(hf.elCN("error-container")[0]);
