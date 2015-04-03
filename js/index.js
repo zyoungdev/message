@@ -79,17 +79,93 @@ var APP = (function()
             convertTime: function(time)
             {
                 var
-                now = new Date();
+                now = new Date(),
+                midnight = new Date(),
+                date = String.prototype.split.call(time, " ");
+                timestamp = time.getTime() / 1000;
 
+                midnight = midnight.setHours(0,0,0,0) / 1000;
                 now = now.getTime() / 1000;
 
-                if (now-1440 < time)
-                    return time.toLocaleTimeString(); 
+                if (timestamp > midnight)
+                    return (time.getHours() % 12) + ":" + time.getMinutes() + " " + String.prototype.slice.call(time.toLocaleTimeString(), time.toLocaleTimeString().length-2);
                 else
-                    return time.toLocaleDateString();
+                    return date[1] + " " + date[2];
             }
             
         };
+    })(),
+    viewContact = (function()
+    {
+        var
+        buildContact = function(u)
+        {
+            hf.ajax("GET", null, "templates/viewContact.php", function(res)
+            {
+                var
+                container = hf.cEL("div", {class: "module-container contact-view-container"}),
+                containerExists = hf.elCN("contact-view-container")[0];
+
+                container.innerHTML = res;
+
+                if (!containerExists)
+                {
+                    document.body.appendChild(container);
+                }
+                else
+                {
+                    hf.elCN("avatar")[0].removeAttribute("style");
+                    hf.elCN("contact-username")[0].innerHTML = "";                    
+                    hf.elCN("contact-displayname")[0].innerHTML = "";                    
+                    hf.elCN("contact-lastlogin")[0].innerHTML = "";                    
+                    hf.elCN("contact-public")[0].innerHTML = "";                    
+                }
+                    
+                if (u.code == 0 || u.code == -1) return;
+
+                var date = new Date(u.lastLogin*1000);
+
+                hf.elCN("avatar")[0].style.backgroundImage = "url(" + u.avatar + ")";
+                hf.elCN("contact-username")[0].innerHTML = u.username;                    
+                hf.elCN("contact-displayname")[0].innerHTML = u.displayName;                    
+                hf.elCN("contact-lastlogin")[0].innerHTML = "Last Login: " + date.toLocaleString();                    
+                hf.elCN("contact-public")[0].innerHTML = u.key["public"];        
+
+            })
+        },
+        getUser = function(u)
+        {
+            var fd = new FormData();
+            fd.append("user", u);
+            hf.ajax("POST", fd, "phpSrc/getContact.php", function(res)
+            {
+                res = JSON.parse(res)
+                buildContact(res);
+            })
+        }
+        return {
+            init: function(u)
+            {
+                getUser(u);
+            },
+            click: function(ev)
+            {
+                var e = ev.target,
+                user = hf.elCN("contact-username")[0].textContent;
+                if (hf.isInside(e, hf.elCN("contact-view-container")[0]))
+                {
+                    if (hf.cN(e, "message"))
+                    {
+                        navigation.stateChange("compose");
+                        messageDraft.init(user);
+                    }
+                    else if (hf.cN(e, "close"))
+                    {
+                        navigation.stateChange("contacts");
+                    }
+                }
+            }
+        }
     })(),
     contactList = (function()
     {
@@ -115,14 +191,17 @@ var APP = (function()
                 
                 if (contactList.code == 0) return;
 
+                console.log(contactList);
                 for (var user in contactList)
                 {
                     var
                     selBut = hf.cEL("input", {class: "contact-checkbox", type: "checkbox"}),
                     contact = hf.cEL("div", {class: "contact"}),
+                    displayname = hf.cEL("div", {class: "contact-displayname"}, contactList[user]["displayName"]);
                     username = hf.cEL("div", {class: "contact-username"}, user);
 
                     contact.appendChild(selBut);
+                    contact.appendChild(displayname);
                     contact.appendChild(username);
 
                     frag.appendChild(contact);
@@ -132,11 +211,6 @@ var APP = (function()
         },
         getList = function()
         {
-            if (contactList)
-            {
-                buildList();
-                return;
-            }
             hf.ajax("GET", null, "phpSrc/listContacts.php", function(res)
             {
                 contactList = JSON.parse(res);
@@ -144,6 +218,7 @@ var APP = (function()
                 {
                     error.init(contactList.message, 5);
                 }
+                sorting = false;
                 sortContacts();
                 buildList();
             });
@@ -170,8 +245,8 @@ var APP = (function()
                 else
                 {
                     // error.init(res.message, 3);
-                    contactList[u] = [];
-                    buildList();
+                    // contactList[u] = [];
+                    getList();
                 }
             });
         },
@@ -311,12 +386,20 @@ var APP = (function()
 
                 if (hf.isInside(e, contactListContainer))
                 {
-                    if (hf.cN(e, "contact-username"))
+                    if (target = hf.rTarget(e, "contact"))
                     {
-                        var user = ev.target.textContent;
+                        if (hf.cN(e, "contact-checkbox"))
+                        {
+                            checkboxClick(e);
+                            return;
+                        }
 
-                        navigation.stateChange("compose");
-                        messageDraft.init(user);
+                        var user = target.children[2].textContent;
+
+                        navigation.stateChange("viewContact");
+                        viewContact.init(user);
+                        // navigation.stateChange("compose");
+                        // messageDraft.init(user);
                     }
                     else if (hf.cN(e, "add-contact-button"))
                     {
@@ -326,7 +409,7 @@ var APP = (function()
                         addContactTimeout = setTimeout(function()
                         {
                             addContact(user)
-                        }, 500);
+                        }, 200);
                     }
                     else if (hf.cN(e, "contact-list-heading-checkbox"))
                     {
@@ -337,10 +420,7 @@ var APP = (function()
                         sortContacts();
                         buildList();
                     }
-                    else if (hf.cN(e, "contact-checkbox"))
-                    {
-                        checkboxClick(e);
-                    }
+                    
                     else if (hf.cN(e, "delete-multiple-contact-button"))
                     {
                         deleteMultipleContacts();
@@ -685,9 +765,13 @@ var APP = (function()
                 size = hf.elCN("view-message-size")[0],
                 message = hf.elCN("view-message-message")[0];
 
-                sender.innerHTML = currentMessage["sender"];
+                sender.innerHTML = "From: " + currentMessage["displayname"] + " &lt; " + currentMessage["sender"] + " &gt;";
+                // sender.innerHTML += " <" + currentMessage["sender"] + ">";
+
+                sender.dataset.username = currentMessage["sender"];
+
                 timestamp.innerHTML = date.toLocaleString();
-                size.innerHTML = hf.convertSize(currentMessage["size"]);
+                size.innerHTML = "Size: " + hf.convertSize(currentMessage["size"]);
                 message.innerHTML = currentMessage["plaintext"];
 
                 var
@@ -807,17 +891,19 @@ var APP = (function()
             var
             msg = hf.cEL("div", {class: "message"}),
             check = hf.cEL("input", {class: "message-checkbox", type: "checkbox"}),
-            username = hf.cEL("div", {class: "message-username"}, u),
+            // username = hf.cEL("div", {class: "message-username"}, u),
+            displayname = hf.cEL("div", {class: "message-username"}, messageList[u][t]["sender"]["displayName"]),
             fingerprint = hf.cEL("div", {class: "message-fingerprint"}, messageList[u][t]["id"].slice(0,7))
             size = hf.cEL("div", {class: "message-size"}, hf.convertSize(messageList[u][t]["size"])),
             date = new Date(messageList[u][t].timestamp * 1000),
             timestamp = hf.cEL("div", {class: "message-timestamp"}, hf.convertTime(date));
 
+            displayname.dataset.username = u;
             timestamp.dataset.timestamp = messageList[u][t].timestamp;
 
             msg.appendChild(check);
             msg.appendChild(size);
-            msg.appendChild(username);
+            msg.appendChild(displayname);
             msg.appendChild(fingerprint);
             msg.appendChild(timestamp);
 
@@ -1175,7 +1261,7 @@ var APP = (function()
                             return;
                         }
                         var
-                        user = target.children[2].textContent,
+                        user = target.children[2].dataset.username,
                         time = target.children[4].dataset.timestamp;
 
                         navigation.stateChange("viewMessage");
@@ -1252,12 +1338,15 @@ var APP = (function()
                 var
                 avatar = hf.elCN("avatar-container")[0].children[0],
                 username = hf.elCN("settings-username")[0],
+                displayname = hf.elCN("settings-displayname")[0],
                 messageNum = hf.elCN("mPerPage")[0];
 
                 avatar.style.backgroundImage = "url(" + settings.avatar + ")";
                 username.innerHTML = settings.user;
+                displayname.value = settings.displayName;
                 messageNum.value = settings.mNum;
                 mPerPageChange();
+                displayName();
             })
         },
         getSettings = function()
@@ -1275,6 +1364,7 @@ var APP = (function()
                         error.init(r.message, 3);
                     }
                     settings.mNum = r["mPerPage"];
+                    settings.displayName = r["displayName"];
                     navigation.init();
 
                 });
@@ -1388,31 +1478,46 @@ var APP = (function()
                 },3000);
             })
         },
+        updateSettings = function()
+        {
+            var
+            numInput = hf.elCN("mPerPage")[0],
+            displayNameInput = hf.elCN("settings-displayname")[0];
+
+            var fd = new FormData();
+            console.log(displayNameInput.value);
+
+            fd.append("mPerPage", numInput.value);
+            fd.append("displayName", displayNameInput.value);
+            hf.ajax("POST", fd, "phpSrc/updateSettings.php", function(res)
+            {
+                res = JSON.parse(res);
+                if (res.code != null)
+                {
+                    error.init(res.message, 3);
+                }
+            });
+        },
         mPerPageChange = function()
         {
-            var numInput = hf.elCN("mPerPage")[0];
-
-            numInput.onchange = function()
+            hf.elCN("mPerPage")[0].onchange = function()
             {
                 clearTimeout(mPerPageTimeout);
                 mPerPageTimeout = setTimeout(function()
                 {
-                    var fd = new FormData();
-
-                    fd.append("mPerPage", numInput.value);
-                    hf.ajax("POST", fd, "phpSrc/updateSettings.php", function(res)
-                    {
-                        res = JSON.parse(res);
-                        if (res.code != null)
-                        {
-                            error.init(res.message, 3);
-                        }
-                    });
+                   updateSettings();
                 },1000);
             }
-        };
+        },
+        displayName = function()
+        {
+            hf.elCN("settings-displayname")[0].onblur = function(){
+                updateSettings();
+            }
+        }
         return {
             user: "",
+            displayName: "",
             avatar: "",
             mNum: 10,
             init: function()
@@ -1531,6 +1636,10 @@ var APP = (function()
                     break;
                 }
                 case "viewMessage":
+                {
+                    break;
+                }
+                case "viewContact":
                 {
                     break;
                 }
@@ -1727,6 +1836,12 @@ var APP = (function()
                 case "viewMessage":
                 {
                     messageView.click(ev);
+                    messageDraft.click(ev);
+                    break;
+                }
+                case "viewContact":
+                {
+                    viewContact.click(ev);
                     break;
                 }
                 case "contacts":

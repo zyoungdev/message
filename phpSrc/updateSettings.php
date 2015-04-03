@@ -20,22 +20,17 @@ class UpdateSettings{
     }
     public function setup()
     {
-        if (isset($_POST["mPerPage"]))
-        {
+        if (isset($_POST["mPerPage"])) 
             $this->settings["mPerPage"] = (int) $_POST["mPerPage"];
-            return 1;
-        }
-        else
-        {
-            return 0;
-        }
+        if (isset($_POST["displayName"])) 
+            $this->settings["displayName"] = $_POST["displayName"];
+
+        return 1;
     }
     public function update()
     {
         $query = array("username" => $_SESSION["user"]["username"]);
         $proj = array('$set' => array("settings" => $this->settings));
-
-        logThis($this->settings);
 
         if ($this->mongo["usersprivate"]->update($query, $proj))
             return 1;

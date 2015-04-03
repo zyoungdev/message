@@ -44,7 +44,6 @@ class SendMessage{
                 array("username" => $this->clean["un"])))
         {
             $this->message["recipient"]["username"] = $this->recipient["username"];
-            logThis($this->recipient);
             return 1;
         } 
         else
@@ -85,9 +84,11 @@ class SendMessage{
     {
         date_default_timezone_set('America/Los_Angeles');
         $date = new DateTime('NOW');
+        logThis($_SESSION);
 
         $map["timestamp"] = $date->getTimestamp();
         $map["sender"]["username"] = $_SESSION["user"]["username"];
+        $map["sender"]["displayName"] = $_SESSION["user"]["settings"]["displayName"];
         $map["sender"]["public"] = $_SESSION["user"]["key"]["public"];
         $map["nonce"] = $this->message["nonce"];
         $map["size"] = $_POST["messageSize"];

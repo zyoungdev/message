@@ -39,6 +39,9 @@ class AddContact{
         {
             $this->contact["username"] = $this->recipient["username"];
             $this->contact["public"] = $this->recipient["key"]["public"];
+
+            $this->contact["displayName"] = $this->mongo["usersprivate"]->findone(
+                array("username" => $_POST["contact"]))["settings"]["displayName"];
             return 1;
         } 
         else
@@ -49,11 +52,12 @@ class AddContact{
     public function addContact()
     {
         $user = $this->contact["username"];
+        $details = array("displayName" => $this->contact["displayName"]);
         if (isset($user["contact"]))
             unset($user["contact"]);
 
         $query = array('username' => $_SESSION["user"]["username"]);
-        $update = array('$set' => array("contacts.$user" => array("public" => $this->contact["public"])));
+        $update = array('$set' => array("contacts.$user" => $details));
 
         if ($this->mongo["usersprivate"]->update($query, $update))
             return 1;

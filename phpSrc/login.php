@@ -41,7 +41,6 @@ class Login{
     {
         // session_write_close();
         closeDB($this->mongo["client"]);
-        
     }
     public function usernameIsClean()
     {
@@ -182,6 +181,7 @@ class Login{
         $update = array('$set' => array("lastLogin" => $date->getTimestamp()));
 
         $this->mongo["userspublic"]->update($query, $update);
+        logThis($_SESSION);
     }
     public function createNewUser()
     {
@@ -197,7 +197,8 @@ class Login{
                 'nonce' => $_SESSION["user"]["key"]["nonce"]
             ),
             'settings' => array(
-                'mPerPage' => 10
+                'mPerPage' => 10,
+                'displayName' => "Anonymous"
             )
         );
         $newuser = array('username' => $this->clean["un"],
@@ -206,8 +207,10 @@ class Login{
             'key' => array(
                 'public' => $_SESSION["user"]["key"]["public"]
             )
-            
         );
+
+        $_SESSION["user"]["settings"] = array('mPerPage' => 10, 'displayName' => "Anonymous");
+        
 
         if ($this->mongo["usersprivate"]->save($newuserprivate))
         {
@@ -306,7 +309,6 @@ function logUserIn()
         
         // hash password
         $login->hashPW();
-
         $login->createSaltNonce();
         $login->createMasterKeys();
         $login->createSigningKeys();

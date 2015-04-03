@@ -36,6 +36,7 @@ class ListContacts{
     }
     public function send()
     {
+        logThis($this->contacts);
         echo json_encode($this->contacts["contacts"]);
     }
 }

@@ -4,7 +4,6 @@
 *
 ***************************************************************************************/
 
-
 html,body{
     height:100%;
     min-width:300px;
@@ -53,6 +52,7 @@ input, textarea{
 }
 input[type="checkbox"]{
     box-shadow:none;
+    background:none;
 }
 ::-webkit-input-placeholder {
     color:    $charcoal * 1.5;
@@ -67,6 +67,18 @@ input[type="checkbox"]{
 }
 ::-ms-input-placeholder { 
    color:    $charcoal * 1.5;
+}
+*::selection {
+  background: $highlight;
+  color:$ivory;
+}
+*::-moz-selection {
+  background: $highlight;
+  color:$ivory;
+}
+*::-webkit-selection {
+  background: $highlight;
+  color:$ivory;
 }
 .module-container{
     @extend %a-100;
@@ -132,6 +144,9 @@ input[type="checkbox"]{
     @extend %a-100;
     padding:0;
     padding-top:10px;
+    div{
+        overflow:hidden;
+    }
     .message-list-controls-container{
         @extend %a-100;
         @extend %a-null-cent;
@@ -164,7 +179,6 @@ input[type="checkbox"]{
             @extend %a-fl-L;
             width:1.3em;
             margin-left:10px;
-            background:black;
             border-radius: 0;
             // display:none;
         }
@@ -335,9 +349,13 @@ input[type="checkbox"]{
             width:1.3em;
             margin-left:10px;;
         }
+        .contact-list-heading-displayname{
+            @extend %a-45;
+            color:$ivory;
+        }
         .contact-list-heading-username{
-            @extend %a-90;
-            color:#cdcdcd;
+            @extend %a-45;
+            color:$ivory;
         }
     }
     .contact-list{
@@ -345,7 +363,7 @@ input[type="checkbox"]{
         @extend %t-90;
         @extend %d-75;
         @extend %a-null-cent;
-        font-size:.7em;
+        font-size:.9em;
         .contact{
             @extend %a-100;
             height:50px;
@@ -363,8 +381,12 @@ input[type="checkbox"]{
                 width:1.3em;
                 margin-left:10px;
             }
+            .contact-displayname{
+                @extend %a-45;
+                font-family:monospace;
+            }
             .contact-username{
-                @extend %a-90;
+                @extend %a-45;
                 font-family:monospace;
             }
             .contact-delete-button{
@@ -372,6 +394,66 @@ input[type="checkbox"]{
                 // height:30px;
             }
         }
+    }
+}
+.contact-view-container{
+    .contact-controls{
+        @extend %a-100;
+        margin-bottom:20px;
+        button{
+            @extend %a-50;
+        }
+    }
+    .avatar-container{
+        @extend %a-200-f;
+        @extend %a-null-cent;
+        height:200px;
+        cursor:pointer;
+        .avatar{
+            @extend %a-100;
+            height:100%;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            box-shadow: 0 0 5px;
+            &:hover p{
+                display:block;
+            }
+            p{
+                @extend %a-cent-null;
+                color:#dedede;
+                display:none;
+                text-align:center;
+                text-shadow:0 0 3px black;
+                font-weight: bolder;
+            }
+        }
+    }
+    .contact-username{
+        font-family: monospace;
+        font-size:2em;
+    }
+    .contact-username{
+        font-size:1.8em;
+    }
+    .contact-username, .contact-displayname{
+        @extend %a-100;
+        text-align:center;
+        font-family:monospace;
+        margin-top:10px;             
+        margin-bottom:10px;
+    }
+    .contact-public{
+        @extend %a-200-f;
+        @extend %a-null-cent;
+        font-family:monospace;
+        word-wrap: break-word;
+    }
+    h2{
+        @extend %a-95;
+        @extend %a-null-cent;
+        text-align:center;
     }
 }
 .view-message-container{
@@ -401,6 +483,7 @@ input[type="checkbox"]{
         @extend %a-p-10;
         border-bottom:solid 1px $ivory;
         font-family:monospace;
+        font-size:1.2em;
     }
     .view-message-timestamp{
         @extend %a-90;
@@ -470,7 +553,13 @@ input[type="checkbox"]{
     .settings-username{
         @extend %a-100;
         text-align:center;
-        font-family:monospace;                
+        font-family:monospace;
+        margin-top:10px;             
+        margin-bottom:10px;
+        font-size:2em;
+    }
+    .settings-displayname{
+        text-align:center;
     }
     h2{
         @extend %a-95;

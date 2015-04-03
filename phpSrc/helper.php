@@ -1,7 +1,7 @@
 <?php
 function logThis($l)
 {
-    file_put_contents("./log", print_r($l, true));
+    file_put_contents("log", print_r($l, true));
 }
 class Returning{
     public $code;

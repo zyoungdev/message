@@ -57,6 +57,7 @@ class ViewMessage{
         if ($pt = Sodium::crypto_box_open($ciphertext,$nonce,$keypair))
         {
             $this->plaintext["sender"] = $this->message["sender"]["username"];
+            $this->plaintext["displayname"] = $this->message["sender"]["displayName"];
             $this->plaintext["plaintext"] = html_entity_decode($pt);
             $this->plaintext["timestamp"] = $this->message["timestamp"];
             $this->plaintext["size"] = $this->message["size"];

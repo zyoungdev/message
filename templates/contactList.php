@@ -5,6 +5,7 @@
 </div>
 <div class="contact-list-heading">
     <input type="checkbox" class="contact-list-heading-checkbox">
+    <div class="contact-list-heading-displayname">Display Name</div>
     <div class="contact-list-heading-username">Username</div>
 </div>
 
