@@ -1,5 +1,3 @@
-
-
 var APP = (function()
 {
     
@@ -994,6 +992,12 @@ var APP = (function()
                 }
                 hf.elCN("message-list")[0].appendChild(frag);
 
+                var maxPages = (Math.ceil(timestamps.length / settings.mNum));
+                hf.elCN("message-list-pagenum-input")[0].value = currentPage + 1;
+                hf.elCN("message-list-pagenum-input")[0].setAttribute("max", maxPages);
+                hf.elCN("message-list-pagenum-total")[0].innerHTML = "of " + maxPages;
+                pagenumInputChange();
+
                 if (currentPage == 0)
                     hf.elCN("prev")[0].style.visibility = "hidden";
                 else
@@ -1149,6 +1153,14 @@ var APP = (function()
                 sortMessageListTimestamp();
                 buildList();
             });
+        },
+        pagenumInputChange = function()
+        {
+            hf.elCN("message-list-pagenum-input")[0].onchange = function()
+            {
+                currentPage = hf.elCN("message-list-pagenum-input")[0].value - 1;
+                buildList();
+            }
         },
         sortMessageListTimestamp = function()
         {

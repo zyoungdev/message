@@ -287,17 +287,43 @@ input[type="checkbox"]{
             }
         }
     }
-    .message-list-page-container{
-        @extend %a-100;
+    .message-list-pagenum-container{
+        @extend %a-45;
         margin-top:20px;
+        margin-left:2.5%;
+        margin-right:2.5%;
+        input{
+            @extend %a-null-null;
+        }
+        .message-list-pagenum-input{
+            @extend %a-50;
+            max-width:100px;
+            text-align:center;
+            background-color: #fff;
+        }
+        .message-list-pagenum-total{
+            @extend %a-50;
+            max-width:100px;
+            height:50px;
+            line-height:50px;
+            text-align:center;
+        }
+    }
+    .message-list-page-container{
+        @extend %a-45;
+        margin-top:20px;
+        margin-left:2.5%;
+        margin-right:2.5%;
         .page-controls{
             @extend %a-95;
             @extend %a-null-cent;
             button{
-                @extend %a-20;
+                @extend %a-45;
                 float:right;
                 @extend %a-top-right;
                 margin:0;
+                margin-left:2.5%;
+                margin-right:2.5%;
             }
             .prev{
                 // display:none;

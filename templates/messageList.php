@@ -17,6 +17,12 @@
 <!-- We will put the message in this list -->
 <div class="message-list"></div>
 
+<!-- Page numbers -->
+<div class="message-list-pagenum-container">
+    <input type="number" min="1" class="message-list-pagenum-input">
+    <div class="message-list-pagenum-total">of 10</div>
+</div>
+
 <!-- Pagination -->
 <div class="message-list-page-container">
     <div class="page-controls">
