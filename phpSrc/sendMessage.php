@@ -74,9 +74,10 @@ class SendMessage{
     public function addContact()
     {
         $user = $this->message["recipient"]["username"];
+        $d = array("displayName" => $this->mongo["usersprivate"]->findone(array("username" => $user))["settings"]["displayName"]);
 
         $query = array('username' => $_SESSION["user"]["username"]);
-        $update = array('$set' => array("contacts.$user" => array()));
+        $update = array('$set' => array("contacts.$user" => $d));
 
         $this->mongo["usersprivate"]->update($query, $update);
     }

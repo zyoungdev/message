@@ -1489,6 +1489,10 @@ var APP = (function()
 
             fd.append("mPerPage", numInput.value);
             fd.append("displayName", displayNameInput.value);
+
+            settings.displayName = displayNameInput.value;
+            settings.mNum = numInput.value;
+
             hf.ajax("POST", fd, "phpSrc/updateSettings.php", function(res)
             {
                 res = JSON.parse(res);
