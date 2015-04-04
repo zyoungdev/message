@@ -336,11 +336,23 @@ input[type="checkbox"]{
     }
 }
 .send-message-box{
+    @extend %a-90;
+    @extend %t-90;
+    @extend %d-55;
+    @extend %a-p-20;
+    @extend %a-null-cent;
+    input{
+        @extend %a-95;
+        @extend %a-null-cent;
+    }
     textarea{
+        @extend %a-95;
+        @extend %a-null-cent;
         min-height:250px;
     }
     .send-message-controls{
         @extend %a-100;
+        margin-bottom:20px;
         .send-message-button, .add-files-button, .discard-message-button{
             @extend %a-30;
             margin-left:1.66666%;

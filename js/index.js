@@ -445,7 +445,6 @@ var APP = (function()
         }
         sendPlaintext = function(rec, pt, el)
         {
-            // console.log(fls);
             if (imgs.length > 0)
             {
                 pt += "<div class=image-file-list>";
@@ -514,7 +513,7 @@ var APP = (function()
                 {
                     error.init(res.message, 3);
                 }
-                imgs = [];
+                clearFiles();
                 navigation.stateChange("contacts");
             });
         },
@@ -696,7 +695,6 @@ var APP = (function()
                     else if (e == sub)
                     {
                         sendPlaintext(rec.value, ta.value,e.parentNode);
-                        clearFiles();
                     }
                     else if (e == dis)
                     {
