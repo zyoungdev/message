@@ -31,11 +31,16 @@ class UpdateSettings{
             }
             $this->settings["displayName"] = $_POST["displayName"];
         } 
+        if (isset($_POST["nested"]))
+        {
+            $this->settings["nested"] = $_POST["nested"];
+        }
 
         return 1;
     }
     public function update()
     {
+        $_SESSION["settings"] = $this->settings;
         $query = array("username" => $_SESSION["user"]["username"]);
         $proj = array('$set' => array("settings" => $this->settings));
 

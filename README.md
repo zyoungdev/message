@@ -9,6 +9,7 @@ This is a messaging service that uses PHP, Javascript, [MongoDB](https://github.
 * Secrets are created at login so there is no key management
 * Ciphertext is not held on the client. It is only decrypted upon message opening.
 * Search for message by "Fingerprint"
+* Nest messages into user threads
 * Sort messages by Timestamp, Username, or Size
 * Quickly send messages by searching their username in the Contact list
 * Mobile friendly single page application

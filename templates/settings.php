@@ -23,5 +23,8 @@
     <button class="settings-download-messages">Download Messages</button>
 </div>
 
+<label for="nested"><h2>Nest Messages by User</h2></label>
+<input type="checkbox" class="nestedCheckbox">
+
 <label for="mPerPage"><h2>Messages Per Page</h2></label>
 <input type="number" min="1", max="25" class="mPerPage">

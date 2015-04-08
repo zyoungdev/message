@@ -7,7 +7,9 @@
 </div>
 
 <div class="message-list-heading">
-    <input type="checkbox" class="message-list-heading-checkbox">
+    <div class="check-container">
+        <input type="checkbox" class="message-list-heading-checkbox">
+    </div>
     <div class="message-list-size">Size</div>
     <div class="message-list-username">Sender</div>
     <div class="message-list-fingerprint">Message</div>

@@ -88,8 +88,11 @@ var APP = (function()
                 midnight = midnight.setHours(0,0,0,0) / 1000;
                 now = now.getTime() / 1000;
 
+                var min = time.getMinutes();
+
+
                 if (timestamp > midnight)
-                    return (time.getHours() % 12) + ":" + time.getMinutes() + " " + String.prototype.slice.call(time.toLocaleTimeString(), time.toLocaleTimeString().length-2);
+                    return (time.getHours() % 12) + ":" + (min < 10 ? '0' : '') + min + " " + String.prototype.slice.call(time.toLocaleTimeString(), time.toLocaleTimeString().length-2);
                 else
                     return date[1] + " " + date[2];
             }
@@ -881,13 +884,17 @@ var APP = (function()
         timeSorting = true,
         sizeSorting = true,
         userSorting = true,
+        numSorting = true,
         sortType = "time",
         currentPage = 0,
         getListTimeout,
+        nested = true,
+        nestedSort = [],
         buildItem = function(u, t)
         {
             var
             msg = hf.cEL("div", {class: "message"}),
+            checkcont = hf.cEL("div", {class: "check-container"}),
             check = hf.cEL("input", {class: "message-checkbox", type: "checkbox"}),
             // username = hf.cEL("div", {class: "message-username"}, u),
             displayname = hf.cEL("div", {class: "message-username"}, messageList[u][t]["sender"]["displayName"]),
@@ -899,113 +906,169 @@ var APP = (function()
             displayname.dataset.username = u;
             timestamp.dataset.timestamp = messageList[u][t].timestamp;
 
-            msg.appendChild(check);
+            checkcont.appendChild(check);
+
+            msg.appendChild(checkcont);
             msg.appendChild(size);
             msg.appendChild(displayname);
             msg.appendChild(fingerprint);
             msg.appendChild(timestamp);
 
             return msg;
-        }
+        },
         buildList = function()
         {
-            hf.ajax("GET", null, "templates/messageList.php", function(res)
+            if (settings.nested)
             {
-                var
-                container = hf.cEL("div", {class: "module-container message-list-container"}),
-                frag = document.createDocumentFragment(),
-                containerExists = hf.elCN("message-list-container")[0];
-
-                container.innerHTML = res;
-
-                if (!containerExists)
-                    document.body.appendChild(container);
-                else
-                    hf.elCN("message-list")[0].innerHTML = "";
-                
-                if (messageList.code == 0) return;
-
-                var 
-                i = Math.floor(currentPage*settings.mNum),
-                count = 0;
-
-                if (sortType == "time")
+                hf.ajax("GET", null, "templates/nestedMessageList.php", function(res)
                 {
-                    for (var len = timestamps.length; i < len; i++)
+                    var
+                    container = hf.cEL("div", {class: "module-container message-list-container"}),
+                    frag = document.createDocumentFragment(),
+                    containerExists = hf.elCN("message-list-container")[0];
+
+                    container.innerHTML = res;
+
+                    if (!containerExists)
+                        document.body.appendChild(container);
+                    else
+                        hf.elCN("message-list")[0].innerHTML = "";
+                    
+                    if (messageList.code == 0) return;
+                    
+                    for (var obj in nestedSort)
                     {
-                        if (count >= settings.mNum)
-                            break;
-                        for (var user in messageList)
+                        var u = nestedSort[obj].user;
+
+                        if (messageList[u].length == 0)
+                            continue;
+                        var
+                        usr = hf.cEL("div", {class: "usr"}),
+                        nummess = hf.cEL("div", {class: "num-messages"}, Object.keys(messageList[u]).length),
+                        username = hf.cEL("div", {class: "username"}, u),
+                        date = new Date(Object.keys(messageList[u])[Object.keys(messageList[u]).length-1] * 1000),
+                        lastmess = hf.cEL("div", {class: "last-message"}, hf.convertTime(date));
+
+                        lastmess.dataset.timestamp = Object.keys(messageList[u])[0]
+
+                        usr.appendChild(nummess);
+                        usr.appendChild(username);
+                        usr.appendChild(lastmess);
+
+                        frag.appendChild(usr);
+
+                        var keys = Object.keys(messageList[u]);
+                        keys.sort();
+                        for (var i = keys.length-1; i >= 0; i--)
                         {
-                            if (!messageList[user][timestamps[i]])
-                                continue;
-                            frag.appendChild(buildItem(user, timestamps[i]));
-                            count++;
+                            usr.appendChild(buildItem(u, keys[i]));
                         }
                     }
-                }
-                else if (sortType == "size")
+                    hf.elCN("message-list")[0].appendChild(frag);
+
+
+                });
+            }
+            else
+            {
+                hf.ajax("GET", null, "templates/messageList.php", function(res)
                 {
-                    var temp = JSON.parse(JSON.stringify(messageList));
-                    for (var len = sizes.length; i < len; i++)
+                    var
+                    container = hf.cEL("div", {class: "module-container message-list-container"}),
+                    frag = document.createDocumentFragment(),
+                    containerExists = hf.elCN("message-list-container")[0];
+
+                    container.innerHTML = res;
+
+                    if (!containerExists)
+                        document.body.appendChild(container);
+                    else
+                        hf.elCN("message-list")[0].innerHTML = "";
+                    
+                    if (messageList.code == 0) return;
+
+                    var 
+                    i = Math.floor(currentPage*settings.mNum),
+                    count = 0;
+
+                    if (sortType == "time")
                     {
-                        if (count >= settings.mNum)
-                            break;
-                        for (var user in temp)
+                        for (var len = timestamps.length; i < len; i++)
                         {
-                            for (var time in temp[user])
-                            {   
-                                if (temp[user][time]["size"] == sizes[i])
-                                {
-                                    if (count >= settings.mNum)
-                                        break;
-                                    frag.appendChild(buildItem(user, time));
-                                    delete temp[user][time];
-                                    count++;
-                                }
-                            }
-                        }
-                    }
-                }
-                else if (sortType == "user")
-                {
-                    for (var len = users.length; i < len; i++)
-                    {
-                        if (count >= settings.mNum)
-                            break;
-                        for (var u in messageList)
-                        {
-                            for (var t in messageList[u])
+                            if (count >= settings.mNum)
+                                break;
+                            for (var user in messageList)
                             {
-                                if (messageList[u][t] == users[i])
-                                {
-                                    if (count >= settings.mNum)
-                                        break;
-                                    frag.appendChild(buildItem(u, t));
-                                    count++;
+                                if (!messageList[user][timestamps[i]])
+                                    continue;
+                                frag.appendChild(buildItem(user, timestamps[i]));
+                                count++;
+                            }
+                        }
+                    }
+                    else if (sortType == "size")
+                    {
+                        var temp = JSON.parse(JSON.stringify(messageList));
+                        for (var len = sizes.length; i < len; i++)
+                        {
+                            if (count >= settings.mNum)
+                                break;
+                            for (var user in temp)
+                            {
+                                for (var time in temp[user])
+                                {   
+                                    if (temp[user][time]["size"] == sizes[i])
+                                    {
+                                        if (count >= settings.mNum)
+                                            break;
+                                        frag.appendChild(buildItem(user, time));
+                                        delete temp[user][time];
+                                        count++;
+                                    }
                                 }
                             }
-                        }   
+                        }
                     }
-                }
-                hf.elCN("message-list")[0].appendChild(frag);
+                    else if (sortType == "user")
+                    {
+                        for (var len = users.length; i < len; i++)
+                        {
+                            if (count >= settings.mNum)
+                                break;
+                            for (var u in messageList)
+                            {
+                                for (var t in messageList[u])
+                                {
+                                    if (messageList[u][t] == users[i])
+                                    {
+                                        if (count >= settings.mNum)
+                                            break;
+                                        frag.appendChild(buildItem(u, t));
+                                        count++;
+                                    }
+                                }
+                            }   
+                        }
+                    }
+                    hf.elCN("message-list")[0].appendChild(frag);
 
-                var maxPages = (Math.ceil(timestamps.length / settings.mNum));
-                hf.elCN("message-list-pagenum-input")[0].value = currentPage + 1;
-                hf.elCN("message-list-pagenum-input")[0].setAttribute("max", maxPages);
-                hf.elCN("message-list-pagenum-total")[0].innerHTML = "of " + maxPages;
-                pagenumInputChange();
+                    var maxPages = (Math.ceil(timestamps.length / settings.mNum));
+                    hf.elCN("message-list-pagenum-input")[0].value = currentPage + 1;
+                    hf.elCN("message-list-pagenum-input")[0].setAttribute("max", maxPages);
+                    hf.elCN("message-list-pagenum-total")[0].innerHTML = "of " + maxPages;
+                    pagenumInputChange();
 
-                if (currentPage == 0)
-                    hf.elCN("prev")[0].style.visibility = "hidden";
-                else
-                    hf.elCN("prev")[0].style.visibility = "visible";
-                if (currentPage == Math.ceil(timestamps.length / settings.mNum)-1)
-                    hf.elCN("next")[0].style.visibility = "hidden";
-                else
-                    hf.elCN("next")[0].style.visibility = "visible";
+                    if (currentPage == 0)
+                        hf.elCN("prev")[0].style.visibility = "hidden";
+                    else
+                        hf.elCN("prev")[0].style.visibility = "visible";
+                    if (currentPage == Math.ceil(timestamps.length / settings.mNum)-1)
+                        hf.elCN("next")[0].style.visibility = "hidden";
+                    else
+                        hf.elCN("next")[0].style.visibility = "visible";
+                });
+            }
 
-            });
         },
         viewMessage = function(u,t)
         {
@@ -1024,6 +1087,21 @@ var APP = (function()
                 }
                 messageView.init(res);                
             });
+        },
+        showHideNested = function(target)
+        {
+            var
+            messages = Array.prototype.slice.call(target.children, 3),
+            display;
+            if (messages[0].style.display == "block")
+                display = "none";
+            else
+                display = "block";
+
+            for (var mes in messages)
+            {
+                messages[mes].style.display = display;
+            }
         },
         checkboxClick = function(e)
         {
@@ -1103,9 +1181,10 @@ var APP = (function()
             {
                 if (checkboxes[i].checked)
                 {
+                    console.log(checkboxes[i]);
                     var
-                    user = checkboxes[i].parentNode.children[2].dataset.username,
-                    timestamp = checkboxes[i].parentNode.children[4].dataset.timestamp;
+                    user = checkboxes[i].parentNode.parentNode.children[2].dataset.username,
+                    timestamp = checkboxes[i].parentNode.parentNode.children[4].dataset.timestamp;
                     
                     // console.log(user, timestamp);
                     deleteMessages.push(newMessageList[user][timestamp]["id"]);
@@ -1148,7 +1227,25 @@ var APP = (function()
                 {
                     error.init(messageList.message, 5);
                 }
-                sortMessageListTimestamp();
+                else
+                {
+                    nestedSort = [];
+                    for (var user in messageList)
+                    {
+                        (function(u)
+                        {
+                            var temp = {};
+                            temp = {
+                                user: u,
+                                last: Object.keys(messageList[u])[Object.keys(messageList[u]).length-1],
+                                len: Object.keys(messageList[u]).length
+                            }
+                            nestedSort.push(temp);
+                        })(user);
+                    }
+                    sortMessageListTimestamp();
+                    sortNestedTime();
+                }
                 buildList();
             });
         },
@@ -1221,6 +1318,52 @@ var APP = (function()
             timeSorting = true;
             sizeSorting = true;
             sortType = "user";
+        },
+        sortNestedUser = function()
+        {
+            nestedSort.sort(function(a, b)
+            {
+                var 
+                nameA = a.user.toLowerCase(),
+                nameB = b.user.toLowerCase();
+                return (nameA < nameB) ? -1 : (nameA > nameB) ? 1 : 0; 
+            });
+            if (!userSorting)
+                nestedSort.reverse();
+
+            userSorting = !userSorting;
+            timeSorting = true;
+            sizeSorting = true;
+            sortType = "user";
+        },
+        sortNestedTime = function()
+        {
+            nestedSort.sort(function(a, b)
+            {
+                return a.last - b.last;
+            })
+            if (!timeSorting)
+                nestedSort.reverse();
+
+            timeSorting = !timeSorting;
+            userSorting = true;
+            sizeSorting = true;
+            sortType = "time";
+        },
+        sortNestedNum = function()
+        {
+            nestedSort.sort(function(a, b)
+            {
+                return a.len - b.len; 
+            });
+
+            if (numSorting)
+                nestedSort.reverse();
+
+            numSorting = !numSorting;
+            userSorting = true;
+            sizeSorting = true;
+            sortType = "time";
         },
         turnPage = function(dir)
         {
@@ -1298,6 +1441,10 @@ var APP = (function()
                         navigation.stateChange("viewMessage");
                         viewMessage(user, time);
                     }
+                    else if (target = hf.rTarget(e, "usr"))
+                    {
+                        showHideNested(target);
+                    }
                     else if (hf.cN(e, "refresh-messages-button"))
                     {
                         clearTimeout(getListTimeout);
@@ -1335,6 +1482,21 @@ var APP = (function()
                     else if (hf.cN(e, "message-list-size"))
                     {
                         sortMessageListSize();
+                        buildList();
+                    }
+                    else if (hf.cN(e, "message-list-nummessages"))
+                    {
+                        sortNestedNum();
+                        buildList();
+                    }
+                    else if (hf.cN(e, "message-list-nestedusername"))
+                    {
+                        sortNestedUser();
+                        buildList();
+                    }
+                    else if (hf.cN(e, "message-list-lastmessage"))
+                    {
+                        sortNestedTime();
                         buildList();
                     }
                     else if (hf.cN(e, "prev"))
@@ -1376,12 +1538,15 @@ var APP = (function()
                 avatar = hf.elCN("avatar-container")[0].children[0],
                 username = hf.elCN("settings-username")[0],
                 displayname = hf.elCN("settings-displayname")[0],
+                nestedCheck = hf.elCN("nestedCheckbox")[0],
                 messageNum = hf.elCN("mPerPage")[0];
 
                 avatar.style.backgroundImage = "url(" + settings.avatar + ")";
                 username.innerHTML = settings.user;
                 displayname.value = settings.displayName;
+                nestedCheck.checked = settings.nested;
                 messageNum.value = settings.mNum;
+                nestChange();
                 mPerPageChange();
                 displayName();
             })
@@ -1402,6 +1567,11 @@ var APP = (function()
                     }
                     settings.mNum = r["mPerPage"];
                     settings.displayName = r["displayName"];
+                    if (r["nested"] == "true")
+                        settings.nested = true;
+                    else
+                        settings.nested = false;
+
                     navigation.init();
 
                 });
@@ -1510,15 +1680,20 @@ var APP = (function()
         {
             var
             numInput = hf.elCN("mPerPage")[0],
+            nestedCheck = hf.elCN("nestedCheckbox")[0],
             displayNameInput = hf.elCN("settings-displayname")[0];
 
             var fd = new FormData();
             // console.log(displayNameInput.value);
 
+            console.log(nestedCheck.checked);
+
             fd.append("mPerPage", numInput.value);
             fd.append("displayName", displayNameInput.value);
+            fd.append("nested", nestedCheck.checked);
 
             settings.displayName = displayNameInput.value;
+            settings.nested = nestedCheck.checked;
             settings.mNum = numInput.value;
 
             hf.ajax("POST", fd, "phpSrc/updateSettings.php", function(res)
@@ -1530,6 +1705,13 @@ var APP = (function()
                 }
             });
         },
+        nestChange = function()
+        {
+            hf.elCN("nestedCheckbox")[0].onchange = function()
+            {
+                updateSettings();
+            }
+        },  
         mPerPageChange = function()
         {
             hf.elCN("mPerPage")[0].onchange = function()
@@ -1551,6 +1733,7 @@ var APP = (function()
             user: "",
             displayName: "",
             avatar: "",
+            nested: false,
             mNum: 10,
             init: function()
             {

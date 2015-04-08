@@ -216,9 +216,11 @@
                 font-size:1em;
                 height:40px;
                 line-height: 40px;
-                .message-list-heading-checkbox{
-                    margin-left:15px;
-                    width:1em;
+                .check-container{
+                    .message-list-heading-checkbox{
+                        // margin-left:15px;
+                        width:1em;
+                    }
                 }
                 .message-list-size{
                     &:hover{
@@ -240,9 +242,11 @@
             .message-list{
                 font-size:1em;
                 .message{
-                    .message-checkbox{
-                        margin-left:15px;
-                        width:1em;
+                    .check-container{
+                        .message-checkbox{
+                            // margin-left:15px;
+                            width:1em;
+                        }
                     }
                     .message-size{
                     }
@@ -368,8 +372,10 @@
             .message-list-heading{
                 height:50px;
                 line-height: 50px;
-                .message-list-heading-checkbox{
-                    margin-left:25px;
+                .check-container{
+                    .message-list-heading-checkbox{
+                        // margin-left:25px;
+                    }
                 }
                 .message-list-size{
                     &:hover{
@@ -390,9 +396,11 @@
             }
             .message-list{
                 .message{
-                    .message-checkbox{
-                        margin-left:25px;
+                    .check-container{
+                        .message-checkbox{
+                            // margin-left:25px;
 
+                        }
                     }
                     .message-size{
                     }

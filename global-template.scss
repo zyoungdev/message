@@ -155,7 +155,10 @@ input[type="checkbox"]{
             margin-right:1.66666%;
             border:none;
         }
-        
+        .refresh-messages-button{
+            margin-left:1.66666%;
+            margin-right:1.66666%;
+        }
         .find-message-input{
             @extend %a-50;
             @extend %a-null-null;
@@ -188,13 +191,13 @@ input[type="checkbox"]{
         background-color: $charcoal;
         color:$ivory;
         font-size:.7em;
-        .message-list-heading-checkbox{
-            @extend %a-cent-null;
-            @extend %a-fl-L;
-            width:1.3em;
-            margin-left:10px;
-            border-radius: 0;
-            // display:none;
+        
+        .check-container{
+            @extend %a-10;
+            .message-list-heading-checkbox{
+                width:1.3em;
+                border-radius: 0;
+            }
         }
         .message-list-size{
             @extend %a-15;
@@ -230,6 +233,30 @@ input[type="checkbox"]{
                 color:$highlight;
             }
         }
+        .message-list-nummessages{
+            @extend %a-33;
+            text-align:center;
+            cursor:pointer;
+            &:hover{
+                color:$highlight;
+            }
+        }
+        .message-list-nestedusername{
+            @extend %a-33;
+            text-align:center;
+            cursor:pointer;
+            &:hover{
+                color:$highlight;
+            }
+        }
+        .message-list-lastmessage{
+            @extend %a-33;
+            text-align:center;
+            cursor:pointer;
+            &:hover{
+                color:$highlight;
+            }
+        }
     }
     .message-list{
         @extend %a-100;
@@ -247,14 +274,12 @@ input[type="checkbox"]{
             &:hover{
                 background-color: $highlight;
             }
-
-            .message-checkbox{
-                @extend %ellipsis;
-                @extend %a-cent-null;
-                @extend %a-fl-L;
-                width:1.3em;
-                margin-left:10px;
-                border-radius: 0;
+            .check-container{
+                @extend %a-10;
+                .message-checkbox{
+                    width:1.3em;
+                    border-radius: 0;
+                }
             }
             .message-size{
                 @extend %ellipsis;
@@ -285,6 +310,48 @@ input[type="checkbox"]{
                 // @extend %a-15;
                 // @extend %a-cent-null;
                 // height:30px;
+            }
+        }
+        .usr{
+            @extend %a-100;
+            @extend %a-null-cent;
+            // height:50px;
+            // line-height:50px;
+            border-bottom:solid 1px $ivory;
+            cursor:pointer;
+
+            &:hover{
+                background-color: $highlight;
+            }
+            .num-messages{
+                @extend %a-33;
+                @extend %ellipsis;
+                height:50px;
+                line-height:50px;
+                text-align:center;
+            }
+            .username{
+                @extend %a-33;
+                @extend %ellipsis;
+                height:50px;
+                line-height:50px;
+                text-align:center;
+            }
+            .last-message{
+                @extend %a-33;
+                @extend %ellipsis;
+                height:50px;
+                line-height:50px;
+                text-align:center;
+            }
+            .message{
+                display:none;
+                background-color: $ivory / 1.025;
+                border-bottom: none;
+                border-top: solid 1px $ivory / 1.1;
+                &:hover{
+                    background-color: $highlight;
+                }
             }
         }
     }
