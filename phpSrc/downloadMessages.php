@@ -1,4 +1,5 @@
 <?php 
+include_once("globals.php");
 include "./helper.php";
 
 class DownloadMessages{
@@ -37,7 +38,7 @@ class DownloadMessages{
     }
     public function getIDS()
     {
-        logThis($this->messages);
+        // logThis($this->messages);
     }
     public function decryptMessages()
     {

@@ -1,4 +1,5 @@
 <?php
+include_once("globals.php");
 include "./helper.php";
 
 class ListMessages{

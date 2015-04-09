@@ -1,4 +1,5 @@
 <?php 
+include_once("globals.php");
 include "./helper.php";
 /* Stored */
 //user
@@ -26,7 +27,6 @@ class Login{
     // public $clean = array();
     // public $dirty = array();
     // public $mongo = array();
-    public $challenge = "This is the challenge";
     public $protectedUN = array("admin", "administrator", "root");
 
     public function __construct()
@@ -149,6 +149,8 @@ class Login{
     }
     public function encryptChallenge()
     {
+        global $challenge;
+
         /*
             Hard code encrypt $this->challenge. Secure? Must be a known value
             We use this so we can encrypt a value in the database without using the secret
@@ -156,7 +158,7 @@ class Login{
             The adversary can't derive the secret, only the [user][key][challengeKey]
             This is also easier to quickly check that we are the same user without using a password
         */
-        $_SESSION["user"]["key"]["challenge"] = Sodium::crypto_secretbox($this->challenge, 
+        $_SESSION["user"]["key"]["challenge"] = Sodium::crypto_secretbox($challenge, 
            hex2bin( $_SESSION["user"]["key"]["nonce"]), hex2bin($_SESSION["user"]["key"]["challengeKey"]));
         $_SESSION["user"]["key"]["challenge"] = bin2hex($_SESSION["user"]["key"]["challenge"]);
     }
@@ -181,7 +183,6 @@ class Login{
         $update = array('$set' => array("lastLogin" => $date->getTimestamp()));
 
         $this->mongo["userspublic"]->update($query, $update);
-        logThis($_SESSION);
     }
     public function createNewUser()
     {
@@ -198,7 +199,8 @@ class Login{
             ),
             'settings' => array(
                 'mPerPage' => 10,
-                'displayName' => "Anonymous"
+                'displayName' => "Anonymous",
+                'nested' => true
             )
         );
         $newuser = array('username' => $this->clean["un"],
@@ -242,7 +244,6 @@ class Login{
 
         if ($res = $this->mongo["usersprivate"]->update($query, $pripro))
         {
-            logThis($res);
             if ($this->mongo["userspublic"]->update($query, $pubpro))
             {
                 $this->mongo["usersprivate"]->update($query, array('$set' => array("messages" => new stdClass())));

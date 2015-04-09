@@ -1,11 +1,11 @@
 <?php 
+include_once("globals.php");
 include "./helper.php";
 
 class ChangeAvatar{
     public function __construct()
     {
         session_start();
-        logThis($_SESSION);
 
         $this->mongo = openDB();
 

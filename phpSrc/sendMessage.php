@@ -1,10 +1,12 @@
 <?php 
+include_once("globals.php");
 include "./helper.php";
 
 class SendMessage{
     public $clean = array();
     public $message = array();
     public $recipient;
+    public $sum = 0;
 
     public function __construct()
     {
@@ -81,11 +83,31 @@ class SendMessage{
 
         $this->mongo["usersprivate"]->update($query, $update);
     }
+    public function checkRecipientAllowance()
+    {
+        global $maxAllowance;
+        $q = array("username" => $this->message["recipient"]["username"]);
+        $p = array('_id' => 0, 'messages' => 1);
+
+        $ret = $this->mongo["usersprivate"]->findone($q, $p);
+        $this->sum = 0;
+        if (isset($ret["messages"]))
+        {
+            foreach ($ret["messages"] as $user => $userval) {
+                foreach ($ret["messages"][$user] as $time => $timeval) {
+                    $this->sum += $ret["messages"][$user][$time]["size"];
+                }
+            }
+        }
+        if ($this->sum + $_POST["messageSize"] > $maxAllowance)
+            return 0;
+        else
+            return 1;
+    }
     public function send()
     {
         date_default_timezone_set('America/Los_Angeles');
         $date = new DateTime('NOW');
-        logThis($_SESSION);
 
         $map["timestamp"] = $date->getTimestamp();
         $map["sender"]["username"] = $_SESSION["user"]["username"];
@@ -158,9 +180,14 @@ function sendMessage()
     $send->escapePlaintext();
     $send->encryptPlaintext();
     $send->addContact();
+
+    if (!$send->checkRecipientAllowance())
+    {
+        $return->exitNow(0, "The recipient is out of storage space.");
+    }
     if (!$send->send())
     {
-        $return->exitNow(0, "Cloud not send the message\n");
+        $return->exitNow(0, "Could not send the message\n");
     }
     $return->exitNow(1, "Message successfully sent!");
 }

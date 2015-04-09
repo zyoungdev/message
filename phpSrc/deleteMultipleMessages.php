@@ -1,4 +1,5 @@
 <?php 
+include_once("globals.php");
 include "./helper.php";
 
 class DeleteMultipleMessages{
@@ -34,7 +35,6 @@ class DeleteMultipleMessages{
 
         $ids = json_decode($_POST["deleteMessages"]);
         
-        logThis($ids);
         if ($this->mongo["messages"]->remove(array("id" => array('$in' => $ids))))
         {
             if ($this->mongo["usersprivate"]->update($query, $projection))

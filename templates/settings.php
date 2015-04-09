@@ -5,10 +5,11 @@
 <h1>
     <div class="settings-username"></div>
 </h1>
+<h2 class="settings-allowance"></h2>
 <input type="text" class="settings-displayname" placeholder="Display Name">
-<!-- <input type="text" class="settings-display-name"> -->
+
+
 <h2>Change Password</h2>
-<!-- <input type="password" class="settings-oldpw" placeholder="Old Password"> -->
 <input type="password" class="settings-newpw" placeholder="New Password">
 <input type="password" class="settings-newpw-double" placeholder="Type New Password Again">
 <div class="button-container">

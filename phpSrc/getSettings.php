@@ -1,4 +1,5 @@
 <?php 
+include_once("globals.php");
 include "./helper.php";
 
 
@@ -20,11 +21,28 @@ class GetSettings{
     }
     public function getSettings()
     {
-        $query = array("username" => $_SESSION["user"]["username"]);
+        $q = array("username" => $_SESSION["user"]["username"]);
+        $p = array('_id' => 0, 'messages' => 1);
 
-        if ($res = $this->mongo["usersprivate"]->findone($query))
-            echo json_encode($res["settings"]);
+        $this->settings = $this->mongo["usersprivate"]->findone($q)["settings"];
+        $ret = $this->mongo["usersprivate"]->findone($q, $p);
 
+        if (isset($ret["messages"]))
+        {
+            $this->settings["allowance"] = 0;
+            foreach ($ret["messages"] as $user => $userval) {
+                foreach ($ret["messages"][$user] as $time => $timeval) {
+                    $this->settings["allowance"] += $ret["messages"][$user][$time]["size"];
+                }
+            }
+        }
+        else
+        {
+            $this->settings["allowance"] = 0;
+        }
+
+
+        echo json_encode($this->settings);
     }
 }
 

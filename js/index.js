@@ -1181,7 +1181,6 @@ var APP = (function()
             {
                 if (checkboxes[i].checked)
                 {
-                    console.log(checkboxes[i]);
                     var
                     user = checkboxes[i].parentNode.parentNode.children[2].dataset.username,
                     timestamp = checkboxes[i].parentNode.parentNode.children[4].dataset.timestamp;
@@ -1537,12 +1536,17 @@ var APP = (function()
                 var
                 avatar = hf.elCN("avatar-container")[0].children[0],
                 username = hf.elCN("settings-username")[0],
+                allowance = hf.elCN("settings-allowance")[0],
                 displayname = hf.elCN("settings-displayname")[0],
                 nestedCheck = hf.elCN("nestedCheckbox")[0],
                 messageNum = hf.elCN("mPerPage")[0];
 
                 avatar.style.backgroundImage = "url(" + settings.avatar + ")";
                 username.innerHTML = settings.user;
+
+
+
+                allowance.innerHTML = (settings.allowance/1000000000 * 100).toPrecision(2) + "% of 1GB";
                 displayname.value = settings.displayName;
                 nestedCheck.checked = settings.nested;
                 messageNum.value = settings.mNum;
@@ -1551,7 +1555,7 @@ var APP = (function()
                 displayName();
             })
         },
-        getSettings = function()
+        getSettings = function(callback)
         {
             var avFD = new FormData();
             avFD.append("user", settings.user);
@@ -1567,13 +1571,13 @@ var APP = (function()
                     }
                     settings.mNum = r["mPerPage"];
                     settings.displayName = r["displayName"];
+                    settings.allowance = r["allowance"];
                     if (r["nested"] == "true")
                         settings.nested = true;
                     else
                         settings.nested = false;
 
-                    navigation.init();
-
+                    callback();                   
                 });
             });
         },
@@ -1686,8 +1690,6 @@ var APP = (function()
             var fd = new FormData();
             // console.log(displayNameInput.value);
 
-            console.log(nestedCheck.checked);
-
             fd.append("mPerPage", numInput.value);
             fd.append("displayName", displayNameInput.value);
             fd.append("nested", nestedCheck.checked);
@@ -1735,13 +1737,14 @@ var APP = (function()
             avatar: "",
             nested: false,
             mNum: 10,
+            allowance: 0,
             init: function()
             {
-                getTemplate();
+                getSettings(getTemplate);
             },
             getUserSettings: function()
             {
-                getSettings();
+                getSettings(navigation.init);
             },
             click: function(ev)
             {

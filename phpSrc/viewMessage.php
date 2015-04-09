@@ -1,4 +1,5 @@
 <?php
+include_once("globals.php");
 include "./helper.php";
 
 class ViewMessage{
@@ -31,7 +32,6 @@ class ViewMessage{
         if ($result = $this->mongo["usersprivate"]->findone($query, $projection))
         {
             $this->message = $result["messages"]["$username"]["$timestamp"];
-            logThis($result);
 
             $id = $result["messages"]["$username"]["$timestamp"]["id"];
             $mQuery = array('id' => $id);
@@ -52,7 +52,6 @@ class ViewMessage{
         $ciphertext = hex2bin($this->message["ciphertext"]);
         $nonce = hex2bin($this->message["nonce"]);
 
-        logThis($this->message);
 
         if ($pt = Sodium::crypto_box_open($ciphertext,$nonce,$keypair))
         {

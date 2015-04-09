@@ -1,4 +1,7 @@
 <?php
+include_once("globals.php");
+
+
 function logThis($l)
 {
     file_put_contents("log", print_r($l, true));
@@ -79,8 +82,7 @@ function closeDB($db)
 
 function challengeIsDecrypted($db)
 {
-    $ptChallenge = "This is the challenge";
-
+    global $challenge;
     $query = array("username" => $_SESSION["user"]["username"]);
     $projection = array('_id' => 0, "key" => 1);
 
@@ -89,7 +91,7 @@ function challengeIsDecrypted($db)
     $plaintext = Sodium::crypto_secretbox_open(hex2bin($key["challenge"]),
        hex2bin($key["nonce"]), hex2bin($_SESSION["user"]["key"]["challengeKey"]));
 
-    if ($plaintext == $ptChallenge) return true;
+    if ($plaintext == $challenge) return true;
     else return false;
 }
 
