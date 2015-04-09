@@ -218,9 +218,8 @@ var APP = (function()
             {
                 contactList = JSON.parse(res);
                 if (contactList.code != null)
-                {
                     error.init(contactList.message, 5);
-                }
+
                 sorting = false;
                 sortContacts();
                 buildList();
@@ -1093,6 +1092,7 @@ var APP = (function()
             var
             messages = Array.prototype.slice.call(target.children, 3),
             display;
+
             if (messages[0].style.display == "block")
                 display = "none";
             else
@@ -1209,7 +1209,6 @@ var APP = (function()
                     messageList = backupMessageList;
                     error.init(res.message, 3);
                 }
-
 
                 delBut.style.display = "none";
                 sortType = "time";
@@ -1544,8 +1543,6 @@ var APP = (function()
                 avatar.style.backgroundImage = "url(" + settings.avatar + ")";
                 username.innerHTML = settings.user;
 
-
-
                 allowance.innerHTML = (settings.allowance/1000000000 * 100).toPrecision(2) + "% of 1GB";
                 displayname.value = settings.displayName;
                 nestedCheck.checked = settings.nested;
@@ -1558,24 +1555,26 @@ var APP = (function()
         getSettings = function(callback)
         {
             var avFD = new FormData();
-            avFD.append("user", settings.user);
-            hf.ajax("POST", avFD, "phpSrc/getAvatar.php", function(res)
+            hf.ajax("GET", null, "phpSrc/getSettings.php", function(r)
             {
-                settings.avatar = res;
-                hf.ajax("GET", null, "phpSrc/getSettings.php", function(r)
+                r = JSON.parse(r);
+
+                if (r.code != null)
+                    error.init(r.message, 3);
+
+                settings.user = r["user"];
+                settings.mNum = r["mPerPage"];
+                settings.displayName = r["displayName"];
+                settings.allowance = r["allowance"];
+
+                r["nested"] == "true" ? settings.nested = true : settings.nested = false;
+
+                avFD.append("user", settings.user);
+
+                hf.ajax("POST", avFD, "phpSrc/getAvatar.php", function(res)
                 {
-                    r = JSON.parse(r);
-                    if (r.code != null)
-                    {
-                        error.init(r.message, 3);
-                    }
-                    settings.mNum = r["mPerPage"];
-                    settings.displayName = r["displayName"];
-                    settings.allowance = r["allowance"];
-                    if (r["nested"] == "true")
-                        settings.nested = true;
-                    else
-                        settings.nested = false;
+                   
+                    settings.avatar = res;
 
                     callback();                   
                 });
@@ -1701,10 +1700,9 @@ var APP = (function()
             hf.ajax("POST", fd, "phpSrc/updateSettings.php", function(res)
             {
                 res = JSON.parse(res);
+
                 if (res.code != null)
-                {
                     error.init(res.message, 3);
-                }
             });
         },
         nestChange = function()
@@ -1989,8 +1987,6 @@ var APP = (function()
                     {
                         //Logged in!
                         error.init(r.message, 3);
-                        settings.user = un;
-
                         init();
                     }
                     else
@@ -2002,6 +1998,18 @@ var APP = (function()
             })
         }
         return{
+            checkSession:function()
+            {
+                hf.ajax("GET", null, "phpSrc/checkSession.php", function(res)
+                {
+                    res = JSON.parse(res)
+                    if (res.code == 1)
+                    {
+                        error.init(res.message, 3);
+                        init();
+                    }
+                })
+            },
             click: function(ev)
             {
                 var
@@ -2041,6 +2049,10 @@ var APP = (function()
         };
     })();
     return {
+        checkSession: function()
+        {
+            login.checkSession();
+        },
         clicked: function(ev)
         {
             switch (appState)
@@ -2083,12 +2095,15 @@ var APP = (function()
         },
         keypress: function(ev)
         {
-
             login.keypress(ev);
         }
     };
 })();
 
+window.onload = function()
+{
+    APP.checkSession();
+}
 window.onclick = function(ev)
 {
     APP.clicked(ev);

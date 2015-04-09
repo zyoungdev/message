@@ -27,6 +27,8 @@ class GetSettings{
         $this->settings = $this->mongo["usersprivate"]->findone($q)["settings"];
         $ret = $this->mongo["usersprivate"]->findone($q, $p);
 
+        $this->settings["user"] = $_SESSION["user"]["username"];
+
         if (isset($ret["messages"]))
         {
             $this->settings["allowance"] = 0;

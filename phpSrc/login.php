@@ -32,8 +32,8 @@ class Login{
     public function __construct()
     {
         session_start();
-        unset($_SESSION["user"]["key"]);
-        // logThis($_SESSION);
+        logThis($_SESSION);
+        unset($_SESSION["user"]);
         $this->mongo = openDB();
         $this->dirty["pw"] = $_POST["password"];
     }
@@ -272,6 +272,8 @@ class Login{
         if(isset($_SESSION["user"]["key"]["keypair"]))
             // echo "keypair";
             Sodium::sodium_memzero($_SESSION["user"]["key"]["keypair"]);
+
+        session_regenerate_id();
     }
 }
 
@@ -324,7 +326,7 @@ function logUserIn()
         }
 
         $login->cleanup();
-        $return->exitNow(1, "Welcome! " . $_SESSION["user"]["username"]);
+        $return->exitNow(1, "Welcome " . $_SESSION["user"]["username"] . "!");
     }
 }
 

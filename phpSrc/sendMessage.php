@@ -76,10 +76,12 @@ class SendMessage{
     public function addContact()
     {
         $user = $this->message["recipient"]["username"];
-        $d = array("displayName" => $this->mongo["usersprivate"]->findone(array("username" => $user))["settings"]["displayName"]);
+        $this->d = array("displayName" => $this->mongo["usersprivate"]->findone(array("username" => $user))["settings"]["displayName"]);
+
+        logThis($this->d);
 
         $query = array('username' => $_SESSION["user"]["username"]);
-        $update = array('$set' => array("contacts.$user" => $d));
+        $update = array('$set' => array("contacts.$user" => $this->d));
 
         $this->mongo["usersprivate"]->update($query, $update);
     }
@@ -111,7 +113,7 @@ class SendMessage{
 
         $map["timestamp"] = $date->getTimestamp();
         $map["sender"]["username"] = $_SESSION["user"]["username"];
-        $map["sender"]["displayName"] = $_SESSION["user"]["settings"]["displayName"];
+        $map["sender"]["displayName"] = $this->d["displayName"];
         $map["sender"]["public"] = $_SESSION["user"]["key"]["public"];
         $map["nonce"] = $this->message["nonce"];
         $map["size"] = $_POST["messageSize"];
