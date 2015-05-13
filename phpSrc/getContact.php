@@ -3,6 +3,7 @@ include_once("globals.php");
 include "./helper.php";
 
 class GetContact{
+    private $mongo;
     public function __construct()
     {
         session_start();
@@ -18,14 +19,14 @@ class GetContact{
     {
         closeDB($this->mongo["client"]);
     }
-    public function userIsClean()
+    private function userIsClean()
     {
         if (ctype_alnum($_POST["user"]))
             return true;
         else
             return false;
     }
-    public function userExists()
+    private function userExists()
     {
         $query = array("username" => $_POST["user"]);
 
@@ -40,29 +41,28 @@ class GetContact{
             return 0;
         }
     }
-    public function send()
+    private function send()
     {
         echo json_encode($this->user);
     }
-}
-
-function main()
-{
-    $get = new GetContact;
-    $ret = new Returning;
-
-    if (!$get->userIsClean())
+    public function main()
     {
-        $ret->exitNow(0, "The username is not clean");
+        $ret = new Returning;
+
+        if (!$this->userIsClean())
+        {
+            $ret->exitNow(0, "The username is not clean");
+        }
+        if (!$this->userExists())
+        {
+            $ret->exitNow(0, "The user does not exist.");
+        }
+        $this->send();
     }
-    if (!$get->userExists())
-    {
-        $ret->exitNow(0, "The user does not exist.");
-    }
-    $get->send();
 }
+$get = new GetContact;
 
 if (isset($_POST["user"]))
-    main();
+    $get->main();
 
 ?>

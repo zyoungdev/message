@@ -3,6 +3,7 @@ include_once("globals.php");
 include "./helper.php";
 
 class GetAvatar{
+    private $mongo;
     public function __construct()
     {
         session_start();
@@ -13,7 +14,7 @@ class GetAvatar{
         closeDB($this->mongo["client"]);
 
     }
-    public function userIsClean()
+    private function userIsClean()
     {
         $length = mb_strlen($_POST["user"]);
         if (ctype_alnum($_POST["user"]) && $length <= 64)
@@ -21,30 +22,30 @@ class GetAvatar{
         else
             return false;
     }
-    public function getAvatar()
+    private function getAvatar()
     {
         $query = array("username" => $_POST["user"]);
         $res = $this->mongo["userspublic"]->findone($query)["avatar"];
 
         echo $res;
     }
+    public function main()
+    {
+        $ret = new Returning;
+
+        // if ($av->userIsClean())
+        // {
+        //     $ret->exitNow(0, "User is not clean");
+        // }
+        $this->getAvatar();
+    }
 }
 
-function main()
-{
-    $av = new GetAvatar;
-    $ret = new Returning;
-
-    // if ($av->userIsClean())
-    // {
-    //     $ret->exitNow(0, "User is not clean");
-    // }
-    $av->getAvatar();
-}
+$av = new GetAvatar;
 
 if ($_POST["user"])
 {
-    main();
+    $av->main();
 }
 
 ?>

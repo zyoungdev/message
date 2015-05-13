@@ -3,6 +3,7 @@ include_once("globals.php");
 include "./helper.php";
 
 class DeleteMessage{
+    private $mongo;
     public function __construct()
     {
         session_start();
@@ -19,7 +20,7 @@ class DeleteMessage{
         session_write_close();
         closeDB($this->mongo["client"]);
     }
-    public function isClean()
+    private function isClean()
     {
         $pattern = "/[0-9]/";
 
@@ -28,7 +29,7 @@ class DeleteMessage{
         else
             return 0;
     }
-    public function deleteMessage()
+    private function deleteMessage()
     {
         $message = $_POST["timestamp"];
         $user = $_POST["username"];
@@ -49,29 +50,27 @@ class DeleteMessage{
             return 0;
         }
     }
+    public function main()
+    {
+        $return = new Returning;
+
+        if (!$this->isClean())
+        {
+            $return->exitNow(0, "Not a timestamp\n");
+        }
+        if (!$this->deleteMessage())
+        {
+            $return->exitNow(0, "Could not delete message\n");
+        }
+        echo "We made it!\n";
+    }
 }
 
-
-function main()
-{
-    $del = new DeleteMessage;
-    $return = new Returning;
-
-    if (!$del->isClean())
-    {
-        $return->exitNow(0, "Not a timestamp\n");
-    }
-    if (!$del->deleteMessage())
-    {
-        $return->exitNow(0, "Could not delete message\n");
-    }
-    echo "We made it!\n";
-
-}
+$del = new DeleteMessage;
 
 if ($_POST["timestamp"] && $_POST["username"])
 {
-    main();
+    $del->main();
 }
 
 ?>

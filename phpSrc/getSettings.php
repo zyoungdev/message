@@ -4,6 +4,7 @@ include "./helper.php";
 
 
 class GetSettings{
+    private $mongo;
     public function __construct()
     {
         session_start();
@@ -19,7 +20,7 @@ class GetSettings{
     {
         closeDB($this->mongo["client"]);
     }
-    public function getSettings()
+    private function getSettings()
     {
         $q = array("username" => $_SESSION["user"]["username"]);
         $p = array('_id' => 0, 'messages' => 1);
@@ -46,16 +47,15 @@ class GetSettings{
 
         echo json_encode($this->settings);
     }
+    public function main()
+    {
+        $ret = new Returning;
+
+        $this->getSettings();
+    }
 }
 
-function main()
-{
-    $get = new GetSettings;
-    $ret = new Returning;
-
-    $get->getSettings();
-}
-
-main();
+$get = new GetSettings;
+$get->main();
 
 ?>

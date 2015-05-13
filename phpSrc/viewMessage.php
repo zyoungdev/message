@@ -3,8 +3,9 @@ include_once("globals.php");
 include "./helper.php";
 
 class ViewMessage{
-    public $message;
-    public $plaintext = array();
+    private $message;
+    private $plaintext = array();
+    private $mongo;
 
     public function __construct()
     {
@@ -22,7 +23,7 @@ class ViewMessage{
         // session_write_close();
         closeDB($this->mongo["client"]);
     }
-    public function getMessage()
+    private function getMessage()
     {
         $timestamp = $_POST["timestamp"];
         $username = $_POST["username"];
@@ -43,7 +44,7 @@ class ViewMessage{
             exit;
         }
     }
-    public function decryptMessage()
+    private function decryptMessage()
     {
         $keypair = Sodium::crypto_box_keypair_from_secretkey_and_publickey(
             hex2bin($_SESSION["user"]["key"]["secret"]), 
@@ -72,7 +73,7 @@ class ViewMessage{
             return 0;
         }
     }
-    public function returnMessage()
+    private function returnMessage()
     {
         echo json_encode($this->plaintext);
 
@@ -81,24 +82,24 @@ class ViewMessage{
         unset($this->plaintext);
         unset($this->message);
     }
-}
-
-function main()
-{
-    $view = new ViewMessage;
-    $ret = new Returning;
-
-    $view->getMessage();
-    if (!$view->decryptmessage())
+    public function main()
     {
-        $ret->exitNow(0, "Could not decrypt message\n");
+        $ret = new Returning;
+
+        $this->getMessage();
+        if (!$this->decryptmessage())
+        {
+            $ret->exitNow(0, "Could not decrypt message\n");
+        }
+        $this->returnMessage();
     }
-    $view->returnMessage();
 }
+
+$view = new ViewMessage;
 
 if ($_POST["username"] && $_POST["timestamp"])
 {
-    main();
+    $view->main();
 }
 
 ?>

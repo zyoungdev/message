@@ -3,6 +3,7 @@ include_once("globals.php");
 include "./helper.php";
 
 class DeleteMultipleMessages{
+    private $mongo;
     public function __construct()
     {
         session_start();
@@ -18,7 +19,7 @@ class DeleteMultipleMessages{
     {
         closeDB($this->mongo["client"]);
     }
-    public function messagesAreClean()
+    private function messagesAreClean()
     {
         foreach ($_POST as $key => $value) {
             if (!ctype_alnum($key))
@@ -26,7 +27,7 @@ class DeleteMultipleMessages{
         }
         return 1;
     }
-    public function updateMessages()
+    private function updateMessages()
     {
         $messages = json_decode($_POST["messages"]);
 
@@ -51,27 +52,27 @@ class DeleteMultipleMessages{
             return 0;
         }
     }
+    public function main()
+    {
+        $ret = new Returning;
+
+        if (!$this->messagesAreClean())
+        {
+            $ret->exitNow(0, "Messages aren't clean");
+        }
+        if (!$this->updateMessages())
+        {
+            $ret->exitNow(0, "Could not delete Messages");
+        }
+        $ret->exitNow(1, "Messages Removed Successfully");
+    }
 }
 
-function main()
-{
-    $del = new DeleteMultipleMessages;
-    $ret = new Returning;
-
-    if (!$del->messagesAreClean())
-    {
-        $ret->exitNow(0, "Messages aren't clean");
-    }
-    if (!$del->updateMessages())
-    {
-        $ret->exitNow(0, "Could not delete Messages");
-    }
-    $ret->exitNow(1, "Messages Removed Successfully");
-}
+$del = new DeleteMultipleMessages;
 
 if ($_POST["messages"] && $_POST["deleteMessages"])
 {
-    main();
+    $del->main();
 }
 
 ?>

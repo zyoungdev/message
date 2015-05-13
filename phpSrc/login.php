@@ -20,20 +20,17 @@ include "./helper.php";
         //secret
         //public
 
-
-
-
 class Login{
     // public $clean = array();
     // public $dirty = array();
     // public $mongo = array();
-    public $protectedUN = array("admin", "administrator", "root");
+    private $protectedUN = array("admin", "administrator", "root");
+    private $mongo;
+    private $dirty;
 
     public function __construct()
     {
         session_start();
-        logThis($_SESSION);
-        unset($_SESSION["user"]);
         $this->mongo = openDB();
         $this->dirty["pw"] = $_POST["password"];
     }
@@ -42,7 +39,15 @@ class Login{
         // session_write_close();
         closeDB($this->mongo["client"]);
     }
-    public function usernameIsClean()
+    private function checkLogin()
+    {
+        if (!challengeIsDecrypted($this->mongo))
+        {
+            $ret = new Returning;
+            $ret->exitNow(-1, "Challenge could not be decrypted");
+        }
+    }
+    private function usernameIsClean()
     {
         $length = mb_strlen($_POST["username"]);
         if (ctype_alnum($_POST["username"]) && $length <= 64)
@@ -55,7 +60,7 @@ class Login{
             return false;
         }
     }
-    public function userExists()
+    private function userExists()
     {
         //check DB if username exists
         foreach ($this->protectedUN as $key => $value) {
@@ -79,7 +84,7 @@ class Login{
             return 0;
         }
     }
-    public function passwordIsCorrect()
+    private function passwordIsCorrect()
     {
         if (Sodium::crypto_pwhash_scryptsalsa208sha256_str_verify(hex2bin($_SESSION["user"]["key"]["hashedPW"]), $this->dirty["pw"]))
         {
@@ -101,7 +106,7 @@ class Login{
             return 0;
         }
     }
-    public function hashPW()
+    private function hashPW()
     {
         $_SESSION["user"]["key"]["hashedPW"] = Sodium::crypto_pwhash_scryptsalsa208sha256_str(
             $this->dirty["pw"], Sodium::CRYPTO_PWHASH_SCRYPTSALSA208SHA256_OPSLIMIT_INTERACTIVE,
@@ -109,19 +114,19 @@ class Login{
 
         $_SESSION["user"]["key"]["hashedPW"] = bin2hex($_SESSION["user"]["key"]["hashedPW"]);
     }
-    public function createSaltNonce()
+    private function createSaltNonce()
     {
         $_SESSION["user"]["key"]["salt"] = Sodium::randombytes_buf(Sodium::CRYPTO_PWHASH_SCRYPTSALSA208SHA256_SALTBYTES);
         $_SESSION["user"]["key"]["salt"] = bin2hex($_SESSION["user"]["key"]["salt"]);
         $_SESSION["user"]["key"]["nonce"] = Sodium::randombytes_buf(Sodium::CRYPTO_SECRETBOX_NONCEBYTES);
         $_SESSION["user"]["key"]["nonce"] = bin2hex($_SESSION["user"]["key"]["nonce"]);
     }
-    public function getSalt()
+    private function getSalt()
     {
         $_SESSION["user"]["key"]["salt"] = $_SESSION["user"]["key"]["salt"];
         $_SESSION["user"]["key"]["nonce"] = $_SESSION["user"]["key"]["nonce"];
     }
-    public function createMasterKeys()
+    private function createMasterKeys()
     {
         $keypairLength = Sodium::CRYPTO_BOX_SECRETKEYBYTES;
         $challengeSecretLength = Sodium::CRYPTO_SECRETBOX_KEYBYTES;
@@ -142,12 +147,12 @@ class Login{
 
         $_SESSION["user"]["key"]["challengeKey"] = bin2hex($_SESSION["user"]["key"]["challengeKey"]);
     }
-    public function createSigningKeys()
+    private function createSigningKeys()
     {
         $_SESSION["user"]["key"]["public"] = Sodium::crypto_box_publickey_from_secretkey(hex2bin($_SESSION["user"]["key"]["secret"]));
         $_SESSION["user"]["key"]["public"] = bin2hex($_SESSION["user"]["key"]["public"]);
     }
-    public function encryptChallenge()
+    private function encryptChallenge()
     {
         global $challenge;
 
@@ -162,7 +167,7 @@ class Login{
            hex2bin( $_SESSION["user"]["key"]["nonce"]), hex2bin($_SESSION["user"]["key"]["challengeKey"]));
         $_SESSION["user"]["key"]["challenge"] = bin2hex($_SESSION["user"]["key"]["challenge"]);
     }
-    public function decryptChallenge()
+    private function decryptChallenge()
     {
         if (!challengeIsDecrypted($this->mongo))
             return 0;
@@ -174,7 +179,7 @@ class Login{
         // if ($plaintext == $this->challenge) return true;
         // else return false;
     }
-    public function updateLoginTime()
+    private function updateLoginTime()
     {
         date_default_timezone_set('America/Los_Angeles');
         $date = new DateTime('NOW');
@@ -184,7 +189,7 @@ class Login{
 
         $this->mongo["userspublic"]->update($query, $update);
     }
-    public function createNewUser()
+    private function createNewUser()
     {
         date_default_timezone_set('America/Los_Angeles');
         $date = new DateTime('NOW');
@@ -226,7 +231,7 @@ class Login{
             return 0;
         }
     }
-    public function updatePassword()
+    private function updatePassword()
     {
         $query = array("username" => $_SESSION["user"]["username"]);
         $privateuser = array('key' => array(
@@ -255,7 +260,7 @@ class Login{
             return 0;
         }
     }
-    public function cleanup()
+    private function cleanup()
     {
         if(isset($_SESSION["user"]["key"]["hashedPW"]))
             // echo "hashedPW";
@@ -275,84 +280,81 @@ class Login{
 
         session_regenerate_id();
     }
+    public function logUserIn()
+    {
+        $return = new Returning;
+        unset($_SESSION["user"]);
+        if (!$this->usernameIsClean())
+        {
+            $return->exitNow(0, "Username can only contain letters and numbers. \n");
+        }
+
+        //check if user is in the DB
+        //if true then load up our user variables
+        if ($this->userExists())
+        {
+            // verify password
+            if (!$this->passwordIsCorrect())
+            {
+                $return->exitNow(0, "The password you provided is incorrect.\n");
+            }
+            $this->getSalt();
+            $this->createMasterKeys();
+            $this->createSigningKeys();
+            if (!challengeIsDecrypted($this->mongo))
+            {
+                $return->exitNow(-1, "Challenge could not be decrypted");
+            }
+            $this->updateLoginTime();
+            $this->cleanup();
+            $return->exitNow(1, "Welcome! " . $_SESSION["user"]["username"]);
+        }
+        else
+        {
+            // hash password
+            $this->hashPW();
+            $this->createSaltNonce();
+            $this->createMasterKeys();
+            $this->createSigningKeys();
+            $this->encryptChallenge();
+            if (!$this->createNewUser())
+            {
+                $return->exitNow(0, "The new user could not be created.\n");
+            }
+            if (!challengeIsDecrypted($this->mongo))
+            {
+                $return->exitNow(-1, "Challenge could not be decrypted");
+            }
+
+            $this->cleanup();
+            $return->exitNow(1, "Welcome " . $_SESSION["user"]["username"] . "!");
+        }
+    }
+    public function changePassword()
+    {
+        $return = new Returning;
+
+        $this->checkLogin();
+        $this->hashPW();
+        $this->createSaltNonce();
+        $this->createMasterKeys();
+        $this->createSigningKeys();
+        $this->encryptChallenge();
+        if (!$this->updatePassword())
+        {
+            $return->exitNow(0, "Unable to change password");
+        }
+        $return->exitNow(1, "Password has been updated.");
+    }
 }
 
-//accepts $_POST["username"] and $_POST["password"]
-function logUserIn()
-{
-    $login = new Login;
-    $return = new Returning;
-    if (!$login->usernameIsClean())
-    {
-        $return->exitNow(0, "Username can only contain letters and numbers. \n");
-    }
-
-    //check if user is in the DB
-    //if true then load up our user variables
-    if ($login->userExists())
-    {
-        // verify password
-        if (!$login->passwordIsCorrect())
-        {
-            $return->exitNow(0, "The password you provided is incorrect.\n");
-        }
-        $login->getSalt();
-        $login->createMasterKeys();
-        $login->createSigningKeys();
-        if (!challengeIsDecrypted($login->mongo))
-        {
-            $return->exitNow(-1, "Challenge could not be decrypted");
-        }
-        $login->updateLoginTime();
-        $login->cleanup();
-        $return->exitNow(1, "Welcome! " . $_SESSION["user"]["username"]);
-    }
-    else
-    {
-        
-        // hash password
-        $login->hashPW();
-        $login->createSaltNonce();
-        $login->createMasterKeys();
-        $login->createSigningKeys();
-        $login->encryptChallenge();
-        if (!$login->createNewUser())
-        {
-            $return->exitNow(0, "The new user could not be created.\n");
-        }
-        if (!challengeIsDecrypted($login->mongo))
-        {
-            $return->exitNow(-1, "Challenge could not be decrypted");
-        }
-
-        $login->cleanup();
-        $return->exitNow(1, "Welcome " . $_SESSION["user"]["username"] . "!");
-    }
-}
-
-function changePassword()
-{
-    $login = new Login;
-    $return = new Returning;
-
-    $login->hashPW();
-
-    $login->createSaltNonce();
-    $login->createMasterKeys();
-    $login->createSigningKeys();
-    $login->encryptChallenge();
-    if (!$login->updatePassword())
-    {
-        $return->exitNow(0, "Unable to change password");
-    }
-    $return->exitNow(1, "Password has been updated.");
-}
+$login = new Login;
 
 if (isset($_POST["username"]) && isset($_POST["password"]))
 {
-    logUserIn();
+    $login->logUserIn();
 }
 else if (isset($_POST["password"]) && isset($_POST["changepassword"]))
 {
-    changePassword();
+    $login->changePassword();
 }

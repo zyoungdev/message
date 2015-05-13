@@ -3,6 +3,7 @@ include_once("globals.php");
 include "./helper.php";
 
 class DeleteContact{
+    private $mongo;
     public function __construct()
     {
         session_start();
@@ -19,14 +20,14 @@ class DeleteContact{
         session_write_close();
         closeDB($this->mongo["client"]);
     }
-    public function isClean()
+    private function isClean()
     {
         if (ctype_alnum($_POST["username"]))
             return 1;
         else
             return 0;
     }
-    public function deleteContact()
+    private function deleteContact()
     {
         $user = $_POST["username"];
 
@@ -42,27 +43,28 @@ class DeleteContact{
             return 0;
         }
     }
+    public function main()
+    {
+        $return = new Returning;
+
+        if (!$this->isClean())
+        {
+            $return->exitNow(0, "The username you provided contains spaces or symbols. Username can only contain letters and numbers.\n");
+        }
+        if (!$this->deleteContact())
+        {
+            $return->exitNow(0, "The contact could not be deleted at this time.\n");
+        }
+        $return->exitNow(1, "Contact removed.");
+    }
 }
 
-function main()
-{
-    $del = new DeleteContact;
-    $return = new Returning;
+$del = new DeleteContact;
 
-    if (!$del->isClean())
-    {
-        $return->exitNow(0, "The username you provided contains spaces or symbols. Username can only contain letters and numbers.\n");
-    }
-    if (!$del->deleteContact())
-    {
-        $return->exitNow(0, "The contact could not be deleted at this time.\n");
-    }
-    $return->exitNow(1, "Contact removed.");
-}
 
 if ($_POST["username"])
 {
-    main();
+    $del->main();
 }
 
 ?>

@@ -3,7 +3,8 @@ include_once("globals.php");
 include "./helper.php";
 
 class UpdateSettings{
-    public $settings = array();
+    private $settings = array();
+    private $mongo;
     public function __construct()
     {
         session_start();
@@ -19,7 +20,7 @@ class UpdateSettings{
     {
         closeDB($this->mongo["client"]);
     }
-    public function setup()
+    private function setup()
     {
         if (isset($_POST["mPerPage"])) 
             $this->settings["mPerPage"] = (int) $_POST["mPerPage"];
@@ -39,7 +40,7 @@ class UpdateSettings{
 
         return 1;
     }
-    public function update()
+    private function update()
     {
         $_SESSION["settings"] = $this->settings;
         $query = array("username" => $_SESSION["user"]["username"]);
@@ -50,25 +51,24 @@ class UpdateSettings{
         else
             return 0;
     }
+    public function main()
+    {
+        $ret = new Returning;
+
+        if (!$this->setup())
+        {
+            $ret->exitNow(0, "Could not setup settings");
+        }
+        if (!$this->update())
+        {
+            $ret->exitNow(0, "Could not update settings");
+        }
+        $ret->exitNow(1, "Settings updated");
+    }
 }
 
-function main()
-{
-    $up = new UpdateSettings;
-    $ret = new Returning;
-
-    if (!$up->setup())
-    {
-        $ret->exitNow(0, "Could not setup settings");
-    }
-    if (!$up->update())
-    {
-        $ret->exitNow(0, "Could not update settings");
-    }
-    $ret->exitNow(1, "Settings updated");
-}
-
-main();
+$up = new UpdateSettings;
+$up->main();
 
 
 ?>

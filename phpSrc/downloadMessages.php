@@ -3,7 +3,8 @@ include_once("globals.php");
 include "./helper.php";
 
 class DownloadMessages{
-    public $messages;
+    private $messages;
+    private $mongo;
     public function __construct()
     {
         session_start();
@@ -19,7 +20,7 @@ class DownloadMessages{
     {
         closeDB($this->mongo["client"]);
     }
-    public function getMessages()
+    private function getMessages()
     {
         $query = array('username' => $_SESSION["user"]["username"]);
         $projection = array(
@@ -36,11 +37,11 @@ class DownloadMessages{
             return 0;
         }
     }
-    public function getIDS()
+    private function getIDS()
     {
         // logThis($this->messages);
     }
-    public function decryptMessages()
+    private function decryptMessages()
     {
         $mes = array();
         foreach ($this->messages as $usr => $usrval) {
@@ -68,25 +69,25 @@ class DownloadMessages{
             }            
         }
     }
-    public function returnData()
+    private function returnData()
     {
         echo json_encode($this->messages);
     }
-}
-
-function main()
-{
-    $down = new DownloadMessages;
-    $ret = new Returning;
-
-    if (!$down->getMessages())
+    public function main()
     {
-        $ret->exitNow(0, "Could not get messages");
+        $ret = new Returning;
+
+        if (!$this->getMessages())
+        {
+            $ret->exitNow(0, "Could not get messages");
+        }
+        // $this->getIDS();
+        $this->decryptMessages();
+        $this->returnData();
     }
-    // $down->getIDS();
-    $down->decryptMessages();
-    $down->returnData();
 }
 
-main();
+$down = new DownloadMessages;
+
+$down->main();
 ?>

@@ -3,6 +3,7 @@ include_once("globals.php");
 include "./helper.php";
 
 class DeleteMultipleContacts{
+    private $mongo;
     public function __construct()
     {
         session_start();
@@ -18,7 +19,7 @@ class DeleteMultipleContacts{
     {
         closeDB($this->mongo["client"]);
     }
-    public function contactsAreClean()
+    private function contactsAreClean()
     {
         foreach ($_POST as $key => $value) {
             if (!ctype_alnum($key))
@@ -26,7 +27,7 @@ class DeleteMultipleContacts{
         }
         return 1;
     }
-    public function updateContacts()
+    private function updateContacts()
     {
         $contacts = json_decode($_POST["contacts"]);
 
@@ -38,27 +39,27 @@ class DeleteMultipleContacts{
         else
             return 0;            
     }
+    public function main()
+    {
+        $ret = new Returning;
+
+        if (!$this->contactsAreClean())
+        {
+            $ret->exitNow(0, "The contacts your provided contain spaces or symbols. Usernames can only contain letters and numbers.");
+        }
+        if (!$this->updateContacts())
+        {
+            $ret->exitNow(0, "The contacts could not be deleted at this time.");
+        }
+        $ret->exitNow(1, "Contacts Removed Successfully");
+    }
 }
 
-function main()
-{
-    $del = new DeleteMultipleContacts;
-    $ret = new Returning;
-
-    if (!$del->contactsAreClean())
-    {
-        $ret->exitNow(0, "The contacts your provided contain spaces or symbols. Usernames can only contain letters and numbers.");
-    }
-    if (!$del->updateContacts())
-    {
-        $ret->exitNow(0, "The contacts could not be deleted at this time.");
-    }
-    $ret->exitNow(1, "Contacts Removed Successfully");
-}
+$del = new DeleteMultipleContacts;
 
 if ($_POST["contacts"])
 {
-    main();
+    $del->main();
 }
 
 ?>

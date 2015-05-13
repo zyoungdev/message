@@ -3,7 +3,8 @@ include_once("globals.php");
 include "./helper.php";
 
 class ListMessages{
-    public $messages;
+    private $messages;
+    private $mongo;
 
     public function __construct()
     {
@@ -21,7 +22,7 @@ class ListMessages{
         // session_write_close();
         closeDB($this->mongo["client"]);
     }
-    public function getMessages()
+    private function getMessages()
     {
         $query = array('username' => $_SESSION["user"]["username"]);
         $projection = array(
@@ -46,24 +47,23 @@ class ListMessages{
             return 0;
         }
     }
-    public function send()
+    private function send()
     {
         echo json_encode($this->messages);
     }
-}
-
-function main()
-{
-    $list = new ListMessages;
-    $return = new Returning;
-
-    if (!$list->getMessages())
+    public function main()
     {
-        $return->exitNow(0, "There are no messages to retrieve\n");
-    }
-    $list->send();
+        $return = new Returning;
 
+        if (!$this->getMessages())
+        {
+            $return->exitNow(0, "There are no messages to retrieve\n");
+        }
+        $this->send();
+
+    }
 }
-main();
+$list = new ListMessages;
+$list->main();
 
 ?>

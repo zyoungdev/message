@@ -3,6 +3,8 @@ include_once("globals.php");
 include "./helper.php";
 
 class ChangeAvatar{
+    private $mongo;
+    
     public function __construct()
     {
         session_start();
@@ -20,7 +22,7 @@ class ChangeAvatar{
         // session_write_close();
         closeDB($this->mongo["client"]);
     }
-    public function updateAvatar()
+    private function updateAvatar()
     {
         $image = $_POST["avatar"];
 
@@ -32,22 +34,22 @@ class ChangeAvatar{
         else
             return 0;
     }
-}
-
-function main()
-{
-    $change = new ChangeAvatar;
-    $ret = new Returning;
-
-    if (!$change->updateAvatar())
+    public function main()
     {
-        $ret->exitNow(0, "Could not change avatar");
+        $ret = new Returning;
+
+        if (!$this->updateAvatar())
+        {
+            $ret->exitNow(0, "Could not change avatar");
+        }
+        $ret->exitNow(1, "Avatar Changed");
     }
-    $ret->exitNow(1, "Avatar Changed");
 }
+
+$change = new ChangeAvatar;
 
 if ($_POST["avatar"])
 {
-    main();
+    $change->main();
 }
 ?>

@@ -3,7 +3,8 @@ include_once("globals.php");
 include "./helper.php";
 
 class ListContacts{
-    public $contacts;
+    private $contacts;
+    private $mongo;
 
     public function __construct()
     {
@@ -21,7 +22,7 @@ class ListContacts{
         // session_write_close();
         closeDB($this->mongo["client"]);
     }
-    public function getContacts()
+    private function getContacts()
     {
         $query = array("username" => $_SESSION["user"]["username"]);
         $projection = array('_id' => 0, "contacts" => 1);
@@ -35,24 +36,23 @@ class ListContacts{
             return 0;
         }
     }
-    public function send()
+    private function send()
     {
         echo json_encode($this->contacts["contacts"]);
     }
-}
-
-function main()
-{
-    $contacts = new ListContacts;
-    $return = new Returning;
-
-    if (!$contacts->getContacts())
+    public function main()
     {
-        $return->exitNow(0, "There are no contacts to be displayed.\n");
+        $return = new Returning;
+
+        if (!$this->getContacts())
+        {
+            $return->exitNow(0, "There are no contacts to be displayed.\n");
+        }
+        $this->send();
     }
-    $contacts->send();
 }
 
-main();
+$contacts = new ListContacts;
+$contacts->main();
 
 ?>

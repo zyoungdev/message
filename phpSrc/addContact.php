@@ -3,7 +3,8 @@ include_once("globals.php");
 include "./helper.php";
 
 class AddContact{
-    public $contact;
+    private $contact;
+    private $mongo;
 
     public function __construct()
     {
@@ -21,7 +22,7 @@ class AddContact{
         session_write_close();
         closeDB($this->mongo["client"]);
     }
-    public function contactIsClean()
+    private function contactIsClean()
     {
         $length = mb_strlen($_POST["contact"]);
         if (ctype_alnum($_POST["contact"]) && $length <= 64)
@@ -33,7 +34,7 @@ class AddContact{
             return false;
         }
     }
-    public function userExists()
+    private function userExists()
     {
         if ($this->recipient = $this->mongo["userspublic"]->findone(
                 array("username" => $_POST["contact"])))
@@ -50,7 +51,7 @@ class AddContact{
             return 0;
         }
     }
-    public function addContact()
+    private function addContact()
     {
         $user = $this->contact["username"];
         $details = array("displayName" => $this->contact["displayName"]);
@@ -65,35 +66,35 @@ class AddContact{
         else
             return 0;
     }
-    public function send()
+    private function send()
     {
         echo $this->contact["public"];
     }
+    public function main()
+    {
+        $return = new Returning;
+
+        if (!$this->contactIsClean())
+        {
+            $return->exitNow(0, "The username you provided contains spaces or symbols. Usernames can only contain letters and numbers.\n");
+        }
+        if (!$this->userExists())
+        {
+            $return->exitNow(0, "The username you provided does not exist.\n");
+        }
+        if (!$this->addContact())
+        {
+            $return->exitNow(0, "The username could not be added at this time.\n");
+        }
+        $return->exitNow(1, "Contact has been added.");
+    }
 }
 
-function main()
-{
-    $add = new AddContact;
-    $return = new Returning;
-
-    if (!$add->contactIsClean())
-    {
-        $return->exitNow(0, "The username you provided contains spaces or symbols. Usernames can only contain letters and numbers.\n");
-    }
-    if (!$add->userExists())
-    {
-        $return->exitNow(0, "The username you provided does not exist.\n");
-    }
-    if (!$add->addContact())
-    {
-        $return->exitNow(0, "The username could not be added at this time.\n");
-    }
-    $return->exitNow(1, "Contact has been added.");
-}
+$add = new AddContact;
 
 if ($_POST["contact"])
 {
-    main();
+    $add->main();
 }
 
 ?>

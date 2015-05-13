@@ -3,6 +3,8 @@ include_once("globals.php");
 include "./helper.php";
 
 class CheckSession{
+    private $mongo;
+    
     public function __construct()
     {
         session_start();
@@ -12,7 +14,7 @@ class CheckSession{
     {
         closeDB($this->mongo["client"]);
     }
-    public function check()
+    private function check()
     {
         if (isset($_SESSION["user"]["key"]["challengeKey"]))
         {
@@ -25,19 +27,19 @@ class CheckSession{
         session_destroy();
         return 0;
     }
+    public function main()
+    {
+        $ret = new Returning;
+
+        if ($this->check())
+            $ret->exitNow(1, "Welcome back " . $_SESSION["user"]["username"]);
+        else
+            echo json_encode(array("nope" => "nope nope"));
+    }
 }
 
-function main()
-{
-    $sess = new CheckSession;
-    $ret = new Returning;
+$sess = new CheckSession;
 
-    if ($sess->check())
-        $ret->exitNow(1, "Welcome back " . $_SESSION["user"]["username"]);
-    else
-        echo json_encode(array("nope" => "nope nope"));
-}
-
-main();
+$sess->main();
 
 ?>
