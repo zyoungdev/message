@@ -1,23 +1,12 @@
 <?php 
-include_once("globals.php");
-include "./helper.php";
 
 class DeleteMultipleMessages{
-    private $mongo;
+    // private $mongo;
     public function __construct()
     {
-        session_start();
-        $this->mongo = openDB();
-
-        if (!challengeIsDecrypted($this->mongo))
-        {
-            $ret = new Returning;
-            $ret->exitNow(-1, "Challenge could not be decrypted");
-        }
     }
     public function __destruct()
     {
-        closeDB($this->mongo["client"]);
     }
     private function messagesAreClean()
     {
@@ -29,6 +18,7 @@ class DeleteMultipleMessages{
     }
     private function updateMessages()
     {
+        global $globalMongo;
         $messages = json_decode($_POST["messages"]);
 
         $query = array("username" => $_SESSION["user"]["username"]);
@@ -36,9 +26,9 @@ class DeleteMultipleMessages{
 
         $ids = json_decode($_POST["deleteMessages"]);
         
-        if ($this->mongo["messages"]->remove(array("id" => array('$in' => $ids))))
+        if ($globalMongo["messages"]->remove(array("id" => array('$in' => $ids))))
         {
-            if ($this->mongo["usersprivate"]->update($query, $projection))
+            if ($globalMongo["usersprivate"]->update($query, $projection))
             {
                 return 1;
             }
@@ -66,13 +56,6 @@ class DeleteMultipleMessages{
         }
         $ret->exitNow(1, "Messages Removed Successfully");
     }
-}
-
-$del = new DeleteMultipleMessages;
-
-if ($_POST["messages"] && $_POST["deleteMessages"])
-{
-    $del->main();
 }
 
 ?>

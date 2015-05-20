@@ -1,36 +1,24 @@
 <?php
-include_once("globals.php");
-include "./helper.php";
 
 class ListMessages{
     private $messages;
-    private $mongo;
 
     public function __construct()
     {
-        session_start();        
-        $this->mongo = openDB();
-
-        if (!challengeIsDecrypted($this->mongo))
-        {
-            $ret = new Returning;
-            $ret->exitNow(-1, "Challenge could not be decrypted");
-        }
     }
     public function __destruct()
     {
-        // session_write_close();
-        closeDB($this->mongo["client"]);
     }
     private function getMessages()
     {
+        global $globalMongo;
         $query = array('username' => $_SESSION["user"]["username"]);
         $projection = array(
             "_id" => 0, 
             'messages' => 1,
         );
 
-        if ($result = $this->mongo["usersprivate"]->findone($query, $projection))
+        if ($result = $globalMongo["usersprivate"]->findone($query, $projection))
         {
             if (isset($result["messages"]))
             {
@@ -63,7 +51,5 @@ class ListMessages{
 
     }
 }
-$list = new ListMessages;
-$list->main();
 
 ?>

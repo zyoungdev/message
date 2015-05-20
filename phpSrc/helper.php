@@ -66,13 +66,13 @@ function unloadSession()
 }
 function openDB()
 {
-    $mongo["client"] = new Mongo();
-    $mongo["collection"] = $mongo["client"]->messageApp;
-    $mongo["userspublic"] = $mongo["collection"]->userspublic;
-    $mongo["usersprivate"] = $mongo["collection"]->usersprivate;
-    $mongo["messages"] = $mongo["collection"]->messages;
+    $db["client"] = new Mongo();
+    $db["collection"] = $db["client"]->messageApp;
+    $db["userspublic"] = $db["collection"]->userspublic;
+    $db["usersprivate"] = $db["collection"]->usersprivate;
+    $db["messages"] = $db["collection"]->messages;
 
-    return $mongo;
+    return $db;
 }
 function closeDB($db)
 {

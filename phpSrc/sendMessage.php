@@ -1,32 +1,18 @@
 <?php 
-include_once("globals.php");
-include "./helper.php";
 
 class SendMessage{
     private $clean = array();
     private $message = array();
     private $recipient;
     private $sum = 0;
-    private $mongo;
 
     public function __construct()
     {
-        session_start();
-        $this->mongo = openDB();
-
-        if (!challengeIsDecrypted($this->mongo))
-        {
-            $ret = new Returning;
-            $ret->exitNow(-1, "Challenge could not be decrypted");
-        }
-
         $message->sender["username"] = $_SESSION["user"]["username"];
         $message->sender["public"] = $_SESSION["user"]["key"]["public"];
     }
     public function __destruct()
     {
-        // session_write_close();
-        closeDB($this->mongo["client"]);
     }
     private function recipientIsClean()
     {
@@ -43,7 +29,8 @@ class SendMessage{
     }
     private function userExists()
     {
-        if ($this->recipient = $this->mongo["userspublic"]->findone(
+        global $globalMongo;
+        if ($this->recipient = $globalMongo["userspublic"]->findone(
                 array("username" => $this->clean["un"])))
         {
             $this->message["recipient"]["username"] = $this->recipient["username"];
@@ -76,23 +63,25 @@ class SendMessage{
     }
     private function addContact()
     {
+        global $globalMongo;
         $user = $this->message["recipient"]["username"];
-        $this->d = array("displayName" => $this->mongo["usersprivate"]->findone(array("username" => $user))["settings"]["displayName"]);
+        $this->d = array("displayName" => $globalMongo["usersprivate"]->findone(array("username" => $user))["settings"]["displayName"]);
 
         logThis($this->d);
 
         $query = array('username' => $_SESSION["user"]["username"]);
         $update = array('$set' => array("contacts.$user" => $this->d));
 
-        $this->mongo["usersprivate"]->update($query, $update);
+        $globalMongo["usersprivate"]->update($query, $update);
     }
     private function checkRecipientAllowance()
     {
         global $maxAllowance;
+        global $globalMongo;
         $q = array("username" => $this->message["recipient"]["username"]);
         $p = array('_id' => 0, 'messages' => 1);
 
-        $ret = $this->mongo["usersprivate"]->findone($q, $p);
+        $ret = $globalMongo["usersprivate"]->findone($q, $p);
         $this->sum = 0;
         if (isset($ret["messages"]))
         {
@@ -109,6 +98,7 @@ class SendMessage{
     }
     private function send()
     {
+        global $globalMongo;
         date_default_timezone_set('America/Los_Angeles');
         $date = new DateTime('NOW');
 
@@ -127,13 +117,13 @@ class SendMessage{
         $id = bin2hex(Sodium::randombytes_buf(16));
         $mQuery = array("ciphertext" => $this->message["ciphertext"], 
             "id" => $id);
-        $this->mongo["messages"]->save($mQuery);
+        $globalMongo["messages"]->save($mQuery);
 
         $map["id"] = $id;
 
         $query = array('username' => $this->clean["un"]);
         $update = array('$set' => array("messages.$sender.$time" => $map));
-        if ($this->mongo["usersprivate"]->update($query, $update))
+        if ($globalMongo["usersprivate"]->update($query, $update))
         {
             $this->cleanup();
             return 1;
@@ -192,11 +182,6 @@ class SendMessage{
         $return->exitNow(1, "Message successfully sent!");
     }
 }
-$send = new SendMessage;
 
-if ($_POST["recipient"] && $_POST["plaintext"] && $_POST["messageSize"])
-{
-    $send->sendMessage();
-}
 
 ?>

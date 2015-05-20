@@ -1,34 +1,23 @@
 <?php 
-include_once("globals.php");
-include "./helper.php";
 
 class DownloadMessages{
     private $messages;
-    private $mongo;
     public function __construct()
     {
-        session_start();
-        $this->mongo = openDB();
-
-        if (!challengeIsDecrypted($this->mongo))
-        {
-            $ret = new Returning;
-            $ret->exitNow(-1, "Challenge could not be decrypted");
-        }
     }
     public function __destruct()
     {
-        closeDB($this->mongo["client"]);
     }
     private function getMessages()
     {
+        global $globalMongo;
         $query = array('username' => $_SESSION["user"]["username"]);
         $projection = array(
             "_id" => 0, 
             'messages' => 1,
         );
 
-        if ($this->messages = $this->mongo["usersprivate"]->findone($query, $projection)["messages"])
+        if ($this->messages = $globalMongo["usersprivate"]->findone($query, $projection)["messages"])
         {
             return 1;
         }
@@ -43,12 +32,13 @@ class DownloadMessages{
     }
     private function decryptMessages()
     {
+        global $globalMongo;
         $mes = array();
         foreach ($this->messages as $usr => $usrval) {
             foreach ($this->messages[$usr] as $time => $timeval) {
                 $mes = $this->messages[$usr][$time];
 
-                $cipher = $this->mongo["messages"]->findone(array('id' => $mes["id"]))["ciphertext"];
+                $cipher = $globalMongo["messages"]->findone(array('id' => $mes["id"]))["ciphertext"];
 
                 $keypair = Sodium::crypto_box_keypair_from_secretkey_and_publickey(
                     hex2bin($_SESSION["user"]["key"]["secret"]), 
@@ -87,7 +77,4 @@ class DownloadMessages{
     }
 }
 
-$down = new DownloadMessages;
-
-$down->main();
 ?>

@@ -1,24 +1,11 @@
 <?php 
-include_once("globals.php");
-include "./helper.php";
 
 class DeleteMessage{
-    private $mongo;
     public function __construct()
     {
-        session_start();
-        $this->mongo = openDB();
-
-        if (!challengeIsDecrypted($this->mongo))
-        {
-            $ret = new Returning;
-            $ret->exitNow(-1, "Challenge could not be decrypted");
-        }
     }
     public function __destruct()
     {
-        session_write_close();
-        closeDB($this->mongo["client"]);
     }
     private function isClean()
     {
@@ -31,6 +18,7 @@ class DeleteMessage{
     }
     private function deleteMessage()
     {
+        global $globalMongo;
         $message = $_POST["timestamp"];
         $user = $_POST["username"];
 
@@ -38,10 +26,10 @@ class DeleteMessage{
         $projection = array('$unset' => array("messages.$user.$message" => ""));
 
         $find = array("messages" => 1);
-        $id = $this->mongo["usersprivate"]->findone($query, $find)["messages"]["$user"]["$message"]["id"];
-        $this->mongo["messages"]->remove(array('id' => $id));
+        $id = $globalMongo["usersprivate"]->findone($query, $find)["messages"]["$user"]["$message"]["id"];
+        $globalMongo["messages"]->remove(array('id' => $id));
 
-        if ($this->mongo["usersprivate"]->update($query, $projection))
+        if ($globalMongo["usersprivate"]->update($query, $projection))
         {
             return 1;
         }
@@ -64,13 +52,6 @@ class DeleteMessage{
         }
         echo "We made it!\n";
     }
-}
-
-$del = new DeleteMessage;
-
-if ($_POST["timestamp"] && $_POST["username"])
-{
-    $del->main();
 }
 
 ?>

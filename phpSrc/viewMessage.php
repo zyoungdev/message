@@ -1,42 +1,30 @@
 <?php
-include_once("globals.php");
-include "./helper.php";
 
 class ViewMessage{
     private $message;
     private $plaintext = array();
-    private $mongo;
 
     public function __construct()
     {
-        session_start();
-        $this->mongo = openDB();
-
-        if (!challengeIsDecrypted($this->mongo))
-        {
-            $ret = new Returning;
-            $ret->exitNow(-1, "Challenge could not be decrypted");
-        }
     }
     public function __destruct()
     {
-        // session_write_close();
-        closeDB($this->mongo["client"]);
     }
     private function getMessage()
     {
+        global $globalMongo;
         $timestamp = $_POST["timestamp"];
         $username = $_POST["username"];
         $query = array("username" => $_SESSION["user"]["username"]);
         $projection = array('_id' => 0, 'messages' => 1);
 
-        if ($result = $this->mongo["usersprivate"]->findone($query, $projection))
+        if ($result = $globalMongo["usersprivate"]->findone($query, $projection))
         {
             $this->message = $result["messages"]["$username"]["$timestamp"];
 
             $id = $result["messages"]["$username"]["$timestamp"]["id"];
             $mQuery = array('id' => $id);
-            $this->message["ciphertext"] = $this->mongo["messages"]->findone($mQuery)["ciphertext"];
+            $this->message["ciphertext"] = $globalMongo["messages"]->findone($mQuery)["ciphertext"];
         }
         else
         {
@@ -93,13 +81,6 @@ class ViewMessage{
         }
         $this->returnMessage();
     }
-}
-
-$view = new ViewMessage;
-
-if ($_POST["username"] && $_POST["timestamp"])
-{
-    $view->main();
 }
 
 ?>

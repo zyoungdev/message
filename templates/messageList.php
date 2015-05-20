@@ -21,7 +21,7 @@
 
 <!-- Page numbers -->
 <div class="message-list-pagenum-container">
-    <input type="number" min="1" class="message-list-pagenum-input">
+    <input type="number" min="0" class="message-list-pagenum-input">
     <div class="message-list-pagenum-total">of 10</div>
 </div>
 

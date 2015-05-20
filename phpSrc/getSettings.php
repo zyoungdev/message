@@ -1,32 +1,20 @@
 <?php 
-include_once("globals.php");
-include "./helper.php";
-
 
 class GetSettings{
-    private $mongo;
     public function __construct()
     {
-        session_start();
-        $this->mongo = openDB();
-
-        if (!challengeIsDecrypted($this->mongo))
-        {
-            $ret = new Returning;
-            $ret->exitNow(-1, "Challenge could not be decrypted");
-        }
     }
     public function __destruct()
     {
-        closeDB($this->mongo["client"]);
     }
     private function getSettings()
     {
+        global $globalMongo;
         $q = array("username" => $_SESSION["user"]["username"]);
         $p = array('_id' => 0, 'messages' => 1);
 
-        $this->settings = $this->mongo["usersprivate"]->findone($q)["settings"];
-        $ret = $this->mongo["usersprivate"]->findone($q, $p);
+        $this->settings = $globalMongo["usersprivate"]->findone($q)["settings"];
+        $ret = $globalMongo["usersprivate"]->findone($q, $p);
 
         $this->settings["user"] = $_SESSION["user"]["username"];
 
@@ -54,8 +42,5 @@ class GetSettings{
         $this->getSettings();
     }
 }
-
-$get = new GetSettings;
-$get->main();
 
 ?>

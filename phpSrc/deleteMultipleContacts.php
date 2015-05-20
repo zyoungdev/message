@@ -1,23 +1,11 @@
 <?php 
-include_once("globals.php");
-include "./helper.php";
 
 class DeleteMultipleContacts{
-    private $mongo;
     public function __construct()
     {
-        session_start();
-        $this->mongo = openDB();
-
-        if (!challengeIsDecrypted($this->mongo))
-        {
-            $ret = new Returning;
-            $ret->exitNow(-1, "Challenge could not be decrypted");
-        }
     }
     public function __destruct()
     {
-        closeDB($this->mongo["client"]);
     }
     private function contactsAreClean()
     {
@@ -29,12 +17,13 @@ class DeleteMultipleContacts{
     }
     private function updateContacts()
     {
+        global $globalMongo;
         $contacts = json_decode($_POST["contacts"]);
 
         $query = array("username" => $_SESSION["user"]["username"]);
         $projection = array('$set' => array("contacts" => $contacts));
 
-        if ($this->mongo["usersprivate"]->update($query, $projection))
+        if ($globalMongo["usersprivate"]->update($query, $projection))
             return 1;
         else
             return 0;            
@@ -53,13 +42,6 @@ class DeleteMultipleContacts{
         }
         $ret->exitNow(1, "Contacts Removed Successfully");
     }
-}
-
-$del = new DeleteMultipleContacts;
-
-if ($_POST["contacts"])
-{
-    $del->main();
 }
 
 ?>

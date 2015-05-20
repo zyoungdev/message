@@ -139,8 +139,10 @@ var APP = (function()
         getUser = function(u)
         {
             var fd = new FormData();
+            fd.append("getContact", true);
             fd.append("user", u);
-            hf.ajax("POST", fd, "phpSrc/getContact.php", function(res)
+
+            hf.ajax("POST", fd, "phpSrc/main.php", function(res)
             {
                 res = JSON.parse(res)
                 buildContact(res);
@@ -214,7 +216,9 @@ var APP = (function()
         },
         getList = function()
         {
-            hf.ajax("GET", null, "phpSrc/listContacts.php", function(res)
+            var fd = new FormData();
+            fd.append("listContacts", true);
+            hf.ajax("POST", fd, "phpSrc/main.php", function(res)
             {
                 contactList = JSON.parse(res);
                 if (contactList.code != null)
@@ -235,9 +239,10 @@ var APP = (function()
             }
 
             var fd = new FormData();
+            fd.append("addContact", true);
             fd.append("contact", u);
 
-            hf.ajax("POST", fd, "phpSrc/addContact.php", function(res)
+            hf.ajax("POST", fd, "phpSrc/main.php", function(res)
             {
                 res = JSON.parse(res);
                 if (res.code == 0 || res.code == -1)
@@ -252,26 +257,26 @@ var APP = (function()
                 }
             });
         },
-        deleteContact = function(i, u)
-        {
-            var fd = new FormData();
-            fd.append("username", u);
+        // deleteContact = function(i, u)
+        // {
+        //     var fd = new FormData();
+        //     fd.append("username", u);
 
-            hf.ajax("POST", fd, "phpSrc/deleteContact.php", function(res)
-            {
-                // console.log(res);
-                // res = JSON.parse(res);
-                if (res.code == null)
-                {
-                    delete contactList[u];
-                    buildList();
-                }
-                else
-                {
-                    error.init(res.message, 3);
-                }
-            });
-        },
+        //     hf.ajax("POST", fd, "phpSrc/deleteContact.php", function(res)
+        //     {
+        //         // console.log(res);
+        //         // res = JSON.parse(res);
+        //         if (res.code == null)
+        //         {
+        //             delete contactList[u];
+        //             buildList();
+        //         }
+        //         else
+        //         {
+        //             error.init(res.message, 3);
+        //         }
+        //     });
+        // },
         deleteMultipleContacts = function()
         {
             // console.log(contactList);
@@ -294,8 +299,9 @@ var APP = (function()
                 }
             }
             contactList = newContactList;
+            fd.append("deleteMultipleContacts", true);
             fd.append("contacts", JSON.stringify(contactList));
-            hf.ajax("POST", fd, "phpSrc/deleteMultipleContacts.php", function(res)
+            hf.ajax("POST", fd, "phpSrc/main.php", function(res)
             {
                 res = JSON.parse(res);
 
@@ -506,9 +512,10 @@ var APP = (function()
                 return;
             }
 
+            fd.append("sendMessage", true);
             fd.append("messageSize", size);
 
-            hf.ajax("POST", fd, "phpSrc/sendMessage.php", function(res)
+            hf.ajax("POST", fd, "phpSrc/main.php", function(res)
             {
                 res = JSON.parse(res);
                 if (res.code != null)
@@ -735,6 +742,8 @@ var APP = (function()
         imgFileList;
         buildView = function()
         {
+            var fd = new FormData();
+            fd.append("viewMessage", true);
             hf.ajax("GET", null, "templates/viewMessage.php", function(res)
             {
                 var
@@ -1074,10 +1083,11 @@ var APP = (function()
             var
             fd = new FormData();
 
+            fd.append("viewMessage", true);
             fd.append("username", u);
             fd.append("timestamp", t);
 
-            hf.ajax("POST", fd, "phpSrc/viewMessage.php", function(res)
+            hf.ajax("POST", fd, "phpSrc/main.php", function(res)
             {
                 res = JSON.parse(res);
                 if (res.code != null)
@@ -1145,10 +1155,11 @@ var APP = (function()
         {
             var fd = new FormData();
 
+            fd.append("deleteMessage", true);
             fd.append("timestamp", t);
             fd.append("username", u);
 
-            hf.ajax("POST", fd, "phpSrc/deleteMessage.php", function(res)
+            hf.ajax("POST", fd, "phpSrc/main.php", function(res)
             {
                 // console.log(res);
                 // res = JSON.parse(res);
@@ -1198,9 +1209,10 @@ var APP = (function()
 
             messageList = newMessageList;
 
+            fd.append("deleteMultipleMessages", true);
             fd.append("messages", JSON.stringify(messageList));
             fd.append("deleteMessages", JSON.stringify(deleteMessages));
-            hf.ajax("POST", fd, "phpSrc/deleteMultipleMessages.php", function(res)
+            hf.ajax("POST", fd, "phpSrc/main.php", function(res)
             {
                 res = JSON.parse(res);
 
@@ -1218,7 +1230,9 @@ var APP = (function()
         },
         getList = function()
         {
-            hf.ajax("GET", null, "phpSrc/listMessages.php", function(res)
+            var fd = new FormData();
+            fd.append("listMessages", true);
+            hf.ajax("POST", fd, "phpSrc/main.php", function(res)
             {
                 messageList = JSON.parse(res);
                 if (messageList.code != null)
@@ -1554,8 +1568,9 @@ var APP = (function()
         },
         getSettings = function(callback)
         {
-            var avFD = new FormData();
-            hf.ajax("GET", null, "phpSrc/getSettings.php", function(r)
+            var fd = new FormData();
+            fd.append("getSettings", true);
+            hf.ajax("POST", fd, "phpSrc/main.php", function(r)
             {
                 r = JSON.parse(r);
 
@@ -1569,13 +1584,13 @@ var APP = (function()
 
                 r["nested"] == "true" ? settings.nested = true : settings.nested = false;
 
+                var avFD = new FormData();
+                avFD.append("getAvatar", true);
                 avFD.append("user", settings.user);
 
-                hf.ajax("POST", avFD, "phpSrc/getAvatar.php", function(res)
+                hf.ajax("POST", avFD, "phpSrc/main.php", function(res)
                 {
-                   
                     settings.avatar = res;
-
                     callback();                   
                 });
             });
@@ -1607,9 +1622,10 @@ var APP = (function()
             {
             return function(res)
             {
+                fd.append("changeAvatar", true);
                 fd.append("avatar", res.target.result);
                 settings.avatar = res.target.result;
-                hf.ajax("POST", fd, "phpSrc/changeAvatar.php", function(r)
+                hf.ajax("POST", fd, "phpSrc/main.php", function(r)
                 {
                     r = JSON.parse(r);
                     if (r.code == 1)
@@ -1629,7 +1645,9 @@ var APP = (function()
         },
         downloadMessages = function()
         {
-            hf.ajax("GET", null, "phpSrc/downloadMessages.php", function(res)
+            var fd = new FormData();
+            fd.append("downloadMessages", true);
+            hf.ajax("POST", fd, "phpSrc/main.php", function(res)
             {
                 var a = hf.cEL("a", {target: "_blank", href: 'data:text/plain;charset=utf-8,' + encodeURIComponent(res)});
                 res = JSON.parse(res);
@@ -1660,9 +1678,9 @@ var APP = (function()
             }
             var fd = new FormData();
             fd.append("password", newpw.value);
-            fd.append("changepassword", 1);
+            fd.append("changePassword", true);
 
-            hf.ajax("POST", fd, "phpSrc/login.php", function(res)
+            hf.ajax("POST", fd, "phpSrc/main.php", function(res)
             {
                 res = JSON.parse(res);
                 if (res.code == 0 || res.code == -1)
@@ -1689,6 +1707,7 @@ var APP = (function()
             var fd = new FormData();
             // console.log(displayNameInput.value);
 
+            fd.append("updateSettings", true);
             fd.append("mPerPage", numInput.value);
             fd.append("displayName", displayNameInput.value);
             fd.append("nested", nestedCheck.checked);
@@ -1697,7 +1716,7 @@ var APP = (function()
             settings.nested = nestedCheck.checked;
             settings.mNum = numInput.value;
 
-            hf.ajax("POST", fd, "phpSrc/updateSettings.php", function(res)
+            hf.ajax("POST", fd, "phpSrc/main.php", function(res)
             {
                 res = JSON.parse(res);
 
@@ -1974,10 +1993,11 @@ var APP = (function()
             //send creds to phpSrc/login.php
             var fd = new FormData();
 
+            fd.append("login", true);
             fd.append("username", un);
             fd.append("password", pw);
 
-            hf.ajax("POST", fd, "phpSrc/login.php", function(res)
+            hf.ajax("POST", fd, "phpSrc/main.php", function(res)
             {
                 if (res)
                 {
@@ -2000,7 +2020,9 @@ var APP = (function()
         return{
             checkSession:function()
             {
-                hf.ajax("GET", null, "phpSrc/checkSession.php", function(res)
+                var fd = new FormData();
+                fd.append("checkSession", true);
+                hf.ajax("POST", fd, "phpSrc/main.php", function(res)
                 {
                     res = JSON.parse(res)
                     if (res.code == 1)

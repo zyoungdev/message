@@ -1,24 +1,12 @@
 <?php 
-include_once("globals.php");
-include "./helper.php";
 
 class UpdateSettings{
     private $settings = array();
-    private $mongo;
     public function __construct()
     {
-        session_start();
-        $this->mongo = openDB();
-
-        if (!challengeIsDecrypted($this->mongo))
-        {
-            $ret = new Returning;
-            $ret->exitNow(-1, "Challenge could not be decrypted");
-        }
     }
     public function __destruct()
     {
-        closeDB($this->mongo["client"]);
     }
     private function setup()
     {
@@ -42,11 +30,12 @@ class UpdateSettings{
     }
     private function update()
     {
+        global $globalMongo;
         $_SESSION["settings"] = $this->settings;
         $query = array("username" => $_SESSION["user"]["username"]);
         $proj = array('$set' => array("settings" => $this->settings));
 
-        if ($this->mongo["usersprivate"]->update($query, $proj))
+        if ($globalMongo["usersprivate"]->update($query, $proj))
             return 1;
         else
             return 0;
@@ -66,9 +55,5 @@ class UpdateSettings{
         $ret->exitNow(1, "Settings updated");
     }
 }
-
-$up = new UpdateSettings;
-$up->main();
-
 
 ?>

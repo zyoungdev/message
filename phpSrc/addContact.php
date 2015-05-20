@@ -1,26 +1,13 @@
 <?php 
-include_once("globals.php");
-include "./helper.php";
 
 class AddContact{
     private $contact;
-    private $mongo;
 
     public function __construct()
     {
-        session_start();
-        $this->mongo = openDB();
-
-        if (!challengeIsDecrypted($this->mongo))
-        {
-            $ret = new Returning;
-            $ret->exitNow(-1, "Challenge could not be decrypted");
-        }
     }
     public function __destruct()
     {
-        session_write_close();
-        closeDB($this->mongo["client"]);
     }
     private function contactIsClean()
     {
@@ -36,13 +23,14 @@ class AddContact{
     }
     private function userExists()
     {
-        if ($this->recipient = $this->mongo["userspublic"]->findone(
+        global $globalMongo;
+        if ($this->recipient = $globalMongo["userspublic"]->findone(
                 array("username" => $_POST["contact"])))
         {
             $this->contact["username"] = $this->recipient["username"];
             $this->contact["public"] = $this->recipient["key"]["public"];
 
-            $this->contact["displayName"] = $this->mongo["usersprivate"]->findone(
+            $this->contact["displayName"] = $globalMongo["usersprivate"]->findone(
                 array("username" => $_POST["contact"]))["settings"]["displayName"];
             return 1;
         } 
@@ -53,6 +41,7 @@ class AddContact{
     }
     private function addContact()
     {
+        global $globalMongo;
         $user = $this->contact["username"];
         $details = array("displayName" => $this->contact["displayName"]);
         if (isset($user["contact"]))
@@ -61,7 +50,7 @@ class AddContact{
         $query = array('username' => $_SESSION["user"]["username"]);
         $update = array('$set' => array("contacts.$user" => $details));
 
-        if ($this->mongo["usersprivate"]->update($query, $update))
+        if ($globalMongo["usersprivate"]->update($query, $update))
             return 1;
         else
             return 0;
@@ -88,13 +77,6 @@ class AddContact{
         }
         $return->exitNow(1, "Contact has been added.");
     }
-}
-
-$add = new AddContact;
-
-if ($_POST["contact"])
-{
-    $add->main();
 }
 
 ?>

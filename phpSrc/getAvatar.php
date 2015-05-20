@@ -1,18 +1,11 @@
 <?php 
-include_once("globals.php");
-include "./helper.php";
 
 class GetAvatar{
-    private $mongo;
     public function __construct()
     {
-        session_start();
-        $this->mongo = openDB();
     }
     public function __destruct()
     {
-        closeDB($this->mongo["client"]);
-
     }
     private function userIsClean()
     {
@@ -24,8 +17,9 @@ class GetAvatar{
     }
     private function getAvatar()
     {
+        global $globalMongo;
         $query = array("username" => $_POST["user"]);
-        $res = $this->mongo["userspublic"]->findone($query)["avatar"];
+        $res = $globalMongo["userspublic"]->findone($query)["avatar"];
 
         echo $res;
     }
@@ -41,11 +35,6 @@ class GetAvatar{
     }
 }
 
-$av = new GetAvatar;
 
-if ($_POST["user"])
-{
-    $av->main();
-}
 
 ?>

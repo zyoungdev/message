@@ -1,23 +1,12 @@
 <?php 
-include_once("globals.php");
-include "./helper.php";
 
 class GetContact{
     private $mongo;
     public function __construct()
     {
-        session_start();
-        $this->mongo = openDB();
-
-        if (!challengeIsDecrypted($this->mongo))
-        {
-            $ret = new Returning;
-            $ret->exitNow(-1, "Challenge could not be decrypted");
-        }
     }
     public function __destruct()
     {
-        closeDB($this->mongo["client"]);
     }
     private function userIsClean()
     {
@@ -28,12 +17,13 @@ class GetContact{
     }
     private function userExists()
     {
+        global $globalMongo;
         $query = array("username" => $_POST["user"]);
 
-        if ($res = $this->mongo["userspublic"]->findone($query))
+        if ($res = $globalMongo["userspublic"]->findone($query))
         {
             $this->user = $res;
-            $this->user["displayName"] = $this->mongo["usersprivate"]->findone($query)["settings"]["displayName"];
+            $this->user["displayName"] = $globalMongo["usersprivate"]->findone($query)["settings"]["displayName"];
             return 1;
         }
         else
@@ -60,9 +50,5 @@ class GetContact{
         $this->send();
     }
 }
-$get = new GetContact;
-
-if (isset($_POST["user"]))
-    $get->main();
 
 ?>

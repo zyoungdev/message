@@ -1,6 +1,4 @@
 <?php 
-include_once("globals.php");
-include "./helper.php";
 /* Stored */
 //user
     //username
@@ -23,29 +21,16 @@ include "./helper.php";
 class Login{
     // public $clean = array();
     // public $dirty = array();
-    // public $mongo = array();
     private $protectedUN = array("admin", "administrator", "root");
     private $mongo;
     private $dirty;
 
     public function __construct()
     {
-        session_start();
-        $this->mongo = openDB();
         $this->dirty["pw"] = $_POST["password"];
     }
     public function __destruct()
     {
-        // session_write_close();
-        closeDB($this->mongo["client"]);
-    }
-    private function checkLogin()
-    {
-        if (!challengeIsDecrypted($this->mongo))
-        {
-            $ret = new Returning;
-            $ret->exitNow(-1, "Challenge could not be decrypted");
-        }
     }
     private function usernameIsClean()
     {
@@ -62,15 +47,16 @@ class Login{
     }
     private function userExists()
     {
+        global $globalMongo;
         //check DB if username exists
         foreach ($this->protectedUN as $key => $value) {
             if (strtolower($this->clean["un"]) == strtolower($value))
                 return 0;
         }
 
-        if ($this->mongo["userspublic"]->findone(array("username" => $this->clean["un"])))
+        if ($globalMongo["userspublic"]->findone(array("username" => $this->clean["un"])))
         {
-            if ($user = $this->mongo["usersprivate"]->findone(array("username" => $this->clean["un"])))
+            if ($user = $globalMongo["usersprivate"]->findone(array("username" => $this->clean["un"])))
             {
                 $_SESSION["user"]["username"] = $user["username"];
                 $_SESSION["user"]["key"]["hashedPW"] = $user["key"]["hashedPW"];
@@ -86,11 +72,12 @@ class Login{
     }
     private function passwordIsCorrect()
     {
+        global $globalMongo;
         if (Sodium::crypto_pwhash_scryptsalsa208sha256_str_verify(hex2bin($_SESSION["user"]["key"]["hashedPW"]), $this->dirty["pw"]))
         {
             $query = array("username" => $_SESSION["user"]["username"]);
             $projection = array("messages" => 0,"contacts" => 0);
-            if ($user = $this->mongo["usersprivate"]->findone($query, $projection))
+            if ($user = $globalMongo["usersprivate"]->findone($query, $projection))
             {
                 $_SESSION["user"] = $user;
                 // $_SESSION["user"]["key"]["public"] = $_SESSION["user"]["key"]["public"];
@@ -169,7 +156,8 @@ class Login{
     }
     private function decryptChallenge()
     {
-        if (!challengeIsDecrypted($this->mongo))
+        global $globalMongo;
+        if (!challengeIsDecrypted($globalMongo))
             return 0;
         else
             return 1;
@@ -181,16 +169,18 @@ class Login{
     }
     private function updateLoginTime()
     {
+        global $globalMongo;
         date_default_timezone_set('America/Los_Angeles');
         $date = new DateTime('NOW');
 
         $query = array("username" => $_SESSION["user"]["username"]);
         $update = array('$set' => array("lastLogin" => $date->getTimestamp()));
 
-        $this->mongo["userspublic"]->update($query, $update);
+        $globalMongo["userspublic"]->update($query, $update);
     }
     private function createNewUser()
     {
+        global $globalMongo;
         date_default_timezone_set('America/Los_Angeles');
         $date = new DateTime('NOW');
         $newuserprivate = array('username' => $this->clean["un"],
@@ -219,9 +209,9 @@ class Login{
         $_SESSION["user"]["settings"] = array('mPerPage' => 10, 'displayName' => "Anonymous");
         
 
-        if ($this->mongo["usersprivate"]->save($newuserprivate))
+        if ($globalMongo["usersprivate"]->save($newuserprivate))
         {
-            if (!$this->mongo["userspublic"]->save($newuser))
+            if (!$globalMongo["userspublic"]->save($newuser))
                 return 0;
             else
                 return 1;
@@ -233,6 +223,7 @@ class Login{
     }
     private function updatePassword()
     {
+        global $globalMongo;
         $query = array("username" => $_SESSION["user"]["username"]);
         $privateuser = array('key' => array(
                 'hashedPW' => $_SESSION["user"]["key"]["hashedPW"],
@@ -247,11 +238,11 @@ class Login{
         $pripro = array('$set' => $privateuser);
         $pubpro = array('$set' => $publicuser);
 
-        if ($res = $this->mongo["usersprivate"]->update($query, $pripro))
+        if ($res = $globalMongo["usersprivate"]->update($query, $pripro))
         {
-            if ($this->mongo["userspublic"]->update($query, $pubpro))
+            if ($globalMongo["userspublic"]->update($query, $pubpro))
             {
-                $this->mongo["usersprivate"]->update($query, array('$set' => array("messages" => new stdClass())));
+                $globalMongo["usersprivate"]->update($query, array('$set' => array("messages" => new stdClass())));
                 return 1;
             }
         }
@@ -283,6 +274,8 @@ class Login{
     public function logUserIn()
     {
         $return = new Returning;
+        $verify = new Verify;
+
         unset($_SESSION["user"]);
         if (!$this->usernameIsClean())
         {
@@ -301,7 +294,7 @@ class Login{
             $this->getSalt();
             $this->createMasterKeys();
             $this->createSigningKeys();
-            if (!challengeIsDecrypted($this->mongo))
+            if (!$verify->challengeIsDecrypted())
             {
                 $return->exitNow(-1, "Challenge could not be decrypted");
             }
@@ -321,7 +314,7 @@ class Login{
             {
                 $return->exitNow(0, "The new user could not be created.\n");
             }
-            if (!challengeIsDecrypted($this->mongo))
+            if (!$verify->challengeIsDecrypted())
             {
                 $return->exitNow(-1, "Challenge could not be decrypted");
             }
@@ -333,8 +326,13 @@ class Login{
     public function changePassword()
     {
         $return = new Returning;
+        $verify = new Verify;
 
-        $this->checkLogin();
+        if (!$verify->challengeIsDecrypted())
+        {
+            $ret = new Returning;
+            $ret->exitNow(-1, "Challenge could not be decrypted");
+        }
         $this->hashPW();
         $this->createSaltNonce();
         $this->createMasterKeys();
@@ -348,13 +346,4 @@ class Login{
     }
 }
 
-$login = new Login;
 
-if (isset($_POST["username"]) && isset($_POST["password"]))
-{
-    $login->logUserIn();
-}
-else if (isset($_POST["password"]) && isset($_POST["changepassword"]))
-{
-    $login->changePassword();
-}
