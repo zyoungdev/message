@@ -2,7 +2,7 @@
 
 This is a messaging service that uses PHP, Javascript, [MongoDB](https://github.com/mongodb/mongo), and [libsodium](https://github.com/jedisct1/libsodium). It has a CRUD workflow so it is basically a single server email application.
 
-Working example at http://45.79.147.7:8087
+Working example at http://messenger.zydev.space
 
 ## Features
 
