@@ -22,7 +22,6 @@ include_once "verify.php";
 include_once "viewMessage.php";
 
 $globalMongo = openDB();
-
 if (isset($_POST["login"]) && $_POST["login"])
 {
     $login = new Login;
@@ -42,7 +41,11 @@ else if (isset($_POST["changePassword"]) && $_POST["changePassword"])
 else
 {
     $verify = new Verify;
-    $verify->challengeIsDecrypted();
+    $ret = new Returning;
+
+    if (!$verify->challengeIsDecrypted())
+        $ret->exitNow(-1, "Challenge doesn't exist or can't be decrypted");
+
     session_regenerate_id();
 
     if (isset($_POST["addContact"]) && $_POST["addContact"])
@@ -64,7 +67,6 @@ else
     elseif (isset($_POST["checkSession"]) && $_POST["checkSession"])
     {
         // We have already verified the user session
-        $ret = new Returning;
         $ret->exitNow(1, "Welcome back " . $_SESSION["user"]["username"]);
     }
     elseif (isset($_POST["deleteContact"]) && $_POST["deleteContact"])

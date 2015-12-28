@@ -10,6 +10,8 @@ class Verify{
         global $challenge;
         global $globalMongo;
         
+        if (!isset($_SESSION["user"]["username"])) return false;
+
         $query = array("username" => $_SESSION["user"]["username"]);
         $projection = array('_id' => 0, "key" => 1);
 
