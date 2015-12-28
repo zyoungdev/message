@@ -15,7 +15,7 @@ class Verify{
 
         $key = $globalMongo["usersprivate"]->findone($query, $projection)["key"];
         
-        $plaintext = Sodium::crypto_secretbox_open(hex2bin($key["challenge"]),
+        $plaintext = \Sodium\crypto_secretbox_open(hex2bin($key["challenge"]),
            hex2bin($key["nonce"]), hex2bin($_SESSION["user"]["key"]["challengeKey"]));
 
         if ($plaintext == $challenge) return true;

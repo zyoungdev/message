@@ -34,7 +34,7 @@ class ViewMessage{
     }
     private function decryptMessage()
     {
-        $keypair = Sodium::crypto_box_keypair_from_secretkey_and_publickey(
+        $keypair = \Sodium\crypto_box_keypair_from_secretkey_and_publickey(
             hex2bin($_SESSION["user"]["key"]["secret"]), 
             hex2bin($this->message["sender"]["public"]));
 
@@ -42,7 +42,7 @@ class ViewMessage{
         $nonce = hex2bin($this->message["nonce"]);
 
 
-        if ($pt = Sodium::crypto_box_open($ciphertext,$nonce,$keypair))
+        if ($pt = \Sodium\crypto_box_open($ciphertext,$nonce,$keypair))
         {
             $this->plaintext["sender"] = $this->message["sender"]["username"];
             $this->plaintext["displayname"] = $this->message["sender"]["displayName"];
@@ -50,9 +50,9 @@ class ViewMessage{
             $this->plaintext["timestamp"] = $this->message["timestamp"];
             $this->plaintext["size"] = $this->message["size"];
 
-            Sodium::sodium_memzero($keypair);
-            Sodium::sodium_memzero($nonce);
-            Sodium::sodium_memzero($pt);
+            \Sodium\memzero($keypair);
+            \Sodium\memzero($nonce);
+            \Sodium\memzero($pt);
 
             return 1;
         }
@@ -65,8 +65,8 @@ class ViewMessage{
     {
         echo json_encode($this->plaintext);
 
-        Sodium::sodium_memzero($this->plaintext["sender"]);
-        Sodium::sodium_memzero($this->plaintext["plaintext"]);
+        \Sodium\memzero($this->plaintext["sender"]);
+        \Sodium\memzero($this->plaintext["plaintext"]);
         unset($this->plaintext);
         unset($this->message);
     }

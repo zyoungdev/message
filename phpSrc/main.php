@@ -27,6 +27,8 @@ if (isset($_POST["login"]) && $_POST["login"])
 {
     $login = new Login;
 
+
+
     if (isset($_POST["username"]) && isset($_POST["password"]))
     {
         $login->logUserIn();
