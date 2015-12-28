@@ -20,7 +20,8 @@ Working example at http://messenger.zydev.space
 
 * Apache server running PHP
 * MongoDB
-* libsodium-php
+* libsodium 1.0.6
+* libsodium-php 1.0.2
 * SASS to compile CSS
 
 ## Installation
