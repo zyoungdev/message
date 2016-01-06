@@ -26,9 +26,12 @@ class DeleteMultipleMessages{
 
         $ids = json_decode($_POST["deleteMessages"]);
         
-        if ($globalMongo["messages"]->remove(array("id" => array('$in' => $ids))))
+        $bulk = new MongoDB\Driver\BulkWrite;
+        $bulk->delete($ids);
+
+        if ($globalMongo["client"]->executeBulkWrite('messageApp.messages', $bulk))
         {
-            if ($globalMongo["usersprivate"]->update($query, $projection))
+            if ($globalMongo["usersprivate"]->updateOne($query, $projection))
             {
                 return 1;
             }

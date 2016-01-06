@@ -13,8 +13,11 @@ class GetSettings{
         $q = array("username" => $_SESSION["user"]["username"]);
         $p = array('_id' => 0, 'messages' => 1);
 
-        $this->settings = $globalMongo["usersprivate"]->findone($q)["settings"];
+        $this->settings = $globalMongo["usersprivate"]->findone($q)->settings;
+        $this->settings = classToArray($this->settings);
+
         $ret = $globalMongo["usersprivate"]->findone($q, $p);
+        $ret = classToArray($ret);
 
         $this->settings["user"] = $_SESSION["user"]["username"];
 

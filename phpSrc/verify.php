@@ -15,7 +15,8 @@ class Verify{
         $query = array("username" => $_SESSION["user"]["username"]);
         $projection = array('_id' => 0, "key" => 1);
 
-        $key = $globalMongo["usersprivate"]->findone($query, $projection)["key"];
+        $key = $globalMongo["usersprivate"]->findone($query, $projection)->key;
+        $key = classToArray($key);
         
         $plaintext = \Sodium\crypto_secretbox_open(hex2bin($key["challenge"]),
            hex2bin($key["nonce"]), hex2bin($_SESSION["user"]["key"]["challengeKey"]));

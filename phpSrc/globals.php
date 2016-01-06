@@ -7,6 +7,10 @@ function logThis($l)
 {
     file_put_contents("log", print_r($l, true));
 }
+function classToArray($c)
+{
+    return json_decode(json_encode($c), true);
+}
 class Returning{
     public $code;
     public $message;
@@ -67,11 +71,11 @@ function unloadSession()
 }
 function openDB()
 {
-    $db["client"] = new Mongo();
-    $db["collection"] = $db["client"]->messageApp;
-    $db["userspublic"] = $db["collection"]->userspublic;
-    $db["usersprivate"] = $db["collection"]->usersprivate;
-    $db["messages"] = $db["collection"]->messages;
+    $db["client"] = new MongoDB\Driver\Manager("mongodb://localhost:27017");
+    $db["collection"] = new MongoDB\Collection($db["client"], "messageApp.app");
+    $db["userspublic"] = new MongoDB\Collection($db["client"], "messageApp.userspublic");
+    $db["usersprivate"] = new MongoDB\Collection($db["client"], "messageApp.usersprivate");
+    $db["messages"] = new MongoDB\Collection($db["client"], "messageApp.messages");
 
     return $db;
 }
@@ -89,7 +93,8 @@ function challengeIsDecrypted($db)
     $query = array("username" => $_SESSION["user"]["username"]);
     $projection = array('_id' => 0, "key" => 1);
 
-    $key = $db["usersprivate"]->findone($query, $projection)["key"];
+    $key = $db["usersprivate"]->findone($query, $projection)->key;
+    $key = classToArray($key);
     
     $plaintext = \Sodium\crypto_secretbox_open(hex2bin($key["challenge"]),
        hex2bin($key["nonce"]), hex2bin($_SESSION["user"]["key"]["challengeKey"]));

@@ -20,6 +20,7 @@ class ListMessages{
 
         if ($result = $globalMongo["usersprivate"]->findone($query, $projection))
         {
+            $result = classToArray($result);
             if (isset($result["messages"]))
             {
                 $this->messages = $result["messages"];

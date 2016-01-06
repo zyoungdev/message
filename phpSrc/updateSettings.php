@@ -35,7 +35,7 @@ class UpdateSettings{
         $query = array("username" => $_SESSION["user"]["username"]);
         $proj = array('$set' => array("settings" => $this->settings));
 
-        if ($globalMongo["usersprivate"]->update($query, $proj))
+        if ($globalMongo["usersprivate"]->updateOne($query, $proj))
             return 1;
         else
             return 0;

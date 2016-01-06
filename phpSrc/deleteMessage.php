@@ -26,10 +26,23 @@ class DeleteMessage{
         $projection = array('$unset' => array("messages.$user.$message" => ""));
 
         $find = array("messages" => 1);
-        $id = $globalMongo["usersprivate"]->findone($query, $find)["messages"]["$user"]["$message"]["id"];
-        $globalMongo["messages"]->remove(array('id' => $id));
+        $sentFrom = $globalMongo["usersprivate"]->findone($query, $find)->messages->$user;
+        $sentFrom = classToArray($sentFrom);
 
-        if ($globalMongo["usersprivate"]->update($query, $projection))
+        foreach ($sentFrom as $m)
+        {
+            if ($m["timestamp"] == $message)
+            {
+                $id = $message;
+            }
+        }
+
+        $bulk = new MongoDB\Driver\BulkWrite;
+        $bulk->delete(array('id' => $id), array('limit' => 1));
+
+        $globalMongo["client"]->executeBulkWrite('messageApp.messages', $bulk);
+
+        if ($globalMongo["usersprivate"]->updateOne($query, $projection))
         {
             return 1;
         }

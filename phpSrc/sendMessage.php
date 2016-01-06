@@ -33,6 +33,7 @@ class SendMessage{
         if ($this->recipient = $globalMongo["userspublic"]->findone(
                 array("username" => $this->clean["un"])))
         {
+            $this->recipient = classToArray($this->recipient);
             $this->message["recipient"]["username"] = $this->recipient["username"];
             return 1;
         } 
@@ -65,14 +66,13 @@ class SendMessage{
     {
         global $globalMongo;
         $user = $this->message["recipient"]["username"];
-        $this->d = array("displayName" => $globalMongo["usersprivate"]->findone(array("username" => $user))["settings"]["displayName"]);
-
-        // logThis($this->d);
+        $this->d = array("displayName" => $globalMongo["usersprivate"]->findone(array("username" => $user))->settings->displayName);
+        $this->d = classToArray($this->d);
 
         $query = array('username' => $_SESSION["user"]["username"]);
         $update = array('$set' => array("contacts.$user" => $this->d));
 
-        $globalMongo["usersprivate"]->update($query, $update);
+        $globalMongo["usersprivate"]->updateOne($query, $update);
     }
     private function checkRecipientAllowance()
     {
@@ -82,6 +82,7 @@ class SendMessage{
         $p = array('_id' => 0, 'messages' => 1);
 
         $ret = $globalMongo["usersprivate"]->findone($q, $p);
+        $ret = classToArray($ret);
         $this->sum = 0;
         if (isset($ret["messages"]))
         {
@@ -117,13 +118,14 @@ class SendMessage{
         $id = bin2hex(\Sodium\randombytes_buf(16));
         $mQuery = array("ciphertext" => $this->message["ciphertext"], 
             "id" => $id);
-        $globalMongo["messages"]->save($mQuery);
+        logThis($globalMongo["messages"]);
+        $globalMongo["messages"]->insertOne($mQuery);
 
         $map["id"] = $id;
 
         $query = array('username' => $this->clean["un"]);
         $update = array('$set' => array("messages.$sender.$time" => $map));
-        if ($globalMongo["usersprivate"]->update($query, $update))
+        if ($globalMongo["usersprivate"]->updateOne($query, $update))
         {
             $this->cleanup();
             return 1;

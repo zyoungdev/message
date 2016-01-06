@@ -58,6 +58,8 @@ class Login{
         {
             if ($user = $globalMongo["usersprivate"]->findone(array("username" => $this->clean["un"])))
             {
+                $user = classToArray($user);
+
                 $_SESSION["user"]["username"] = $user["username"];
                 $_SESSION["user"]["key"]["hashedPW"] = $user["key"]["hashedPW"];
                 return 1;
@@ -79,7 +81,7 @@ class Login{
             $projection = array("messages" => 0,"contacts" => 0);
             if ($user = $globalMongo["usersprivate"]->findone($query, $projection))
             {
-                $_SESSION["user"] = $user;
+                $_SESSION["user"] = classToArray($user);
                 // $_SESSION["user"]["key"]["public"] = $_SESSION["user"]["key"]["public"];
                 return 1;
             }
@@ -110,6 +112,7 @@ class Login{
     }
     private function getSalt()
     {
+        logThis($_SESSION);
         $_SESSION["user"]["key"]["salt"] = $_SESSION["user"]["key"]["salt"];
         $_SESSION["user"]["key"]["nonce"] = $_SESSION["user"]["key"]["nonce"];
     }
@@ -176,7 +179,7 @@ class Login{
         $query = array("username" => $_SESSION["user"]["username"]);
         $update = array('$set' => array("lastLogin" => $date->getTimestamp()));
 
-        $globalMongo["userspublic"]->update($query, $update);
+        $globalMongo["userspublic"]->updateOne($query, $update);
     }
     private function createNewUser()
     {
@@ -209,9 +212,9 @@ class Login{
         $_SESSION["user"]["settings"] = array('mPerPage' => 10, 'displayName' => "Anonymous");
         
 
-        if ($globalMongo["usersprivate"]->save($newuserprivate))
+        if ($globalMongo["usersprivate"]->insertOne($newuserprivate))
         {
-            if (!$globalMongo["userspublic"]->save($newuser))
+            if (!$globalMongo["userspublic"]->insertOne($newuser))
                 return 0;
             else
                 return 1;
@@ -238,11 +241,11 @@ class Login{
         $pripro = array('$set' => $privateuser);
         $pubpro = array('$set' => $publicuser);
 
-        if ($res = $globalMongo["usersprivate"]->update($query, $pripro))
+        if ($res = $globalMongo["usersprivate"]->updateOne($query, $pripro))
         {
-            if ($globalMongo["userspublic"]->update($query, $pubpro))
+            if ($globalMongo["userspublic"]->updateOne($query, $pubpro))
             {
-                $globalMongo["usersprivate"]->update($query, array('$set' => array("messages" => new stdClass())));
+                $globalMongo["usersprivate"]->updateOne($query, array('$set' => array("messages" => new stdClass())));
                 return 1;
             }
         }

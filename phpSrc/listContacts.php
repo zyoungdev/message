@@ -17,6 +17,7 @@ class ListContacts{
 
         if ($this->contacts = $globalMongo["usersprivate"]->findone($query, $projection))
         {
+            $this->contacts = classToArray($this->contacts);
             return 1;
         }
         else

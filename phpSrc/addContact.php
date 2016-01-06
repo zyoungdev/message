@@ -27,11 +27,13 @@ class AddContact{
         if ($this->recipient = $globalMongo["userspublic"]->findone(
                 array("username" => $_POST["contact"])))
         {
+            $this->recipient = classToArray($this->recipient);
+
             $this->contact["username"] = $this->recipient["username"];
             $this->contact["public"] = $this->recipient["key"]["public"];
 
-            $this->contact["displayName"] = $globalMongo["usersprivate"]->findone(
-                array("username" => $_POST["contact"]))["settings"]["displayName"];
+            $this->contact["displayName"] = classToArray($globalMongo["usersprivate"]->findone(
+                array("username" => $_POST["contact"]))->settings->displayName);
             return 1;
         } 
         else
@@ -50,7 +52,7 @@ class AddContact{
         $query = array('username' => $_SESSION["user"]["username"]);
         $update = array('$set' => array("contacts.$user" => $details));
 
-        if ($globalMongo["usersprivate"]->update($query, $update))
+        if ($globalMongo["usersprivate"]->updateOne($query, $update))
             return 1;
         else
             return 0;

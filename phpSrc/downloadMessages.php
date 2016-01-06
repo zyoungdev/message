@@ -17,8 +17,9 @@ class DownloadMessages{
             'messages' => 1,
         );
 
-        if ($this->messages = $globalMongo["usersprivate"]->findone($query, $projection)["messages"])
+        if ($this->messages = $globalMongo["usersprivate"]->findone($query, $projection)->messages)
         {
+            $this->messages = classToArray($this->messages);
             return 1;
         }
         else
@@ -38,7 +39,8 @@ class DownloadMessages{
             foreach ($this->messages[$usr] as $time => $timeval) {
                 $mes = $this->messages[$usr][$time];
 
-                $cipher = $globalMongo["messages"]->findone(array('id' => $mes["id"]))["ciphertext"];
+                $cipher = $globalMongo["messages"]->findone(array('id' => $mes["id"]))->ciphertext;
+                $cipher = classToArray($cipher);
 
                 $keypair = \Sodium\crypto_box_keypair_from_secretkey_and_publickey(
                     hex2bin($_SESSION["user"]["key"]["secret"]), 

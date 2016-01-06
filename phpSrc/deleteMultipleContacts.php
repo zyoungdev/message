@@ -23,7 +23,7 @@ class DeleteMultipleContacts{
         $query = array("username" => $_SESSION["user"]["username"]);
         $projection = array('$set' => array("contacts" => $contacts));
 
-        if ($globalMongo["usersprivate"]->update($query, $projection))
+        if ($globalMongo["usersprivate"]->updateOne($query, $projection))
             return 1;
         else
             return 0;            

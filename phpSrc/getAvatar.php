@@ -19,7 +19,8 @@ class GetAvatar{
     {
         global $globalMongo;
         $query = array("username" => $_POST["user"]);
-        $res = $globalMongo["userspublic"]->findone($query)["avatar"];
+        $res = $globalMongo["userspublic"]->findone($query)->avatar;
+        $res = classToArray($res);
 
         echo $res;
     }

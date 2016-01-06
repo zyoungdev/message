@@ -20,11 +20,13 @@ class ViewMessage{
 
         if ($result = $globalMongo["usersprivate"]->findone($query, $projection))
         {
+            $result = classToArray($result);
             $this->message = $result["messages"]["$username"]["$timestamp"];
 
             $id = $result["messages"]["$username"]["$timestamp"]["id"];
             $mQuery = array('id' => $id);
-            $this->message["ciphertext"] = $globalMongo["messages"]->findone($mQuery)["ciphertext"];
+            $this->message["ciphertext"] = $globalMongo["messages"]->findone($mQuery)->ciphertext;
+            $this->message["ciphertext"] = classToArray($this->message["ciphertext"]);
         }
         else
         {
