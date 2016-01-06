@@ -19,14 +19,35 @@ Working example at http://messenger.zydev.space
 ## Prerequisites
 
 * Apache server running PHP
-* MongoDB
-* libsodium 1.0.6
+* MongoDB Server
+* MongoDB PHP Driver 1.1.1
+* PHP7
+* libsodium 1.0.8
 * libsodium-php 1.0.2
 * SASS to compile CSS
 
 ## Installation
+`git clone` this project to your servers public directory.
 
-Once you have all of the prerequisites, simply `git clone` this project to your servers public directory. You will need to compile `main.scss` with `sass main.scss` to get your completed CSS template. There is no user verification implemented so simply type in a username and password and a profile is created for you.
+
+If you don't have the php-mongodb package in your distro repository you can:
+```
+pecl install mongodb/mongodb
+```
+The requirement is to have the `mongodb.so` shared object in your `/usr/lib/php/modules` folder. PHP7 will automatically load this. No need to add it to your `php.ini` file.
+
+Next you can place the php-MongoDB classes with composer:
+```
+cd /path/to/this/repo
+composer install
+```
+
+You will need to manually install the libsodium-php shared object:
+```
+pecl install libsodium
+```
+
+Once you have all of the prerequisites, you will need to compile `main.scss` with `sass main.scss` to get your completed CSS template. There is no user verification implemented so simply type in a username and password and a profile is created for you.
 
 ## Caveats
 
