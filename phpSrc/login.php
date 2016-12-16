@@ -75,7 +75,7 @@ class Login{
     private function passwordIsCorrect()
     {
         global $globalMongo;
-        if ( \Sodium\crypto_pwhash_scryptsalsa208sha256_str_verify(hex2bin($_SESSION["user"]["key"]["hashedPW"]), $this->dirty["pw"]) )
+        if ( \Sodium\crypto_pwhash_str_verify(hex2bin($_SESSION["user"]["key"]["hashedPW"]), $this->dirty["pw"]) )
         {
             $query = array("username" => $_SESSION["user"]["username"]);
             $projection = array("messages" => 0,"contacts" => 0);
@@ -97,9 +97,9 @@ class Login{
     }
     private function hashPW()
     {
-        $_SESSION["user"]["key"]["hashedPW"] = \Sodium\crypto_pwhash_scryptsalsa208sha256_str(
-            $this->dirty["pw"], \Sodium\CRYPTO_PWHASH_SCRYPTSALSA208SHA256_OPSLIMIT_INTERACTIVE,
-                    \Sodium\CRYPTO_PWHASH_SCRYPTSALSA208SHA256_MEMLIMIT_INTERACTIVE);
+        $_SESSION["user"]["key"]["hashedPW"] = \Sodium\crypto_pwhash_str(
+            $this->dirty["pw"], \Sodium\CRYPTO_PWHASH_OPSLIMIT_INTERACTIVE,
+                    \Sodium\CRYPTO_PWHASH_MEMLIMIT_INTERACTIVE);
 
         $_SESSION["user"]["key"]["hashedPW"] = bin2hex($_SESSION["user"]["key"]["hashedPW"]);
     }
