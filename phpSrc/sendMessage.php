@@ -118,7 +118,6 @@ class SendMessage{
         $id = bin2hex(\Sodium\randombytes_buf(16));
         $mQuery = array("ciphertext" => $this->message["ciphertext"], 
             "id" => $id);
-        logThis($globalMongo["messages"]);
         $globalMongo["messages"]->insertOne($mQuery);
 
         $map["id"] = $id;

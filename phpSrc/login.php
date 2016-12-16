@@ -112,7 +112,6 @@ class Login{
     }
     private function getSalt()
     {
-        logThis($_SESSION);
         $_SESSION["user"]["key"]["salt"] = $_SESSION["user"]["key"]["salt"];
         $_SESSION["user"]["key"]["nonce"] = $_SESSION["user"]["key"]["nonce"];
     }
