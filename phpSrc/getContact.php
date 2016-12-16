@@ -23,7 +23,7 @@ class GetContact{
         if ($res = $globalMongo["userspublic"]->findone($query))
         {
             $this->user = $res;
-            $this->user["displayName"] = classToArray($globalMongo["usersprivate"]->findone($query)->settings->displayName);
+            $this->user->displayName = $globalMongo["usersprivate"]->findone($query)->settings->displayName;
             return 1;
         }
         else
