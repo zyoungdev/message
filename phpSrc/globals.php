@@ -72,10 +72,10 @@ function unloadSession()
 function openDB()
 {
     $db["client"] = new MongoDB\Driver\Manager("mongodb://localhost:27017");
-    $db["collection"] = new MongoDB\Collection($db["client"], "messageApp.app");
-    $db["userspublic"] = new MongoDB\Collection($db["client"], "messageApp.userspublic");
-    $db["usersprivate"] = new MongoDB\Collection($db["client"], "messageApp.usersprivate");
-    $db["messages"] = new MongoDB\Collection($db["client"], "messageApp.messages");
+    $db["collection"] = new MongoDB\Collection($db["client"], "messageApp", "app");
+    $db["userspublic"] = new MongoDB\Collection($db["client"], "messageApp", "userspublic");
+    $db["usersprivate"] = new MongoDB\Collection($db["client"], "messageApp", "usersprivate");
+    $db["messages"] = new MongoDB\Collection($db["client"], "messageApp", "messages");
 
     return $db;
 }
