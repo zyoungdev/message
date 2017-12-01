@@ -49,12 +49,12 @@ class SendMessage{
     }
     private function encryptPlaintext()
     {
-        $keypair = \Sodium\crypto_box_keypair_from_secretkey_and_publickey(
+        $keypair = sodium_crypto_box_keypair_from_secretkey_and_publickey(
             hex2bin($_SESSION["user"]["key"]["secret"]), hex2bin($this->recipient["key"]["public"]));
 
-        $this->message["nonce"] = \Sodium\randombytes_buf(\Sodium\CRYPTO_BOX_NONCEBYTES);
+        $this->message["nonce"] = random_bytes(SODIUM_CRYPTO_BOX_NONCEBYTES);
 
-        $this->message["ciphertext"] = \Sodium\crypto_box(
+        $this->message["ciphertext"] = sodium_crypto_box(
             $this->clean["plaintext"], $this->message["nonce"], $keypair);
             // $this->clean["plaintext"], $this->message["nonce"], $keypair);
 
@@ -115,7 +115,7 @@ class SendMessage{
 
         //Save the ciphertext separatesly in the messages Collection
         //Link it to the usersprivate Collection with an the _id
-        $id = bin2hex(\Sodium\randombytes_buf(16));
+        $id = bin2hex(random_bytes(16));
         $mQuery = array("ciphertext" => $this->message["ciphertext"], 
             "id" => $id);
         $globalMongo["messages"]->insertOne($mQuery);
@@ -137,24 +137,24 @@ class SendMessage{
     private function cleanup()
     {
         if(isset($this->recipient["username"]))
-            \Sodium\memzero($this->recipient["username"]);
+            sodium_memzero($this->recipient["username"]);
         if(isset($this->recipient["lastLogin"]))
             unset($this->recipient["lastLogin"]);
         if(isset($this->recipient["key"]["public"]))
-            \Sodium\memzero($this->recipient["key"]["public"]);
+            sodium_memzero($this->recipient["key"]["public"]);
 
         if(isset($this->message["recipient"]["username"]))
-            \Sodium\memzero($this->message["recipient"]["username"]);
+            sodium_memzero($this->message["recipient"]["username"]);
         if(isset($this->message["nonce"]))
-            \Sodium\memzero($this->message["nonce"]);
+            sodium_memzero($this->message["nonce"]);
         if(isset($this->message["ciphertext"]))
-            \Sodium\memzero($this->message["ciphertext"]);
+            sodium_memzero($this->message["ciphertext"]);
         if(isset($this->message["timestamp"]))
             unset($this->message["timestamp"]);
         if(isset($this->message["sender"]["username"]))
-            \Sodium\memzero($this->message["sender"]["username"]);
+            sodium_memzero($this->message["sender"]["username"]);
         if(isset($this->message["sender"]["public"]))
-            \Sodium\memzero($this->message["sender"]["public"]);
+            sodium_memzero($this->message["sender"]["public"]);
     }
     public function sendMessage()
     {

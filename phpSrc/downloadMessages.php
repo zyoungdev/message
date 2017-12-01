@@ -42,14 +42,14 @@ class DownloadMessages{
                 $cipher = $globalMongo["messages"]->findone(array('id' => $mes["id"]))->ciphertext;
                 $cipher = classToArray($cipher);
 
-                $keypair = \Sodium\crypto_box_keypair_from_secretkey_and_publickey(
+                $keypair = sodium_crypto_box_keypair_from_secretkey_and_publickey(
                     hex2bin($_SESSION["user"]["key"]["secret"]), 
                     hex2bin($mes["sender"]["public"]));
 
                 $ciphertext = hex2bin($cipher);
                 $nonce = hex2bin($mes["nonce"]);
 
-                $pt = \Sodium\crypto_box_open($ciphertext,$nonce,$keypair);
+                $pt = sodium_crypto_box_open($ciphertext,$nonce,$keypair);
 
                 $this->messages[$usr][$time]["plaintext"] = $pt;
 

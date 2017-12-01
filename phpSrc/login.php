@@ -75,7 +75,7 @@ class Login{
     private function passwordIsCorrect()
     {
         global $globalMongo;
-        if ( \Sodium\crypto_pwhash_str_verify(hex2bin($_SESSION["user"]["key"]["hashedPW"]), $this->dirty["pw"]) )
+        if ( sodium_crypto_pwhash_str_verify(hex2bin($_SESSION["user"]["key"]["hashedPW"]), $this->dirty["pw"]) )
         {
             $query = array("username" => $_SESSION["user"]["username"]);
             $projection = array("messages" => 0,"contacts" => 0);
@@ -97,17 +97,17 @@ class Login{
     }
     private function hashPW()
     {
-        $_SESSION["user"]["key"]["hashedPW"] = \Sodium\crypto_pwhash_str(
-            $this->dirty["pw"], \Sodium\CRYPTO_PWHASH_OPSLIMIT_INTERACTIVE,
-                    \Sodium\CRYPTO_PWHASH_MEMLIMIT_INTERACTIVE);
+        $_SESSION["user"]["key"]["hashedPW"] = sodium_crypto_pwhash_str(
+            $this->dirty["pw"], SODIUM_CRYPTO_PWHASH_OPSLIMIT_INTERACTIVE,
+                    SODIUM_CRYPTO_PWHASH_MEMLIMIT_INTERACTIVE);
 
         $_SESSION["user"]["key"]["hashedPW"] = bin2hex($_SESSION["user"]["key"]["hashedPW"]);
     }
     private function createSaltNonce()
     {
-        $_SESSION["user"]["key"]["salt"] = \Sodium\randombytes_buf(\Sodium\CRYPTO_PWHASH_SCRYPTSALSA208SHA256_SALTBYTES);
+        $_SESSION["user"]["key"]["salt"] = random_bytes(SODIUM_CRYPTO_PWHASH_SCRYPTSALSA208SHA256_SALTBYTES);
         $_SESSION["user"]["key"]["salt"] = bin2hex($_SESSION["user"]["key"]["salt"]);
-        $_SESSION["user"]["key"]["nonce"] = \Sodium\randombytes_buf(\Sodium\CRYPTO_SECRETBOX_NONCEBYTES);
+        $_SESSION["user"]["key"]["nonce"] = random_bytes(SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
         $_SESSION["user"]["key"]["nonce"] = bin2hex($_SESSION["user"]["key"]["nonce"]);
     }
     private function getSalt()
@@ -117,28 +117,28 @@ class Login{
     }
     private function createMasterKeys()
     {
-        $keypairLength = \Sodium\CRYPTO_BOX_SECRETKEYBYTES;
-        $challengeSecretLength = \Sodium\CRYPTO_SECRETBOX_KEYBYTES;
+        $keypairLength = SODIUM_CRYPTO_BOX_SECRETKEYBYTES;
+        $challengeSecretLength = SODIUM_CRYPTO_SECRETBOX_KEYBYTES;
 
         //Create Secret
-        $_SESSION["user"]["key"]["secret"] = \Sodium\crypto_pwhash_scryptsalsa208sha256(
+        $_SESSION["user"]["key"]["secret"] = sodium_crypto_pwhash_scryptsalsa208sha256(
             $keypairLength, $this->dirty["pw"], hex2bin($_SESSION["user"]["key"]["salt"]),
-            \Sodium\CRYPTO_PWHASH_SCRYPTSALSA208SHA256_OPSLIMIT_INTERACTIVE,
-            \Sodium\CRYPTO_PWHASH_SCRYPTSALSA208SHA256_MEMLIMIT_INTERACTIVE);
+            SODIUM_CRYPTO_PWHASH_SCRYPTSALSA208SHA256_OPSLIMIT_INTERACTIVE,
+            SODIUM_CRYPTO_PWHASH_SCRYPTSALSA208SHA256_MEMLIMIT_INTERACTIVE);
 
         $_SESSION["user"]["key"]["secret"] = bin2hex($_SESSION["user"]["key"]["secret"]);
 
         //Create Challenge Secret
-        $_SESSION["user"]["key"]["challengeKey"] = \Sodium\crypto_pwhash_scryptsalsa208sha256(
+        $_SESSION["user"]["key"]["challengeKey"] = sodium_crypto_pwhash_scryptsalsa208sha256(
             $challengeSecretLength, $this->dirty["pw"], hex2bin($_SESSION["user"]["key"]["salt"]),
-            \Sodium\CRYPTO_PWHASH_SCRYPTSALSA208SHA256_OPSLIMIT_INTERACTIVE,
-            \Sodium\CRYPTO_PWHASH_SCRYPTSALSA208SHA256_MEMLIMIT_INTERACTIVE);
+            SODIUM_CRYPTO_PWHASH_SCRYPTSALSA208SHA256_OPSLIMIT_INTERACTIVE,
+            SODIUM_CRYPTO_PWHASH_SCRYPTSALSA208SHA256_MEMLIMIT_INTERACTIVE);
 
         $_SESSION["user"]["key"]["challengeKey"] = bin2hex($_SESSION["user"]["key"]["challengeKey"]);
     }
     private function createSigningKeys()
     {
-        $_SESSION["user"]["key"]["public"] = \Sodium\crypto_box_publickey_from_secretkey(hex2bin($_SESSION["user"]["key"]["secret"]));
+        $_SESSION["user"]["key"]["public"] = sodium_crypto_box_publickey_from_secretkey(hex2bin($_SESSION["user"]["key"]["secret"]));
         $_SESSION["user"]["key"]["public"] = bin2hex($_SESSION["user"]["key"]["public"]);
     }
     private function encryptChallenge()
@@ -152,7 +152,7 @@ class Login{
             The adversary can't derive the secret, only the [user][key][challengeKey]
             This is also easier to quickly check that we are the same user without using a password
         */
-        $_SESSION["user"]["key"]["challenge"] = \Sodium\crypto_secretbox($challenge, 
+        $_SESSION["user"]["key"]["challenge"] = sodium_crypto_secretbox($challenge, 
            hex2bin( $_SESSION["user"]["key"]["nonce"]), hex2bin($_SESSION["user"]["key"]["challengeKey"]));
         $_SESSION["user"]["key"]["challenge"] = bin2hex($_SESSION["user"]["key"]["challenge"]);
     }
@@ -163,7 +163,7 @@ class Login{
             return 0;
         else
             return 1;
-        // $plaintext = \Sodium\crypto_secretbox_open(hex2bin($_SESSION["user"]["key"]["challenge"]),
+        // $plaintext = sodium_crypto_secretbox_open(hex2bin($_SESSION["user"]["key"]["challenge"]),
         //    hex2bin($_SESSION["user"]["key"]["nonce"]), hex2bin($_SESSION["user"]["key"]["challengeKey"]));
 
         // if ($plaintext == $this->challenge) return true;
@@ -257,19 +257,19 @@ class Login{
     {
         if(isset($_SESSION["user"]["key"]["hashedPW"]))
             // echo "hashedPW";
-            \Sodium\memzero($_SESSION["user"]["key"]["hashedPW"]);
+            sodium_memzero($_SESSION["user"]["key"]["hashedPW"]);
         if(isset($_SESSION["user"]["key"]["salt"]))
             // echo "salt";
-            \Sodium\memzero($_SESSION["user"]["key"]["salt"]);
+            sodium_memzero($_SESSION["user"]["key"]["salt"]);
         if(isset($_SESSION["user"]["key"]["challenge"]))
             // echo "salt";
-            \Sodium\memzero($_SESSION["user"]["key"]["challenge"]);
+            sodium_memzero($_SESSION["user"]["key"]["challenge"]);
         if(isset($_SESSION["user"]["key"]["nonce"]))
             // echo "nonce";
-            \Sodium\memzero($_SESSION["user"]["key"]["nonce"]);
+            sodium_memzero($_SESSION["user"]["key"]["nonce"]);
         if(isset($_SESSION["user"]["key"]["keypair"]))
             // echo "keypair";
-            \Sodium\memzero($_SESSION["user"]["key"]["keypair"]);
+            sodium_memzero($_SESSION["user"]["key"]["keypair"]);
 
         session_regenerate_id();
     }
