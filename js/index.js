@@ -1,6 +1,5 @@
 var APP = (function()
 {
-    
     var
     appState = "login",
     hf = (function()
@@ -450,13 +449,26 @@ var APP = (function()
             fls = [];
             fileList = [];
             imgList = [];
-        }
+        },
         sendPlaintext = function(rec, pt, el)
         {
             if (imgs.length > 0)
             {
+                // Convert each File to Object
+                var imgList_obj = [];
+                for ( var i = 0 ; i < imgList.length ; i++ )
+                {
+                    var img_obj = {
+                        'lastModified' : imgList[i].lastModified,
+                        'name' : imgList[i].name,
+                        'size' : imgList[i].size,
+                        'type' : imgList[i].type,
+                    }
+                    imgList_obj.push( img_obj );
+                }
+
                 pt += "<div class=image-file-list>";
-                pt += JSON.stringify(imgList);
+                pt += JSON.stringify( imgList_obj );
                 pt += "</div>";
 
                 pt += "<div class=view-message-images-container>";
@@ -810,13 +822,17 @@ var APP = (function()
             var
             anchor = hf.cEL("a", {target: "_blank"}),
             style = window.getComputedStyle(img.children[0]).backgroundImage,
-            uri = style.slice(4, style.length-1);
+            uri = style.slice(4, style.length-1),
             container = hf.elCN("view-message-images-container")[0],
             index = Array.prototype.indexOf.call(container.children, img);
 
             anchor.download = imgFileList[index].name;
-            anchor.href = uri;
+            anchor.href = uri.slice( 1, uri.length - 1 ); // Add data without quotes
+
+            // Force click the anchor to download the image
+            document.body.appendChild( anchor );
             anchor.click();
+            document.body.removeChild( anchor );
         },
         fileClick = function(file)
         {
