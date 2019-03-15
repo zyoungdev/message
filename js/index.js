@@ -480,8 +480,21 @@ var APP = (function()
             }
             if (fls.length > 0)
             {
+                // Convert each File to Object
+                var fileList_Obj = [];
+                for ( var i = 0 ; i < fileList.length ; i++ )
+                {
+                    var fileObj = {
+                        'lastModified' : fileList[i].lastModified,
+                        'name' : fileList[i].name,
+                        'size' : fileList[i].size,
+                        'type' : fileList[i].type,
+                    }
+                    fileList_Obj.push( fileObj );
+                }
+
                 pt += "<div class=file-file-list>";
-                pt += JSON.stringify(fileList);
+                pt += JSON.stringify( fileList_Obj );
                 pt += "</div>";
 
                 pt += "<div class=view-message-files-container>";
@@ -836,13 +849,18 @@ var APP = (function()
         },
         fileClick = function(file)
         {
-            // console.log(flFileList);
             var
+            anchor = hf.cEL("a", {target: "_blank"}),
             fileContainer = hf.elCN("view-message-files-container")[0],
             index = Array.prototype.indexOf.call(fileContainer.children, file.parentNode);
 
-            file.download = flFileList[index].name;
-            file.click();
+            anchor.download = flFileList[index].name;
+            anchor.href = file.href;
+
+            // Force click the anchor to download the file
+            document.body.appendChild( anchor );
+            anchor.click();
+            document.body.removeChild( anchor );
         }
         return{
             init: function(res)
