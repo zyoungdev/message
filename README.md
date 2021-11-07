@@ -1,3 +1,7 @@
+# No Longer Maintained
+
+`php-sodium` is not an alternative for `libsodium-php`.
+
 # Encrypted CRUD Messaging
 
 This is a messaging service that uses PHP, Javascript, [MongoDB](https://github.com/mongodb/mongo), and [libsodium](https://github.com/jedisct1/libsodium). It has a CRUD workflow so it is basically a single server email application.
